@@ -7,7 +7,6 @@
  * @License: MIT
  */
 
-
 // eslint-disable-next-line no-unused-vars
 const { Instance } = require("../../service/instance");
 const { InstanceCommand } = require("./command");
@@ -21,10 +20,7 @@ class StartupError extends Error {
   }
 }
 
-
 module.exports.StartCommand = class extends InstanceCommand {
-
-
   constructor() {
     super("StartCommand");
   }
@@ -38,8 +34,7 @@ module.exports.StartCommand = class extends InstanceCommand {
     if (instanceStatus != Instance.STATUS_STOP) {
       throw new StartupError("This instance status is NOT STATUS_STOP.");
     }
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      throw new StartupError("Startup command or working directory cannot be null.");
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) throw new StartupError("Startup command or working directory cannot be null.");
 
     instance.setLock(true);
 
@@ -56,7 +51,6 @@ module.exports.StartCommand = class extends InstanceCommand {
       logger.info(`COMMAND: ${commandExeFile} ${commnadParameters.join(" ")}`);
       logger.info(`WORK_DIR: ${instance.config.cwd}`);
 
-
       // Create process.
       instance.process = childProcess.spawn(commandExeFile, commnadParameters, {
         cwd: instance.config.cwd,
@@ -68,10 +62,8 @@ module.exports.StartCommand = class extends InstanceCommand {
         throw new StartupError(`Failed to create process.`);
       }
       // Process event.
-      instance.process.stdout.on("data", (text) =>
-        instance.emit("data", iconv.decode(text, instance.config.ie)));
-      instance.process.stderr.on("data", (text) =>
-        instance.emit("data", iconv.decode(text, instance.config.oe)));
+      instance.process.stdout.on("data", (text) => instance.emit("data", iconv.decode(text, instance.config.ie)));
+      instance.process.stderr.on("data", (text) => instance.emit("data", iconv.decode(text, instance.config.oe)));
 
       // 设置启动状态
       instance.processStatus = instance.STATUS_RUN;
@@ -83,7 +75,6 @@ module.exports.StartCommand = class extends InstanceCommand {
 
       // 产生开启事件
       instance.started();
-
     } catch (err) {
       instance.stoped(-2);
       throw new StartupError(`Failed to create instance. Please check your startup parameters:\n ${err.message}`);
@@ -91,4 +82,4 @@ module.exports.StartCommand = class extends InstanceCommand {
       instance.setLock(false);
     }
   }
-}
+};

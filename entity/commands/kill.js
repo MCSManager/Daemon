@@ -4,23 +4,21 @@
  * @LastEditTime: 2021-03-24 22:24:31
  * @Description:
  * @Projcet: MCSManager Daemon
- * @License: MIT 
+ * @License: MIT
  */
-
 
 // eslint-disable-next-line no-unused-vars
 const { Instance } = require("../../service/instance");
 const { InstanceCommand } = require("./command");
 
-
-
 module.exports.KillCommand = class extends InstanceCommand {
-
   /**
    * @param {String} data
    * @return {void}
    */
-  constructor() { super("KillCommand"); }
+  constructor() {
+    super("KillCommand");
+  }
 
   /**
    * @param {Instance} instance
@@ -35,4 +33,4 @@ module.exports.KillCommand = class extends InstanceCommand {
     }
     return this;
   }
-}
+};

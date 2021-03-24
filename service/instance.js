@@ -34,7 +34,6 @@ class InstanceConfig extends DataStructure {
   }
 }
 
-
 class Instance extends EventEmitter {
   /**
    * @param {string} startCommand
@@ -53,7 +52,7 @@ class Instance extends EventEmitter {
     // Action lock
     this.lock = false;
 
-    // Config init 
+    // Config init
     this.config = new InstanceConfig(instanceName);
     this.config.load();
 
@@ -74,8 +73,7 @@ class Instance extends EventEmitter {
    * @return {void}
    */
   execCommand(command) {
-    if (this.lock)
-      throw new InstanceCommandError("This " + command.info + " operation cannot be completed because the command executes a deadlock.");
+    if (this.lock) throw new InstanceCommandError("This " + command.info + " operation cannot be completed because the command executes a deadlock.");
     command.exec(this);
   }
 

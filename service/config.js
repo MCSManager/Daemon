@@ -5,7 +5,6 @@
  * @Description: 守护进程配置类
  */
 
-
 const fs = require("fs-extra");
 const uuid = require("uuid");
 

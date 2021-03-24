@@ -26,9 +26,8 @@ class DataStructure {
   save() {
     fs.writeFileSync(this.__filename__, JSON.stringify(this, null, 4), { encoding: "utf-8" });
   }
-
 }
 
 module.exports = {
   DataStructure
-}
+};

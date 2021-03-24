@@ -12,7 +12,6 @@ const { StartCommand } = require("../entity/commands/start");
 const { SendCommand } = require("../entity/commands/cmd");
 const { KillCommand } = require("../entity/commands/kill");
 
-
 const instance = new Instance("XXX");
 instance.parameters({
   startCommand: "cmd.exe",
@@ -24,7 +23,6 @@ instance.parameters({
 
 instanceService.addInstance(instance);
 const resInstance = instanceService.getInstance("XXX");
-
 
 instance.on("data", (text) => {
   console.log("[STDOUT]:", text);
@@ -38,11 +36,10 @@ instance.on("exit", (code) => {
 
 resInstance.execCommand(new StartCommand());
 try {
-  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽1"))
-  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽2"))
-  resInstance.execCommand(new SendCommand("ping www.baidu.com"))
-  setTimeout(() => resInstance.execCommand(new KillCommand()), 3000)
-
+  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽1"));
+  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽2"));
+  resInstance.execCommand(new SendCommand("ping www.baidu.com"));
+  setTimeout(() => resInstance.execCommand(new KillCommand()), 3000);
 } catch (err) {
   console.log(err);
 }

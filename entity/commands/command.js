@@ -10,7 +10,6 @@
 // const { Instance } = require("../../service/instance");
 
 module.exports.InstanceCommand = class {
-
   /**
    * @param {String} info
    * @return {*}
@@ -24,6 +23,7 @@ module.exports.InstanceCommand = class {
    * @param {require("../../service/instance").instance} instance
    * @return {*}
    */
-  exec(instance) { return instance; }
-
-}
+  exec(instance) {
+    return instance;
+  }
+};

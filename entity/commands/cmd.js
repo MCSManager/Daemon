@@ -7,17 +7,12 @@
  * @License: MIT
  */
 
-
-
 const iconv = require("iconv-lite");
 // eslint-disable-next-line no-unused-vars
 const { Instance } = require("../../service/instance");
 const { InstanceCommand } = require("./command");
 
-
-
 module.exports.SendCommand = class extends InstanceCommand {
-
   /**
    * @param {String} data
    * @return {void}
@@ -40,4 +35,4 @@ module.exports.SendCommand = class extends InstanceCommand {
     instance.process.stdin.write("\n");
     return this;
   }
-}
+};
