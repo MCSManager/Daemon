@@ -1,8 +1,0 @@
-{
-    "__filename__": "XXX.json",
-    "startCommand": "cmd.exe",
-    "stopCommand": "^c",
-    "cwd": ".",
-    "ie": "GBK",
-    "oe": "GBK"
-}
