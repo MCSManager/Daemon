@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-24 23:12:03
+ * @LastEditTime: 2021-03-24 23:21:40
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -24,12 +24,9 @@ class StartupError extends Error {
 
 module.exports.StartCommand = class extends InstanceCommand {
 
-  /**
-   * @param {String} info
-   * @return {void}
-   */
-  constructor(info) {
-    super(info);
+
+  constructor() {
+    super("StartCommand");
   }
 
   /**
@@ -37,7 +34,6 @@ module.exports.StartCommand = class extends InstanceCommand {
    * @return {void}
    */
   exec(instance) {
-    instance.setLock(true);
     const instanceStatus = instance.status();
     if (instanceStatus != Instance.STATUS_STOP) {
       throw new StartupError("This instance status is NOT STATUS_STOP.");
@@ -45,19 +41,22 @@ module.exports.StartCommand = class extends InstanceCommand {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
       throw new StartupError("Startup command or working directory cannot be null.");
 
-    // 设置启动状态
-    instance.processStatus = instance.STATUS_STARTING;
-    // 启动次数增加
-    instance.startCount++;
-    // 命令解析
-    const commandList = instance.config.startCommand.split(" ");
-    const commandExeFile = commandList[0];
-    const commnadParameters = commandList.slice(1);
-
-    logger.info(`COMMAND: ${commandExeFile} ${commnadParameters.join(" ")}`);
-    logger.info(`WORK_DIR: ${instance.config.cwd}`);
+    instance.setLock(true);
 
     try {
+      // 设置启动状态
+      instance.processStatus = instance.STATUS_STARTING;
+      // 启动次数增加
+      instance.startCount++;
+      // 命令解析
+      const commandList = instance.config.startCommand.split(" ");
+      const commandExeFile = commandList[0];
+      const commnadParameters = commandList.slice(1);
+
+      logger.info(`COMMAND: ${commandExeFile} ${commnadParameters.join(" ")}`);
+      logger.info(`WORK_DIR: ${instance.config.cwd}`);
+
+
       // Create process.
       instance.process = childProcess.spawn(commandExeFile, commnadParameters, {
         cwd: instance.config.cwd,

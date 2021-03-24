@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-24 23:10:44
+ * @LastEditTime: 2021-03-24 23:21:05
  * @Description: 实例服务测试类
  */
 
@@ -36,13 +36,13 @@ instance.on("exit", (code) => {
   // console.log("剩余的：", resInstance);
 });
 
-
 resInstance.execCommand(new StartCommand());
 try {
   resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽1"))
   resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽2"))
-  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽3"))
-  setTimeout(() => resInstance.execCommand(new KillCommand()), 1000)
+  resInstance.execCommand(new SendCommand("ping www.baidu.com"))
+  setTimeout(() => resInstance.execCommand(new KillCommand()), 3000)
+
 } catch (err) {
   console.log(err);
 }
