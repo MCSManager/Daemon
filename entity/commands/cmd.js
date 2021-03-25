@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-24 23:12:25
+ * @LastEditTime: 2021-03-25 09:19:57
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -19,7 +19,6 @@ module.exports.SendCommand = class extends InstanceCommand {
    */
   constructor(cmd) {
     super("SendCommand");
-    this.lock = false;
     this.cmd = cmd;
   }
 

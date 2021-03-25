@@ -7,7 +7,7 @@
 
 // const childProcess = require("child_process");
 const { EventEmitter } = require("events");
-// const iconv = require("iconv-lite");
+const iconv = require("iconv-lite");
 // const { logger } = require("../service/log");
 // eslint-disable-next-line no-unused-vars
 const { InstanceCommand } = require("../entity/commands/command");
@@ -69,6 +69,7 @@ class Instance extends EventEmitter {
   }
 
   /**
+   * 对本实例执行对应的命令
    * @param {InstanceCommand} command
    * @return {void}
    */
@@ -77,24 +78,37 @@ class Instance extends EventEmitter {
     command.exec(this);
   }
 
-  // 使用自定义命令来进行关闭操作
-  stop() {
-    const stopCommand = this.stopCommand;
-    if (stopCommand.toLocaleLowerCase() == "^c") {
-      this.process.kill("SIGINT");
-    } else {
-      this.sendCommand(stopCommand);
-    }
+  /**
+   * 对本实例执行对应的命令 别名
+   * @param {InstanceCommand} command
+   * @return {void}
+   */
+  exec(command) {
+    this.execCommand(command);
   }
 
   status() {
     return this.processStatus;
   }
 
-  started() {
+  /**
+   * 实例已启动后必须执行的函数
+   * @param {NodeJS.Process} process
+   */
+  started(process) {
+    // Process event.
+    process.stdout.on("data", (text) => this.emit("data", iconv.decode(text, this.config.ie)));
+    process.stderr.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
+    process.on("exit", (code) => this.stoped(code));
+    this.process = process;
+    this.processStatus = Instance.STATUS_RUN;
     this.emit("open", this);
   }
 
+  /**
+   * 实例已关闭后必须执行的函数
+   * @param {Number} code
+   */
   stoped(code = 0) {
     this.releaseResources();
     this.processStatus = this.STATUS_STOP;

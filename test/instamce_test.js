@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-24 23:21:05
+ * @LastEditTime: 2021-03-25 13:43:35
  * @Description: 实例服务测试类
  */
 
@@ -10,7 +10,8 @@ const { instanceService } = require("../service/instance_service");
 
 const { StartCommand } = require("../entity/commands/start");
 const { SendCommand } = require("../entity/commands/cmd");
-const { KillCommand } = require("../entity/commands/kill");
+// const { KillCommand } = require("../entity/commands/kill");
+const { StopCommand } = require("../entity/commands/stop");
 
 const instance = new Instance("XXX");
 instance.parameters({
@@ -37,9 +38,12 @@ instance.on("exit", (code) => {
 resInstance.execCommand(new StartCommand());
 try {
   resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽1"));
-  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽2"));
+
   resInstance.execCommand(new SendCommand("ping www.baidu.com"));
-  setTimeout(() => resInstance.execCommand(new KillCommand()), 3000);
+  resInstance.execCommand(new SendCommand("echo 你好，这里是中文测试 ABCDEFG 嗨喽2"));
+  // setTimeout(() => resInstance.execCommand(new KillCommand()), 3000);
+  setTimeout(() => resInstance.execCommand(new StopCommand()), 3000);
+  resInstance.execCommand(new StartCommand());
 } catch (err) {
   console.log(err);
 }
