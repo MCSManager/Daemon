@@ -49,13 +49,8 @@ class Instance extends EventEmitter {
   constructor(instanceName) {
     super();
 
-    this.STATUS_STOP = Instance.STATUS_STOP;
-    this.STATUS_STARTING = Instance.STATUS_STARTING;
-    this.STATUS_RUN = Instance.STATUS_RUNNING;
-    this.STATUS_BUSY = Instance.STATUS_BUSY;
-
     //Basic information
-    this.processStatus = this.STATUS_STOP;
+    this.instanceStatus = Instance.STATUS_STOP;
     this.instanceName = instanceName;
 
     // Action lock
@@ -99,8 +94,9 @@ class Instance extends EventEmitter {
     this.execCommand(command);
   }
 
-  status() {
-    return this.processStatus;
+  status(v) {
+    if (v) this.instanceStatus = v;
+    return this.instanceStatus;
   }
 
   /**
@@ -114,7 +110,7 @@ class Instance extends EventEmitter {
     process.stderr.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
     process.on("exit", (code) => this.stoped(code));
     this.process = process;
-    this.processStatus = Instance.STATUS_RUNNING;
+    this.instanceStatus = Instance.STATUS_RUNNING;
     this.emit("open", this);
     this.config.save();
   }
@@ -125,8 +121,9 @@ class Instance extends EventEmitter {
    */
   stoped(code = 0) {
     this.releaseResources();
-    this.processStatus = this.STATUS_STOP;
+    this.instanceStatus = Instance.STATUS_STOP;
     this.emit("exit", code);
+    if (this.config) this.config.save();
   }
 
   releaseResources() {
@@ -149,6 +146,7 @@ class Instance extends EventEmitter {
       this.stoped(-999);
     } finally {
       this.config.del();
+      this.config = null;
     }
   }
 
@@ -160,10 +158,11 @@ class Instance extends EventEmitter {
 }
 
 // 实例类静态变量
+Instance.STATUS_BUSY = -1;
 Instance.STATUS_STOP = 0;
-Instance.STATUS_STARTING = 1;
-Instance.STATUS_RUNNINGNING = 2;
-Instance.STATUS_BUSY = 3;
+Instance.STATUS_STOPPING = 1;
+Instance.STATUS_STARTING = 2;
+Instance.STATUS_RUNNINGNING = 3;
 
 module.exports = {
   Instance

@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-26 17:30:52
+ * @LastEditTime: 2021-03-26 17:42:52
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -46,7 +46,7 @@ module.exports.StartCommand = class extends InstanceCommand {
 
     try {
       // 设置启动状态
-      instance.processStatus = instance.STATUS_STARTING;
+      instance.status(Instance.STATUS_STARTING);
       // 启动次数增加
       instance.startCount++;
       // 命令解析
