@@ -23,7 +23,7 @@ routerApp.use((event, socket, data, next) => {
   // const instance = instanceService.getInstance(instanceName);
   if (event == "instance/open" || event == "instance/stop" || event == "instance/command" || event == "instance/kill") {
     if (!instanceService.exists(instanceName)) {
-      protocol.sendError(socket, event, {
+      protocol.error(socket, event, {
         instanceName: instanceName,
         err: `应用实例 ${instanceName} 不存在或未运行，无法继续操作`
       });
@@ -32,7 +32,7 @@ routerApp.use((event, socket, data, next) => {
   }
   if (event == "instance/open") {
     if (instanceService.getInstance(instanceName).status() != Instance.STATUS_STOP) {
-      protocol.sendError(socket, event, {
+      protocol.error(socket, event, {
         instanceName: instanceName,
         err: `应用实例 ${instanceName} 已经在运行`
       });
@@ -55,7 +55,7 @@ routerApp.on("instance/overview", (socket) => {
       status: instance.status()
     });
   }
-  protocol.send(socket, "instance/overview", overview);
+  protocol.msg(socket, "instance/overview", overview);
 });
 
 
@@ -75,9 +75,9 @@ routerApp.on("instance/new", (socket, data) => {
       oe: "GBK"
     });
     instanceService.createInstance(instance);
-    protocol.send(socket, "instance/new", { instanceName });
+    protocol.msg(socket, "instance/new", { instanceName });
   } catch (err) {
-    protocol.sendError(socket, "instance/new", {
+    protocol.error(socket, "instance/new", {
       instanceName: instanceName,
       err: err.message
     });
@@ -91,10 +91,10 @@ routerApp.on("instance/open", (socket, data) => {
   const instance = instanceService.getInstance(instanceName);
   try {
     instance.exec(new StartCommand());
-    protocol.send(socket, "instance/open", { instanceName });
+    protocol.msg(socket, "instance/open", { instanceName });
   } catch (err) {
     logger.warn(`应用实例${instanceName}启动时错误: ${err}`);
-    protocol.sendError(socket, "instance/open", {
+    protocol.error(socket, "instance/open", {
       instanceName: instanceName,
       err: err.message
     });
@@ -108,9 +108,9 @@ routerApp.on("instance/stop", (socket, data) => {
   const instance = instanceService.getInstance(instanceName);
   try {
     instance.exec(new StopCommand());
-    protocol.send(socket, "instance/stop", { instanceName });
+    protocol.msg(socket, "instance/stop", { instanceName });
   } catch (err) {
-    protocol.sendError(socket, "instance/stop", {
+    protocol.error(socket, "instance/stop", {
       instanceName: instanceName,
       err: err.message
     });
@@ -123,7 +123,7 @@ routerApp.on("instance/delete", (socket, data) => {
   const instanceName = data.instanceName;
   try {
     instanceService.removeInstance(instanceName);
-    protocol.send(socket, "instance/delete", { instanceName });
+    protocol.msg(socket, "instance/delete", { instanceName });
   } catch (err) {
     protocol.error(socket, "instance/delete", { instanceName: instanceName, err: err.message });
   }
@@ -137,9 +137,9 @@ routerApp.on("instance/command", (socket, data) => {
   const instance = instanceService.getInstance(instanceName);
   try {
     instance.exec(new SendCommand(command));
-    protocol.send(socket, "instance/command", { instanceName });
+    protocol.msg(socket, "instance/command", { instanceName });
   } catch (err) {
-    protocol.sendError(socket, "instance/command", {
+    protocol.error(socket, "instance/command", {
       instanceName: instanceName,
       err: err.message
     });
@@ -153,9 +153,9 @@ routerApp.on("instance/kill", (socket, data) => {
   const instance = instanceService.getInstance(instanceName);
   try {
     instance.exec(new KillCommand());
-    protocol.send(socket, "instance/kill", { instanceName });
+    protocol.msg(socket, "instance/kill", { instanceName });
   } catch (err) {
-    protocol.sendError(socket, "instance/kill", {
+    protocol.error(socket, "instance/kill", {
       instanceName: instanceName,
       err: err.message
     });

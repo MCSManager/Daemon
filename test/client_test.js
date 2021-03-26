@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:40:35
+ * @LastEditTime: 2021-03-26 16:23:07
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -33,7 +33,6 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     // client = socket;
     socket.emit("auth", "test_key");
-
   });
 
   it("新建实例", function (done) {
@@ -63,6 +62,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
         setTimeout(() => done(), 1000)
       }
       if (msg.event == "instance/stdout") {
+        // 这里后续的试输出也会用到
         console.log("[Console]:", msg.data.text);
         return;
       }
@@ -70,6 +70,29 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.emit("auth", "test_key");
     socket.emit("instance/open", {
       instanceName: "TestServer"
+    });
+  });
+
+  it("向实例发送命令", function (done) {
+    const socket = io.connect(ip, connectConfig);
+    var f = 0;
+    socket.on("protocol", (msg) => {
+      if ((msg.status === 200) && msg.event == "instance/command") {
+        // console.log(">>>: ", msg);
+        // setTimeout(() => done(), 1200);
+        f++;
+      }
+      if (msg.event == "instance/stdout" && f == 1) {
+        if (msg.data.text.indexOf("Test你好123") !== -1) {
+          socket.close()
+          done();
+        }
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/command", {
+      instanceName: "TestServer",
+      command: "echo Test你好123"
     });
   });
 
@@ -130,34 +153,67 @@ describe("基于 Socket.io 的控制器层测试", function () {
   });
 
 
-
+  it("无权限情况下一些操作", function (done) {
+    let count = 0;
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status == 500 && msg.event == "error") {
+        count++;
+        if (count >= 6) {
+          done();
+          socket.close();
+        }
+      }
+    });
+    socket.emit("auth", "test_key1");
+    socket.emit("instance/overview", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/new", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/open", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/stop", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/delete", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/command", {
+      instanceName: "TestServer",
+      command: "echo Test你好123"
+    });
+  });
 
 });
 
-// protocol.send(socket, "instance/overview", "");
-// protocol.send(socket, "instance/new", {
+// protocol.msg(socket, "instance/overview", "");
+// protocol.msg(socket, "instance/new", {
 //   instanceName: "TestServer",
 //   command: "cmd.exe",
 //   cwd: ".",
 //   stopCommand: "^c"
 // });
-// protocol.send(socket, "instance/new", {
+// protocol.msg(socket, "instance/new", {
 //   instanceName: "TestServer2",
 //   command: "cmd2.exe",
 //   cwd: ".",
 //   stopCommand: "^c"
 // });
-// protocol.send(socket, "instance/open", {
+// protocol.msg(socket, "instance/open", {
 //   instanceName: "TestServer"
 // });
 
-// protocol.send(socket, "instance/command", {
+// protocol.msg(socket, "instance/command", {
 //   instanceName: "TestServer",
 //   command: "ping www.baidu.com"
 // });
 
 // setTimeout(() => {
-//   protocol.send(socket, "instance/stop", {
+//   protocol.msg(socket, "instance/stop", {
 //     instanceName: "TestServer"
 //   });
 // }, 3000);

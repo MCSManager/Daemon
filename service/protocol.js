@@ -1,8 +1,10 @@
 /*
- * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
- * @License: MIT
+ * @Date: 2020-11-23 17:45:02
+ * @LastEditTime: 2021-03-26 15:47:49
  * @Description: 定义网络协议与常用发送/广播/解析功能，客户端也应当拥有此文件
+ * @Projcet: MCSManager Daemon
+ * @License: MIT
  */
 
 // eslint-disable-next-line no-unused-vars
@@ -35,7 +37,7 @@ module.exports.Packet = Packet;
  * @param {object} data
  * @return {void}
  */
-module.exports.send = (socket, event, data) => {
+module.exports.msg = (socket, event, data) => {
   const packet = new Packet(STATUS_OK, event, data);
   socket.emit("protocol", packet);
 };
@@ -45,18 +47,11 @@ module.exports.send = (socket, event, data) => {
  * @param {string} event
  * @param {object} err
  */
-module.exports.sendError = (socket, event, err) => {
+module.exports.error = (socket, event, err) => {
   const packet = new Packet(STATUS_ERR, event, err);
   socket.emit("protocol", packet);
 };
 
-module.exports.error = (...args) => {
-  module.exports.sendError(...args);
-}
-
-module.exports.msg = (...args) => {
-  module.exports.send(...args);
-}
 
 /**
  * @param {object} text
@@ -100,6 +95,6 @@ module.exports.socketObjects = () => {
 // 全局 Socket 广播
 module.exports.broadcast = (event, obj) => {
   for (const id in globalSocket) {
-    module.exports.send(globalSocket[id], event, obj);
+    module.exports.msg(globalSocket[id], event, obj);
   }
 };
