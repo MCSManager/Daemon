@@ -1,9 +1,12 @@
 /*
- * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
- * @License: MIT
+ * @Date: 2020-11-23 17:45:02
+ * @LastEditTime: 2021-03-26 10:54:04
  * @Description:
+ * @Projcet: MCSManager Daemon
+ * @License: MIT
  */
+
 const log4js = require("log4js");
 const LOG_FILE_PATH = "logs/current.log";
 
