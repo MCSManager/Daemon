@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 16:23:07
+ * @LastEditTime: 2021-03-26 16:24:07
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -189,31 +189,3 @@ describe("基于 Socket.io 的控制器层测试", function () {
   });
 
 });
-
-// protocol.msg(socket, "instance/overview", "");
-// protocol.msg(socket, "instance/new", {
-//   instanceName: "TestServer",
-//   command: "cmd.exe",
-//   cwd: ".",
-//   stopCommand: "^c"
-// });
-// protocol.msg(socket, "instance/new", {
-//   instanceName: "TestServer2",
-//   command: "cmd2.exe",
-//   cwd: ".",
-//   stopCommand: "^c"
-// });
-// protocol.msg(socket, "instance/open", {
-//   instanceName: "TestServer"
-// });
-
-// protocol.msg(socket, "instance/command", {
-//   instanceName: "TestServer",
-//   command: "ping www.baidu.com"
-// });
-
-// setTimeout(() => {
-//   protocol.msg(socket, "instance/stop", {
-//     instanceName: "TestServer"
-//   });
-// }, 3000);
