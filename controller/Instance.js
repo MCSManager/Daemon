@@ -10,6 +10,11 @@ const protocol = require("../service/protocol");
 const { instanceService } = require("../service/instance_service");
 const { Instance } = require("../entity/instance");
 const { logger } = require("../service/log");
+
+const { StartCommand } = require("../entity/commands/start");
+const { StopCommand } = require("../entity/commands/stop");
+const { SendCommand } = require("../entity/commands/cmd");
+const { KillCommand } = require("../entity/commands/kill");
 // const io = require('socket.io')();
 
 // 部分实例操作路由器验证中间件
@@ -60,9 +65,13 @@ routerApp.on("instance/new", (socket, data) => {
   const stopCommand = data.stopCommand || "^C";
   try {
     const instance = new Instance(instanceName);
-    instance.setStartCommand(command);
-    instance.setCwd(cwd);
-    instance.setStopCommand(stopCommand);
+    instance.parameters({
+      startCommand: command,
+      stopCommand: stopCommand,
+      cwd: cwd,
+      ie: "GBK",
+      oe: "GBK"
+    });
     instanceService.createInstance(instance);
     protocol.send(socket, "instance/new", { instanceName });
   } catch (err) {
@@ -78,7 +87,7 @@ routerApp.on("instance/open", (socket, data) => {
   const instanceName = data.instanceName;
   const instance = instanceService.getInstance(instanceName);
   try {
-    instance.start();
+    instance.exec(new StartCommand());
     protocol.send(socket, "instance/open", { instanceName });
   } catch (err) {
     logger.warn(`应用实例${instanceName}启动时错误: ${err}`);
@@ -92,8 +101,9 @@ routerApp.on("instance/open", (socket, data) => {
 // 关闭实例
 routerApp.on("instance/stop", (socket, data) => {
   const instanceName = data.instanceName;
+  const instance = instanceService.getInstance(instanceName);
   try {
-    instanceService.getInstance(instanceName).stop();
+    instance.exec(new StopCommand());
     protocol.send(socket, "instance/stop", { instanceName });
   } catch (err) {
     protocol.sendError(socket, "instance/stop", {
@@ -106,9 +116,10 @@ routerApp.on("instance/stop", (socket, data) => {
 // 向应用实例发送命令
 routerApp.on("instance/command", (socket, data) => {
   const instanceName = data.instanceName;
-  const command = data.command;
+  const command = data.command || "";
+  const instance = instanceService.getInstance(instanceName);
   try {
-    instanceService.getInstance(instanceName).sendCommand(command);
+    instance.exec(new SendCommand(command));
     protocol.send(socket, "instance/command", { instanceName });
   } catch (err) {
     protocol.sendError(socket, "instance/command", {
@@ -121,8 +132,9 @@ routerApp.on("instance/command", (socket, data) => {
 // 杀死应用实例方法
 routerApp.on("instance/kill", (socket, data) => {
   const instanceName = data.instanceName;
+  const instance = instanceService.getInstance(instanceName);
   try {
-    instanceService.getInstance(instanceName).kill();
+    instance.exec(new KillCommand());
     protocol.send(socket, "instance/kill", { instanceName });
   } catch (err) {
     protocol.sendError(socket, "instance/kill", {

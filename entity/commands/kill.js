@@ -1,14 +1,14 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-24 22:24:31
+ * @LastEditTime: 2021-03-26 11:30:11
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
 
 // eslint-disable-next-line no-unused-vars
-const { Instance } = require("../../service/instance");
+const { Instance } = require("../instance");
 const { InstanceCommand } = require("./command");
 
 module.exports.KillCommand = class extends InstanceCommand {
