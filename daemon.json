@@ -1,6 +1,0 @@
-{
-    "__filename__": "daemon.json",
-    "version": 1,
-    "port": 24444,
-    "key": "test_key"
-}
