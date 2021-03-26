@@ -20,23 +20,15 @@ const { KillCommand } = require("../entity/commands/kill");
 // 部分实例操作路由器验证中间件
 routerApp.use((event, socket, data, next) => {
   const instanceName = data.instanceName;
-  // const instance = instanceService.getInstance(instanceName);
-  if (event == "instance/open" || event == "instance/stop" || event == "instance/command" || event == "instance/kill") {
+  if (event == "instance/new") return next();
+  if (event == "instance/overview") return next();
+  // 类 AOP
+  if (event.startsWith("instance")) {
     if (!instanceService.exists(instanceName)) {
-      protocol.error(socket, event, {
+      return protocol.error(socket, event, {
         instanceName: instanceName,
-        err: `应用实例 ${instanceName} 不存在或未运行，无法继续操作`
+        err: `应用实例 ${instanceName} 不存在，无法继续操作.`
       });
-      return;
-    }
-  }
-  if (event == "instance/open") {
-    if (instanceService.getInstance(instanceName).status() != Instance.STATUS_STOP) {
-      protocol.error(socket, event, {
-        instanceName: instanceName,
-        err: `应用实例 ${instanceName} 已经在运行`
-      });
-      return;
     }
   }
   next();

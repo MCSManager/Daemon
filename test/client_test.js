@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 17:14:36
+ * @LastEditTime: 2021-03-26 18:01:36
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -139,7 +139,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("删除实例并验证", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      // console.log(">>>: ", msg);
+      console.log(">>>: ", msg);
       if (msg.status !== 200 && msg.event == "instance/delete")
         done(new Error("删除代码不等于 200"));
       if (msg.status === 200 && msg.event == "instance/overview") {
@@ -190,6 +190,36 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("instance/command", {
       instanceName: "TestServer",
+      command: "echo Test你好123"
+    });
+  });
+
+
+  it("操作一些不存在的服务器", function (done) {
+    let count = 0;
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status == 500) {
+        count++;
+        if (count >= 4) {
+          done();
+          socket.close();
+        }
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/open", {
+      instanceName: "splofjasoih"
+    });
+    socket.emit("instance/stop", {
+      instanceName: "splofjasoih"
+    });
+    socket.emit("instance/delete", {
+      instanceName: "splofjasoih"
+    });
+    socket.emit("instance/command", {
+      instanceName: "splofjasoih",
       command: "echo Test你好123"
     });
   });
