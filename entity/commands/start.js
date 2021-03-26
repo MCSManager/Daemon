@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-26 16:59:19
+ * @LastEditTime: 2021-03-26 17:30:52
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -21,8 +21,13 @@ class StartupError extends Error {
 }
 
 module.exports.StartCommand = class extends InstanceCommand {
-  constructor() {
+  /**
+   * @param {String} Source
+   * @return {*}
+   */
+  constructor(Source = "Unknown") {
     super("StartCommand");
+    this.Source = Source;
   }
 
   /**
@@ -49,9 +54,12 @@ module.exports.StartCommand = class extends InstanceCommand {
       const commandExeFile = commandList[0];
       const commnadParameters = commandList.slice(1);
 
-      logger.info(`Starting instance: ${instance.instanceName}`);
+      logger.info("----------------")
+      logger.info(`Object ${this.Source} sends a command to open ${instance.instanceName} instance.`);
+      logger.info(`Starting instance: [${instance.instanceName}]`);
       logger.info(`Command: ${commandExeFile} ${commnadParameters.join(" ")}`);
       logger.info(`Directory: ${instance.config.cwd}`);
+      logger.info("----------------")
 
       // Create process.
       const process = childProcess.spawn(commandExeFile, commnadParameters, {
@@ -65,9 +73,11 @@ module.exports.StartCommand = class extends InstanceCommand {
       }
       // 产生开启事件
       instance.started(process);
+      logger.info(`The instance is enabled successfully!`);
     } catch (err) {
       instance.stoped(-2);
-      throw new StartupError(`Failed to create instance. Please check your startup parameters:\n ${err}`);
+      logger.warn(`Failed to open instance!`);
+      throw new StartupError(`Failed to open instance. Please check your startup parameters: \n ${err}`);
     } finally {
       instance.setLock(false);
     }

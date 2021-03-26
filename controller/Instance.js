@@ -90,7 +90,7 @@ routerApp.on("instance/open", (socket, data) => {
   const instanceName = data.instanceName;
   const instance = instanceService.getInstance(instanceName);
   try {
-    instance.exec(new StartCommand());
+    instance.exec(new StartCommand(socket.id));
     protocol.msg(socket, "instance/open", { instanceName });
   } catch (err) {
     logger.warn(`应用实例${instanceName}启动时错误: ${err}`);
