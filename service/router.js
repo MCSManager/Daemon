@@ -38,7 +38,7 @@ class RouterApp extends EventEmitter {
    * @return {RouterApp}
    */
   on(event, fn) {
-    logger.info(`装载控制器: ${event}`);
+    logger.info(`  注册: ${event} 事件`);
     return super.on(event, fn);
   }
 

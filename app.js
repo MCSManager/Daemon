@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 18:29:28
+ * @LastEditTime: 2021-03-26 18:42:13
  * @Description: 守护进程启动文件
  */
 
@@ -70,6 +70,8 @@ process.on("unhandledRejection", (reason, p) => {
 logger.info(`守护进程已成功启动.`);
 logger.info(`正在监听 ${config.port} 端口，等待数据...`);
 logger.info("-");
-logger.info(`此进程访问密匙: ${config.key}`);
-logger.info(`请牢记此密匙，丢失后只可重置配置`);
+logger.info(`访问密匙(Key): ${config.key}`);
+
+require("./service/ui");
+
 
