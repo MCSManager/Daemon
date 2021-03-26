@@ -1,13 +1,15 @@
 /*
- * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
+ * @Date: 2020-11-23 17:45:02
+ * @LastEditTime: 2021-03-26 10:50:21
+ * @Description: 
+ * @Projcet: MCSManager Daemon
  * @License: MIT
- * @Description: 应用实例服务提供类
  */
-
 // eslint-disable-next-line no-unused-vars
-const { Instance } = require("./instance");
+const { Instance } = require("../entity/instance");
 const { EventEmitter } = require("events");
+
 
 class InstanceService extends EventEmitter {
   constructor() {

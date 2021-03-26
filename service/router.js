@@ -60,11 +60,9 @@ class RouterApp extends EventEmitter {
    */
   execMiddlewares(index, event, socket, data) {
     const currentFn = this.middlewares[index];
-    if (!currentFn) {
-      return this.LastMiddlewaresFn(event, socket, data);
-    }
+    if (!currentFn) return this.LastMiddlewaresFn(event, socket, data);
     try {
-      currentFn(event, socket, data, () => {
+      return currentFn(event, socket, data, () => {
         return this.execMiddlewares(index + 1, event, socket, data);
       });
     } catch (err) {

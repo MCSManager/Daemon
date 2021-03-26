@@ -1,11 +1,11 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2020-11-23 17:51:11
+ * @LastEditTime: 2021-03-26 10:51:01
  * @Description: 守护进程启动文件
  */
 
-const { config } = require("./service/config");
+const { config } = require("./entity/config");
 const { logger } = require("./service/log");
 
 logger.info(`欢迎使用 Daemon 程序.`);

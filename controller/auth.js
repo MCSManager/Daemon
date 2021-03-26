@@ -1,13 +1,15 @@
 /*
- * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
+ * @Date: 2020-11-23 17:45:02
+ * @LastEditTime: 2021-03-26 10:51:53
+ * @Description: 
+ * @Projcet: MCSManager Daemon
  * @License: MIT
- * @Description: 身份验证相关控制器
  */
 
 const { routerApp } = require("../service/router");
 const protocol = require("../service/protocol");
-const { config } = require("../service/config");
+const { config } = require("../entity/config");
 const { logger } = require("../service/log");
 
 // 权限认证中间件

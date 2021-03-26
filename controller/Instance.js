@@ -8,7 +8,7 @@
 const { routerApp } = require("../service/router");
 const protocol = require("../service/protocol");
 const { instanceService } = require("../service/instance_service");
-const { Instance } = require("../service/instance");
+const { Instance } = require("../entity/instance");
 const { logger } = require("../service/log");
 // const io = require('socket.io')();
 
