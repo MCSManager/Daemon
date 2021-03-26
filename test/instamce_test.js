@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:33:02
+ * @LastEditTime: 2021-03-26 16:36:18
  * @Description: 实例服务测试类
  */
 
@@ -59,7 +59,5 @@ describe("实例应用的基本测试", function () {
     const obj = instanceService.getAllInstance();
     assert.equal(obj["XXX"], null);
   });
-
-
 
 });

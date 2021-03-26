@@ -43,7 +43,7 @@ routerApp.use((event, socket, data, next) => {
 });
 
 
-// 获取实例列表
+// 获取本守护进程实例总览
 routerApp.on("instance/overview", (socket) => {
   const instances = instanceService.getAllInstance();
   const overview = [];

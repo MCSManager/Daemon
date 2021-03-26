@@ -23,14 +23,21 @@ class InstanceCommandError extends Error {
 class InstanceConfig extends DataStructure {
   constructor(path) {
     super(path);
+    this.startCommand = null;
+    this.stopCommand = null;
+    this.cwd = null;
+    this.ie = null;
+    this.oe = null;
+    this.createDatetime = "--";
+    this.lastDatetime = "--";
   }
 
   parameters(cfg) {
-    this.startCommand = cfg.startCommand || "";
-    this.stopCommand = cfg.stopCommand || "^C";
-    this.cwd = cfg.cwd || ".";
-    this.ie = cfg.ie || "GBK";
-    this.oe = cfg.oe || "GBK";
+    this.startCommand = cfg.startCommand || this.startCommand || "";
+    this.stopCommand = cfg.stopCommand || this.stopCommand || "^C";
+    this.cwd = cfg.cwd || this.cwd || ".";
+    this.ie = cfg.ie || this.ie || "GBK";
+    this.oe = cfg.oe || this.oe || "GBK";
     this.save();
   }
 }
@@ -44,7 +51,8 @@ class Instance extends EventEmitter {
 
     this.STATUS_STOP = Instance.STATUS_STOP;
     this.STATUS_STARTING = Instance.STATUS_STARTING;
-    this.STATUS_RUN = Instance.STATUS_RUN;
+    this.STATUS_RUN = Instance.STATUS_RUNNING;
+    this.STATUS_BUSY = Instance.STATUS_BUSY;
 
     //Basic information
     this.processStatus = this.STATUS_STOP;
@@ -75,7 +83,10 @@ class Instance extends EventEmitter {
    * @return {void}
    */
   execCommand(command) {
-    if (this.lock) throw new InstanceCommandError("This " + command.info + " operation cannot be completed because the command executes a deadlock.");
+    if (this.lock)
+      throw new InstanceCommandError(`This ${command.info} operation cannot be completed because the command executes a deadlock.`);
+    if (this.status() == Instance.STATUS_BUSY)
+      throw new InstanceCommandError(`The status of ${this.instanceName} instance is busy and cannot do anything.`);
     command.exec(this);
   }
 
@@ -102,7 +113,7 @@ class Instance extends EventEmitter {
     process.stderr.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
     process.on("exit", (code) => this.stoped(code));
     this.process = process;
-    this.processStatus = Instance.STATUS_RUN;
+    this.processStatus = Instance.STATUS_RUNNING;
     this.emit("open", this);
   }
 
@@ -144,7 +155,8 @@ class Instance extends EventEmitter {
 // 实例类静态变量
 Instance.STATUS_STOP = 0;
 Instance.STATUS_STARTING = 1;
-Instance.STATUS_RUN = 2;
+Instance.STATUS_RUNNINGNING = 2;
+Instance.STATUS_BUSY = 3;
 
 module.exports = {
   Instance

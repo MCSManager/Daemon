@@ -27,7 +27,7 @@ module.exports.SendCommand = class extends InstanceCommand {
    * @return {void}
    */
   exec(instance) {
-    if (!instance.process || instance.status() != Instance.STATUS_RUN) {
+    if (!instance.process || instance.status() != Instance.STATUS_RUNNING) {
       throw new Error("This instance status is NOT STATUS_RUN.");
     }
     instance.process.stdin.write(iconv.encode(this.cmd, instance.config.oe));

@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 16:24:07
+ * @LastEditTime: 2021-03-26 16:37:56
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -11,10 +11,7 @@ const io = require("socket.io-client");
 const connectConfig = {
   multiplex: false,
   reconnectionDelayMax: 1000,
-  timeout: 1000,
-  query: {
-    token: "test"
-  }
+  timeout: 2000
 };
 const ip = "ws://127.0.0.1:24444";
 
