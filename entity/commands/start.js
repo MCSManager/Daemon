@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-25 13:45:19
+ * @LastEditTime: 2021-03-26 16:59:19
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -67,7 +67,7 @@ module.exports.StartCommand = class extends InstanceCommand {
       instance.started(process);
     } catch (err) {
       instance.stoped(-2);
-      throw new StartupError(`Failed to create instance. Please check your startup parameters:\n ${err.message}`);
+      throw new StartupError(`Failed to create instance. Please check your startup parameters:\n ${err}`);
     } finally {
       instance.setLock(false);
     }

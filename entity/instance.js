@@ -28,7 +28,7 @@ class InstanceConfig extends DataStructure {
     this.cwd = null;
     this.ie = null;
     this.oe = null;
-    this.createDatetime = "--";
+    this.createDatetime = new Date().toLocaleDateString();
     this.lastDatetime = "--";
   }
 
@@ -108,6 +108,7 @@ class Instance extends EventEmitter {
    * @param {NodeJS.Process} process
    */
   started(process) {
+    this.config.lastDatetime = this.fullTime();
     // Process event.
     process.stdout.on("data", (text) => this.emit("data", iconv.decode(text, this.config.ie)));
     process.stderr.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
@@ -115,6 +116,7 @@ class Instance extends EventEmitter {
     this.process = process;
     this.processStatus = Instance.STATUS_RUNNING;
     this.emit("open", this);
+    this.config.save();
   }
 
   /**
@@ -148,6 +150,11 @@ class Instance extends EventEmitter {
     } finally {
       this.config.del();
     }
+  }
+
+  fullTime() {
+    const date = new Date();
+    return date.toLocaleDateString() + " " + date.getHours() + ":" + date.getMinutes();
   }
 
 }

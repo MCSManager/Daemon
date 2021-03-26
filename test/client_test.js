@@ -2,11 +2,13 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 16:37:56
+ * @LastEditTime: 2021-03-26 17:14:36
  * @Description: Socket 基本通信与基本功能测试类
  */
 
+const fs = require("fs-extra");
 const io = require("socket.io-client");
+var should = require('should');
 
 const connectConfig = {
   multiplex: false,
@@ -112,10 +114,11 @@ describe("基于 Socket.io 的控制器层测试", function () {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
       if (msg.status === 200 && msg.event == "instance/overview") {
-        // console.log(">>>: ", msg);
+        console.log(">>>: ", msg);
         socket.close()
         if (msg.data.length >= 1) {
-          done();
+          if (msg.data[0].startCount == 1)
+            done();
         } else {
           done(new Error("服务器消失，数量不足1"))
         }
@@ -126,6 +129,12 @@ describe("基于 Socket.io 的控制器层测试", function () {
       instanceName: "TestServer"
     });
   });
+
+  it("读本地服务器文件", function () {
+    const text = fs.readFileSync("./TestServer.json", "utf-8")
+    should(text).have.String();
+    console.log("本地文件储存如下:", text);
+  })
 
   it("删除实例并验证", function (done) {
     const socket = io.connect(ip, connectConfig);

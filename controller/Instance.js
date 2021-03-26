@@ -52,7 +52,10 @@ routerApp.on("instance/overview", (socket) => {
     if (!instance) continue;
     overview.push({
       instanceName: instance.instanceName,
-      status: instance.status()
+      createDatetime: instance.config.createDatetime,
+      lastDatetime: instance.config.lastDatetime,
+      startCount: instance.startCount,
+      status: instance.status(),
     });
   }
   protocol.msg(socket, "instance/overview", overview);
@@ -77,10 +80,7 @@ routerApp.on("instance/new", (socket, data) => {
     instanceService.createInstance(instance);
     protocol.msg(socket, "instance/new", { instanceName });
   } catch (err) {
-    protocol.error(socket, "instance/new", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/new", { instanceName: instanceName, err: err.message });
   }
 });
 
@@ -94,10 +94,7 @@ routerApp.on("instance/open", (socket, data) => {
     protocol.msg(socket, "instance/open", { instanceName });
   } catch (err) {
     logger.warn(`应用实例${instanceName}启动时错误: ${err}`);
-    protocol.error(socket, "instance/open", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/open", { instanceName: instanceName, err: err.message });
   }
 });
 
@@ -110,10 +107,7 @@ routerApp.on("instance/stop", (socket, data) => {
     instance.exec(new StopCommand());
     protocol.msg(socket, "instance/stop", { instanceName });
   } catch (err) {
-    protocol.error(socket, "instance/stop", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/stop", { instanceName: instanceName, err: err.message });
   }
 });
 
@@ -139,10 +133,7 @@ routerApp.on("instance/command", (socket, data) => {
     instance.exec(new SendCommand(command));
     protocol.msg(socket, "instance/command", { instanceName });
   } catch (err) {
-    protocol.error(socket, "instance/command", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/command", { instanceName: instanceName, err: err.message });
   }
 });
 
@@ -155,9 +146,6 @@ routerApp.on("instance/kill", (socket, data) => {
     instance.exec(new KillCommand());
     protocol.msg(socket, "instance/kill", { instanceName });
   } catch (err) {
-    protocol.error(socket, "instance/kill", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/kill", { instanceName: instanceName, err: err.message });
   }
 });

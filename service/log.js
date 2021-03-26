@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 10:54:04
+ * @LastEditTime: 2021-03-26 16:55:36
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -38,6 +38,18 @@ log4js.configure({
 
 const logger = log4js.getLogger("default");
 
+
+function fullTime() {
+  const date = new Date();
+  return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`;
+}
+
+function fullLocalTime() {
+  return new Date().toLocaleTimeString();
+}
+
 module.exports = {
-  logger
+  logger,
+  fullTime,
+  fullLocalTime
 };
