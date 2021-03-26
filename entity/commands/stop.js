@@ -8,7 +8,7 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-const { Instance } = require("../../service/instance");
+const { Instance } = require("../instance");
 const { InstanceCommand } = require("./command");
 const { SendCommand } = require("./cmd");
 

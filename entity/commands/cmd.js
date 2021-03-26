@@ -9,7 +9,7 @@
 
 const iconv = require("iconv-lite");
 // eslint-disable-next-line no-unused-vars
-const { Instance } = require("../../service/instance");
+const { Instance } = require("../instance");
 const { InstanceCommand } = require("./command");
 
 module.exports.SendCommand = class extends InstanceCommand {
