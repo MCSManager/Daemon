@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:03:34
+ * @LastEditTime: 2021-03-26 15:27:18
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -107,6 +107,31 @@ describe("基于 Socket.io 的控制器层测试", function () {
       instanceName: "TestServer"
     });
   });
+
+  it("删除实例并验证", function (done) {
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status !== 200 && msg.event == "instance/delete")
+        done(new Error("删除代码不等于 200"));
+      if (msg.status === 200 && msg.event == "instance/overview") {
+        if (msg.data.length === 0) {
+          socket.close()
+          done();
+        }
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/delete", {
+      instanceName: "TestServer"
+    });
+    socket.emit("instance/overview", {
+      instanceName: "TestServer"
+    });
+  });
+
+
+
 
 });
 

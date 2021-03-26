@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 22:28:10
- * @LastEditTime: 2021-03-24 22:41:53
+ * @LastEditTime: 2021-03-26 15:22:45
  * @Description: Saving and reading of data configuration
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -25,6 +25,10 @@ class DataStructure {
 
   save() {
     fs.writeFileSync(this.__filename__, JSON.stringify(this, null, 4), { encoding: "utf-8" });
+  }
+
+  del() {
+    fs.removeSync(this.__filename__);
   }
 }
 

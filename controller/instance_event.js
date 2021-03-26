@@ -1,8 +1,10 @@
 /*
- * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
- * @License: MIT
+ * @Date: 2020-11-23 17:45:02
+ * @LastEditTime: 2021-03-26 15:16:38
  * @Description: 应用实例所有主动性事件
+ * @Projcet: MCSManager Daemon
+ * @License: MIT
  */
 
 const protocol = require("../service/protocol");
@@ -21,8 +23,6 @@ instanceService.on("exit", (instanceName) => {
   protocol.broadcast("instance/stopped", {
     instanceName: instanceName
   });
-  // Note：现版本功能，每次退出都销毁实例，开启则重新新建
-  instanceService.removeInstance(instanceName);
 });
 
 // 实例启动事件

@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:04:04
+ * @LastEditTime: 2021-03-26 15:29:45
  * @Description: 
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -50,10 +50,10 @@ class InstanceService extends EventEmitter {
    * @param {string} instanceName
    */
   removeInstance(instanceName) {
-    instanceName;
-    // const instance = this.getInstance(instanceName);
-    // if (instance) instance.destroy();
-    // delete this.instances[instanceName];
+    const instance = this.getInstance(instanceName);
+    if (instance) instance.destroy();
+    delete this.instances[instanceName];
+    return true;
   }
 
   /**

@@ -11,7 +11,9 @@ const iconv = require("iconv-lite");
 // const { logger } = require("../service/log");
 // eslint-disable-next-line no-unused-vars
 const { InstanceCommand } = require("./commands/command");
+const { KillCommand } = require("./commands/kill");
 const { DataStructure } = require("./structure");
+// const fs = require("fs-extra");
 
 class InstanceCommandError extends Error {
   constructor(msg) {
@@ -126,6 +128,15 @@ class Instance extends EventEmitter {
     }
     this.process = null;
   }
+
+  destroy() {
+    try {
+      this.exec(new KillCommand());
+    } finally {
+      this.config.del();
+    }
+  }
+
 }
 
 // 实例类静态变量

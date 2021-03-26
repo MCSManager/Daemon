@@ -42,6 +42,7 @@ routerApp.use((event, socket, data, next) => {
   next();
 });
 
+
 // 获取实例列表
 routerApp.on("instance/overview", (socket) => {
   const instances = instanceService.getAllInstance();
@@ -56,6 +57,7 @@ routerApp.on("instance/overview", (socket) => {
   }
   protocol.send(socket, "instance/overview", overview);
 });
+
 
 // 新建应用实例
 routerApp.on("instance/new", (socket, data) => {
@@ -82,6 +84,7 @@ routerApp.on("instance/new", (socket, data) => {
   }
 });
 
+
 // 开启实例
 routerApp.on("instance/open", (socket, data) => {
   const instanceName = data.instanceName;
@@ -97,6 +100,7 @@ routerApp.on("instance/open", (socket, data) => {
     });
   }
 });
+
 
 // 关闭实例
 routerApp.on("instance/stop", (socket, data) => {
@@ -117,19 +121,14 @@ routerApp.on("instance/stop", (socket, data) => {
 // 删除实例
 routerApp.on("instance/delete", (socket, data) => {
   const instanceName = data.instanceName;
-  const instance = instanceService.getInstance(instanceName);
   try {
-    // 杀死进程并删除实例
-    instance.exec(new KillCommand());
     instanceService.removeInstance(instanceName);
-    protocol.send(socket, "instance/stop", { instanceName });
+    protocol.send(socket, "instance/delete", { instanceName });
   } catch (err) {
-    protocol.error(socket, "instance/stop", {
-      instanceName: instanceName,
-      err: err.message
-    });
+    protocol.error(socket, "instance/delete", { instanceName: instanceName, err: err.message });
   }
 });
+
 
 // 向应用实例发送命令
 routerApp.on("instance/command", (socket, data) => {
@@ -146,6 +145,7 @@ routerApp.on("instance/command", (socket, data) => {
     });
   }
 });
+
 
 // 杀死应用实例方法
 routerApp.on("instance/kill", (socket, data) => {

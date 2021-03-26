@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 14:57:35
+ * @LastEditTime: 2021-03-26 15:33:02
  * @Description: 实例服务测试类
  */
 
@@ -12,10 +12,10 @@ const { instanceService } = require("../service/instance_service");
 const { StartCommand } = require("../entity/commands/start");
 const { SendCommand } = require("../entity/commands/cmd");
 // const { KillCommand } = require("../entity/commands/kill");
-const { StopCommand } = require("../entity/commands/stop");
+// const { StopCommand } = require("../entity/commands/stop");
 // const { describe, it } = require("mocha");
 
-// var assert = require('assert');
+var assert = require('assert');
 describe("实例应用的基本测试", function () {
   it("创建实例", function () {
     const instance = new Instance("XXX");
@@ -50,7 +50,16 @@ describe("实例应用的基本测试", function () {
     resInstance.execCommand(new SendCommand("ping www.baidu.com"));
     resInstance.execCommand(new SendCommand("echo 测试输出内容结束"));
     // setTimeout(() => resInstance.execCommand(new KillCommand()), 3000);
-    setTimeout(() => resInstance.execCommand(new StopCommand()), 6000);
+    // setTimeout(() => resInstance.execCommand(new StopCommand()), 6000);
     return true;
   });
+
+  it("删除服务器", function () {
+    instanceService.removeInstance("XXX");
+    const obj = instanceService.getAllInstance();
+    assert.equal(obj["XXX"], null);
+  });
+
+
+
 });

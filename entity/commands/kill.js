@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-26 11:30:11
+ * @LastEditTime: 2021-03-26 15:19:43
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -27,10 +27,8 @@ module.exports.KillCommand = class extends InstanceCommand {
   exec(instance) {
     if (instance.process && instance.process.pid) {
       instance.process.kill("SIGKILL");
-      instance.stoped(-3);
-      // always unlock
-      instance.setLock(false);
     }
-    return this;
+    instance.stoped(-3);
+    instance.setLock(false);
   }
 };
