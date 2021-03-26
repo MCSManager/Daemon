@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:27:18
+ * @LastEditTime: 2021-03-26 15:40:35
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -23,7 +23,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("身份验证", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log(">>>: ", msg);
+      // console.log(">>>: ", msg);
       if (msg.status === 200 && msg.data === true && msg.event == "auth") {
         socket.close()
         done();
@@ -39,7 +39,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("新建实例", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log(">>>: ", msg);
+      // console.log(">>>: ", msg);
       if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/new") {
         socket.close()
         done();
@@ -59,12 +59,11 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.on("protocol", (msg) => {
 
       if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/opened") {
-        console.log(">>>: ", msg);
+        // console.log(">>>: ", msg);
         setTimeout(() => done(), 1000)
       }
       if (msg.event == "instance/stdout") {
-        console.log("开启实例: [输出]", msg.data.text);
-        // setTimeout(socket.close, 1000);
+        console.log("[Console]:", msg.data.text);
         return;
       }
     });
@@ -77,7 +76,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("关闭实例", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log(">>>: ", msg);
+      // console.log(">>>: ", msg);
       if (msg.status === 200 && msg.event == "instance/stop") {
         socket.close()
         done();
@@ -93,7 +92,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
       if (msg.status === 200 && msg.event == "instance/overview") {
-        console.log(">>>: ", msg);
+        // console.log(">>>: ", msg);
         socket.close()
         if (msg.data.length >= 1) {
           done();
@@ -111,7 +110,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("删除实例并验证", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log(">>>: ", msg);
+      // console.log(">>>: ", msg);
       if (msg.status !== 200 && msg.event == "instance/delete")
         done(new Error("删除代码不等于 200"));
       if (msg.status === 200 && msg.event == "instance/overview") {
