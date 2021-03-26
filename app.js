@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 16:33:21
+ * @LastEditTime: 2021-03-26 18:29:28
  * @Description: 守护进程启动文件
  */
 
@@ -36,7 +36,7 @@ const protocol = require("./service/protocol");
  * @return {void}
  */
 function socketMonitor(socket) {
-  logger.info(`会话 ${socket.id} 已链接`);
+  logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已链接`);
 
   // 加入到全局Socket对象
   protocol.addGlobalSocket(socket);
@@ -49,7 +49,7 @@ function socketMonitor(socket) {
     // 从全局Socket对象移除
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
-    logger.info(`会话 ${socket.id} 已断开`);
+    logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已断开`);
   });
 }
 
@@ -58,12 +58,12 @@ io.on("connection", socketMonitor);
 
 // 错误报告监听
 process.on("uncaughtException", function (err) {
-  logger.error(`错误报告(uncaughtException): ${err}`);
+  logger.error(`错误报告(uncaughtException):`, err);
 });
 
 // 错误报告监听
 process.on("unhandledRejection", (reason, p) => {
-  logger.error(`错误报告(unhandledRejection): ${reason}\n${p}`);
+  logger.error(`错误报告(unhandledRejection):`, reason, p);
 });
 
 // 启动完毕

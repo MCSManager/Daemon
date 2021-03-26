@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-26 17:42:52
+ * @LastEditTime: 2021-03-26 18:32:12
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -69,14 +69,13 @@ module.exports.StartCommand = class extends InstanceCommand {
       });
       // Process check.
       if (!process || !process.pid) {
-        throw new StartupError(`Failed to create process.`);
+        throw new StartupError(`Failed to create process. Process.pid is ${process.pid}.`);
       }
       // 产生开启事件
       instance.started(process);
       logger.info(`The instance is enabled successfully!`);
     } catch (err) {
       instance.stoped(-2);
-      logger.warn(`Failed to open instance!`);
       throw new StartupError(`Failed to open instance. Please check your startup parameters: \n ${err}`);
     } finally {
       instance.setLock(false);

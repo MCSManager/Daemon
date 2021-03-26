@@ -67,7 +67,7 @@ class RouterApp extends EventEmitter {
       });
     } catch (err) {
       // 这里的错误并不一定是中间件代码的错误，也有可能是最后一步的 LastMiddlewaresFn 所未捕捉的错误
-      logger.error(`Middleware recursion error: ${err}`);
+      logger.error(`Middleware recursion error:`, err);
     }
   }
 
@@ -88,7 +88,8 @@ module.exports.routerApp = routerApp;
 module.exports.navigation = (socket) => {
   for (const event of routerApp.eventNames()) {
     socket.on(event, (data) => {
-      logger.info(`会话 ${socket.id} 访问 ${event} 事件控制器`);
+      logger.info(`收到 ${socket.id}(${socket.handshake.address}) 的 ${event} 指令.`);
+      logger.info(`    数据: ${JSON.stringify(data)}.`);
       routerApp.emit(event, socket, data);
     });
   }
