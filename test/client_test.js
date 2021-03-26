@@ -2,12 +2,11 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 12:27:57
+ * @LastEditTime: 2021-03-26 15:03:34
  * @Description: Socket 基本通信与基本功能测试类
  */
 
 const io = require("socket.io-client");
-const protocol = require("../service/protocol");
 
 const connectConfig = {
   multiplex: false,
@@ -19,59 +18,96 @@ const connectConfig = {
 };
 const ip = "ws://127.0.0.1:24444";
 
-
-// socket.on("disconnect", (err) => {
-//   console.log("链接断开:", err);
-// });
-
-// socket.on("connect_error", function (err) {
-//   console.log("链接错误:", err);
-// });
-
-// socket.on("error", function (err) {
-//   console.log(`错误: ${err}`);
-// });
-// socket.on("reconnect_attempt", function (count) {
-//   console.log(`第 ${count} 次重连尝试中...`);
-// });
-
-
-// socket.on("log", (msg) => {
-//   console.log("客户端日志: ", protocol.parse(msg));
-// });
-
-// let client = null;
-
 describe("基于 Socket.io 的控制器层测试", function () {
+
   it("身份验证", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log("Server >> Client: ", msg);
-      if (msg.status === 200 && msg.data === true)
+      console.log(">>>: ", msg);
+      if (msg.status === 200 && msg.data === true && msg.event == "auth") {
+        socket.close()
         done();
+      }
       else
         done(new Error("测试失败"));
     });
     // client = socket;
-    protocol.send(socket, "auth", "test_key");
+    socket.emit("auth", "test_key");
+
   });
 
   it("新建实例", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
-      console.log("Server >> Client: ", msg);
-      if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/new")
+      console.log(">>>: ", msg);
+      if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/new") {
+        socket.close()
         done();
+      }
     });
-
-    protocol.send(socket, "auth", "test_key");
-    protocol.send(socket, "instance/new", {
+    socket.emit("auth", "test_key");
+    socket.emit("instance/new", {
       instanceName: "TestServer",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"
     });
   });
+
+  it("开启实例", function (done) {
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+
+      if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/opened") {
+        console.log(">>>: ", msg);
+        setTimeout(() => done(), 1000)
+      }
+      if (msg.event == "instance/stdout") {
+        console.log("开启实例: [输出]", msg.data.text);
+        // setTimeout(socket.close, 1000);
+        return;
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/open", {
+      instanceName: "TestServer"
+    });
+  });
+
+  it("关闭实例", function (done) {
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status === 200 && msg.event == "instance/stop") {
+        socket.close()
+        done();
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/stop", {
+      instanceName: "TestServer"
+    });
+  });
+
+  it("服务器总览", function (done) {
+    const socket = io.connect(ip, connectConfig);
+    socket.on("protocol", (msg) => {
+      if (msg.status === 200 && msg.event == "instance/overview") {
+        console.log(">>>: ", msg);
+        socket.close()
+        if (msg.data.length >= 1) {
+          done();
+        } else {
+          done(new Error("服务器消失，数量不足1"))
+        }
+      }
+    });
+    socket.emit("auth", "test_key");
+    socket.emit("instance/overview", {
+      instanceName: "TestServer"
+    });
+  });
+
 });
 
 // protocol.send(socket, "instance/overview", "");

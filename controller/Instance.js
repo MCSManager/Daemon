@@ -113,6 +113,24 @@ routerApp.on("instance/stop", (socket, data) => {
   }
 });
 
+
+// 删除实例
+routerApp.on("instance/delete", (socket, data) => {
+  const instanceName = data.instanceName;
+  const instance = instanceService.getInstance(instanceName);
+  try {
+    // 杀死进程并删除实例
+    instance.exec(new KillCommand());
+    instanceService.removeInstance(instanceName);
+    protocol.send(socket, "instance/stop", { instanceName });
+  } catch (err) {
+    protocol.error(socket, "instance/stop", {
+      instanceName: instanceName,
+      err: err.message
+    });
+  }
+});
+
 // 向应用实例发送命令
 routerApp.on("instance/command", (socket, data) => {
   const instanceName = data.instanceName;

@@ -11,7 +11,7 @@ const { EventEmitter } = require("events");
 // eslint-disable-next-line no-unused-vars
 const { Socket } = require("socket.io");
 
-const protocol = require("./protocol");
+// const protocol = require("./protocol");
 const { logger } = require("./log");
 
 // 路由控制器类（单例类）
@@ -56,7 +56,7 @@ class RouterApp extends EventEmitter {
    * @param {string} event
    * @param {Socket} socket
    * @param {string} data
-   * @return {this}
+   * @return {any}
    */
   execMiddlewares(index, event, socket, data) {
     const currentFn = this.middlewares[index];
@@ -86,20 +86,13 @@ module.exports.routerApp = routerApp;
  * @param {Socket} socket
  */
 module.exports.navigation = (socket) => {
-  // 初始化 Session 变量
-  if (!socket.session) socket.session = {};
-  // 向自定义路由转发请求
-  socket.on("protocol", (data) => {
-    try {
-      const packet = protocol.parse(data);
-      if (packet.event) {
-        routerApp.emit(packet.event, socket, packet.data);
-      }
-    } catch (err) {
-      logger.error(`路由控制器业务错误: ${err}`);
-    }
-  });
-};
+  for (const event of routerApp.eventNames()) {
+    socket.on(event, (data) => {
+      logger.info(`会话 ${socket.id} 访问 ${event} 事件控制器`);
+      routerApp.emit(event, socket, data);
+    });
+  }
+}
 
 // 导入所有路由层类
 function importController() {
@@ -113,5 +106,4 @@ function importController() {
   }
   logger.info(`装载完毕，总路由控制器${routerApp.eventNames().length}个，中间件${routerApp.middlewares.length}个.`);
 }
-
 importController();

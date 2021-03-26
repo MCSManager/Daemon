@@ -50,6 +50,14 @@ module.exports.sendError = (socket, event, err) => {
   socket.emit("protocol", packet);
 };
 
+module.exports.error = (...args) => {
+  module.exports.sendError(...args);
+}
+
+module.exports.msg = (...args) => {
+  module.exports.send(...args);
+}
+
 /**
  * @param {object} text
  */

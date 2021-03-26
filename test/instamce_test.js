@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 12:21:07
+ * @LastEditTime: 2021-03-26 14:57:35
  * @Description: 实例服务测试类
  */
 
@@ -29,18 +29,19 @@ describe("实例应用的基本测试", function () {
 
     instanceService.addInstance(instance);
     // const resInstance = instanceService.getInstance("XXX");
-
+    return true;
   });
 
   it("运行实例", function () {
     const instance = instanceService.getInstance("XXX");
     // instance.on("data", (text) => {
-    //   // console.log("[STDOUT]:", text);
+    //   console.log("[STDOUT]:", text);
     // });
     // instance.on("exit", (code) => {
-    //   // console.log("程序已经退出:", code);
+    //   console.log("程序已经退出:", code);
     // });
     instance.execCommand(new StartCommand());
+    return true;
   });
 
   it("执行操作", function () {
@@ -50,5 +51,6 @@ describe("实例应用的基本测试", function () {
     resInstance.execCommand(new SendCommand("echo 测试输出内容结束"));
     // setTimeout(() => resInstance.execCommand(new KillCommand()), 3000);
     setTimeout(() => resInstance.execCommand(new StopCommand()), 6000);
+    return true;
   });
 });
