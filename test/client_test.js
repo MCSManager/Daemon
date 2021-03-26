@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 18:01:36
+ * @LastEditTime: 2021-03-26 18:15:21
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -172,7 +172,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
         }
       }
     });
-    socket.emit("auth", "test_key1");
+    socket.emit("auth", "test_kedsdy1");
     socket.emit("instance/overview", {
       instanceName: "TestServer"
     });
