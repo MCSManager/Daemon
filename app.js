@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 18:42:13
+ * @LastEditTime: 2021-03-28 08:50:33
  * @Description: 守护进程启动文件
  */
 
@@ -30,12 +30,9 @@ io.use((socket, next) => {
 const router = require("./service/router");
 const protocol = require("./service/protocol");
 
-/**
- * Socket 链接事件函数
- * @param {Socket} socket
- * @return {void}
- */
-function socketMonitor(socket) {
+
+// 注册链接事件
+io.on("connection", (socket) => {
   logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已链接`);
 
   // 加入到全局Socket对象
@@ -51,10 +48,7 @@ function socketMonitor(socket) {
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
     logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已断开`);
   });
-}
-
-// 注册链接事件
-io.on("connection", socketMonitor);
+});
 
 // 错误报告监听
 process.on("uncaughtException", function (err) {

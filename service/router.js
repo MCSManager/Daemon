@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 08:40:34
+ * @LastEditTime: 2021-03-28 08:47:26
  * @Description: 路由导航器，用于分析 Socket.io 协议并封装转发到自定义路由
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -70,14 +70,14 @@ module.exports.navigation = (socket) => {
   // 向 Socket 注册所有事件
   for (const event of routerApp.eventNames()) {
     socket.on(event, (data) => {
-      logger.info(`收到 ${socket.id}(${socket.handshake.address}) 的 ${event} 指令.`);
-      logger.info(`    数据: ${JSON.stringify(data)}.`);
       routerApp.emit(event, socket, data);
     });
   }
   // 向 Socket 注册所有中间件
   for (const fn of routerApp.getMiddlewares()) {
-    socket.use((packet, next) => fn(packet[0], socket, packet[1], next));
+    socket.use((packet, next) => {
+      fn(packet[0], socket, packet[1], next);
+    });
   }
 }
 
