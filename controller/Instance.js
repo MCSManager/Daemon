@@ -44,6 +44,7 @@ routerApp.on("instance/overview", (socket) => {
     if (!instance) continue;
     overview.push({
       instanceUUID: instance.instanceUUID,
+      nickname: instance.config.nickname,
       createDatetime: instance.config.createDatetime,
       lastDatetime: instance.config.lastDatetime,
       startCount: instance.startCount,

@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 09:37:12
+ * @LastEditTime: 2021-03-28 10:33:37
  * @Description: 守护进程启动文件
  */
 
@@ -35,7 +35,17 @@ if (!fs.existsSync(config.instanceDirectory)) {
 
 const router = require("./service/router");
 const protocol = require("./service/protocol");
+const { instanceService } = require("./service/instance_service");
 
+// 装载实例
+try {
+  logger.info("正在装载本地实例文件...");
+  instanceService.loadInstances(config.instanceDirectory);
+  logger.info(`全部本地实例装载完毕，总计 ${instanceService.getInstancesSize()} 个.`)
+} catch (err) {
+  logger.error("读取本地实例文件失败，此问题必须修复才可启动:", err);
+  process.exit(-1);
+}
 
 // 注册链接事件
 io.on("connection", (socket) => {

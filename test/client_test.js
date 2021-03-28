@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 10:16:41
+ * @LastEditTime: 2021-03-28 10:42:55
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -16,7 +16,9 @@ const connectConfig = {
   timeout: 2000
 };
 const ip = "ws://127.0.0.1:24444";
-let testServerID = null;
+
+let testServerID = "7e498901057c41b097afdf38478ce89a";
+let preDelServerUUID = "";
 
 describe("基于 Socket.io 的控制器层测试", function () {
 
@@ -40,7 +42,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.on("protocol", (msg) => {
       // console.log(">>>: ", msg);
       if (msg.status === 200 && msg.event == "instance/new") {
-        testServerID = msg.data.instanceUUID;
+        preDelServerUUID = msg.data.instanceUUID;
         socket.close()
         done();
       }
@@ -48,18 +50,6 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.emit("auth", "test_key");
     socket.emit("instance/new", {
       nickname: "TestServer1",
-      command: "cmd.exe",
-      cwd: ".",
-      stopCommand: "^c"
-    });
-    socket.emit("instance/new", {
-      nickname: "TestServer2",
-      command: "cmd.exe",
-      cwd: ".",
-      stopCommand: "^c"
-    });
-    socket.emit("instance/new", {
-      nickname: "TestServer3",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"
@@ -164,10 +154,10 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/delete", {
-      instanceUUID: testServerID
+      instanceUUID: preDelServerUUID
     });
     socket.emit("instance/overview", {
-      instanceUUID: testServerID
+      instanceUUID: preDelServerUUID
     });
   });
 

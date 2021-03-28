@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:29:45
+ * @LastEditTime: 2021-03-28 10:32:41
  * @Description: 
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -9,7 +9,8 @@
 // eslint-disable-next-line no-unused-vars
 const { Instance } = require("../entity/instance");
 const { EventEmitter } = require("events");
-
+const fs = require("fs-extra");
+const path = require("path")
 
 class InstanceService extends EventEmitter {
   constructor() {
@@ -18,12 +19,16 @@ class InstanceService extends EventEmitter {
   }
 
   /**
-   * @param {Instance} instance
-   * @return {*}
+   * 装载所有实例应用
+   * @return {void}
    */
-  createInstance(instance) {
-    this.addInstance(instance);
-    return instance;
+  loadInstances(dir) {
+    const files = fs.readdirSync(dir);
+    for (const fileName of files) {
+      if (path.extname(fileName) !== ".json") continue;
+      const instance = new Instance(fileName.split(".")[0]);
+      this.addInstance(instance);
+    }
   }
 
   /**
@@ -73,6 +78,16 @@ class InstanceService extends EventEmitter {
    */
   getAllInstance() {
     return this.instances;
+  }
+
+  /**
+   * @return {Number}
+   */
+  getInstancesSize() {
+    let i = 0;
+    // eslint-disable-next-line no-unused-vars
+    for (const _key in this.instances) i++;
+    return i;
   }
 }
 

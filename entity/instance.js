@@ -25,12 +25,12 @@ class InstanceCommandError extends Error {
 class InstanceConfig extends DataStructure {
   constructor(path) {
     super(path);
-    this.nickname = null;
-    this.startCommand = null;
-    this.stopCommand = null;
-    this.cwd = null;
-    this.ie = null;
-    this.oe = null;
+    this.nickname = "";
+    this.startCommand = "";
+    this.stopCommand = "";
+    this.cwd = "";
+    this.ie = "utf-8";
+    this.oe = "utf-8";
     this.createDatetime = new Date().toLocaleDateString();
     this.lastDatetime = "--";
   }
