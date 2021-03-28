@@ -2,13 +2,13 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 10:11:40
+ * @LastEditTime: 2021-03-28 10:16:41
  * @Description: Socket 基本通信与基本功能测试类
  */
 
-const fs = require("fs-extra");
+// const fs = require("fs-extra");
 const io = require("socket.io-client");
-var should = require('should');
+// var should = require('should');
 
 const connectConfig = {
   multiplex: false,
@@ -40,7 +40,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.on("protocol", (msg) => {
       // console.log(">>>: ", msg);
       if (msg.status === 200 && msg.event == "instance/new") {
-        testServerID = msg.data.instanceName;
+        testServerID = msg.data.instanceUUID;
         socket.close()
         done();
       }
@@ -82,7 +82,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/open", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
   });
 
@@ -104,7 +104,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/command", {
-      instanceName: testServerID,
+      instanceUUID: testServerID,
       command: "echo Test你好123"
     });
   });
@@ -120,7 +120,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/stop", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
   });
 
@@ -139,7 +139,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/overview", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
   });
 
@@ -164,10 +164,10 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/delete", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/overview", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
   });
 
@@ -187,22 +187,22 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_kedsdy1");
     socket.emit("instance/overview", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/new", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/open", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/stop", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/delete", {
-      instanceName: testServerID
+      instanceUUID: testServerID
     });
     socket.emit("instance/command", {
-      instanceName: testServerID,
+      instanceUUID: testServerID,
       command: "echo Test你好123"
     });
   });
@@ -223,16 +223,16 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/open", {
-      instanceName: "splofjasoih"
+      instanceUUID: "splofjasoih"
     });
     socket.emit("instance/stop", {
-      instanceName: "splofjasoih"
+      instanceUUID: "splofjasoih"
     });
     socket.emit("instance/delete", {
-      instanceName: "splofjasoih"
+      instanceUUID: "splofjasoih"
     });
     socket.emit("instance/command", {
-      instanceName: "splofjasoih",
+      instanceUUID: "splofjasoih",
       command: "echo Test你好123"
     });
   });

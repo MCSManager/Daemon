@@ -11,23 +11,23 @@ const protocol = require("../service/protocol");
 const { instanceService } = require("../service/instance_service");
 
 // 程序输出流日志广播
-instanceService.on("data", (instanceName, text) => {
+instanceService.on("data", (instanceUUID, text) => {
   protocol.broadcast("instance/stdout", {
-    instanceName: instanceName,
+    instanceUUID: instanceUUID,
     text: text
   });
 });
 
 // 实例退出事件
-instanceService.on("exit", (instanceName) => {
+instanceService.on("exit", (instanceUUID) => {
   protocol.broadcast("instance/stopped", {
-    instanceName: instanceName
+    instanceUUID: instanceUUID
   });
 });
 
 // 实例启动事件
-instanceService.on("open", (instanceName) => {
+instanceService.on("open", (instanceUUID) => {
   protocol.broadcast("instance/opened", {
-    instanceName: instanceName
+    instanceUUID: instanceUUID
   });
 });

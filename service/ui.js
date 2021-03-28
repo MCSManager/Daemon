@@ -50,7 +50,7 @@ function command(cmd) {
     let result = "实例名称 | 实例标识符 | 状态码\n";
     for (const id in objs) {
       const instance = objs[id];
-      result += `${instance.config.nickname} ${instance.instanceName} ${instance.status()}\n`;
+      result += `${instance.config.nickname} ${instance.instanceUUID} ${instance.status()}\n`;
     }
     result += "\n状态码解释:\n忙碌 = -1; 停止 = 0;\n停止中 = 1; 开始中 = 2;\n正在运行 = 3;\n";
     return result;

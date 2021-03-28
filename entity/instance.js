@@ -50,18 +50,18 @@ class Instance extends EventEmitter {
   /**
    * @param {string} startCommand
    */
-  constructor(instanceName) {
+  constructor(instanceUUID) {
     super();
 
     //Basic information
     this.instanceStatus = Instance.STATUS_STOP;
-    this.instanceName = instanceName;
+    this.instanceUUID = instanceUUID;
 
     // Action lock
     this.lock = false;
 
     // Config init
-    this.config = new InstanceConfig(path.join(globalConfig.config.instanceDirectory, instanceName));
+    this.config = new InstanceConfig(path.join(globalConfig.config.instanceDirectory, instanceUUID));
     this.config.load();
 
     this.process = null;
@@ -85,7 +85,7 @@ class Instance extends EventEmitter {
     if (this.lock)
       throw new InstanceCommandError(`This ${command.info} operation cannot be completed because the command executes a deadlock.`);
     if (this.status() == Instance.STATUS_BUSY)
-      throw new InstanceCommandError(`The status of ${this.instanceName} instance is busy and cannot do anything.`);
+      throw new InstanceCommandError(`The status of ${this.instanceUUID} instance is busy and cannot do anything.`);
     command.exec(this);
   }
 

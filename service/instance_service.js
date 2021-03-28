@@ -30,42 +30,42 @@ class InstanceService extends EventEmitter {
    * @param {Instance} instance
    */
   addInstance(instance) {
-    if (this.instances[instance.instanceName]) {
-      throw new Error(`应用实例 ${instance.instanceName} 已经存在.`);
+    if (this.instances[instance.instanceUUID]) {
+      throw new Error(`应用实例 ${instance.instanceUUID} 已经存在.`);
     }
-    this.instances[instance.instanceName] = instance;
+    this.instances[instance.instanceUUID] = instance;
     // 动态监听新增的实例输出流，传递给自身事件流
     instance.on("data", (...arr) => {
-      this.emit("data", instance.instanceName, ...arr);
+      this.emit("data", instance.instanceUUID, ...arr);
     });
     instance.on("exit", (...arr) => {
-      this.emit("exit", instance.instanceName, ...arr);
+      this.emit("exit", instance.instanceUUID, ...arr);
     });
     instance.on("open", (...arr) => {
-      this.emit("open", instance.instanceName, ...arr);
+      this.emit("open", instance.instanceUUID, ...arr);
     });
   }
 
   /**
-   * @param {string} instanceName
+   * @param {string} instanceUUID
    */
-  removeInstance(instanceName) {
-    const instance = this.getInstance(instanceName);
+  removeInstance(instanceUUID) {
+    const instance = this.getInstance(instanceUUID);
     if (instance) instance.destroy();
-    delete this.instances[instanceName];
+    delete this.instances[instanceUUID];
     return true;
   }
 
   /**
-   * @param {string} instanceName
+   * @param {string} instanceUUID
    * @return {Instance}
    */
-  getInstance(instanceName) {
-    return this.instances[instanceName];
+  getInstance(instanceUUID) {
+    return this.instances[instanceUUID];
   }
 
-  exists(instanceName) {
-    return this.instances[instanceName] ? true : false;
+  exists(instanceUUID) {
+    return this.instances[instanceUUID] ? true : false;
   }
 
   /**
