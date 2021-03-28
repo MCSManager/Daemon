@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 18:38:13
+ * @LastEditTime: 2021-03-28 09:19:02
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -46,6 +46,18 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.emit("auth", "test_key");
     socket.emit("instance/new", {
       instanceName: "TestServer",
+      command: "cmd.exe",
+      cwd: ".",
+      stopCommand: "^c"
+    });
+    socket.emit("instance/new", {
+      instanceName: "TestServer2",
+      command: "cmd.exe",
+      cwd: ".",
+      stopCommand: "^c"
+    });
+    socket.emit("instance/new", {
+      instanceName: "TestServer3",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"

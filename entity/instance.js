@@ -23,6 +23,7 @@ class InstanceCommandError extends Error {
 class InstanceConfig extends DataStructure {
   constructor(path) {
     super(path);
+    this.nickname = null;
     this.startCommand = null;
     this.stopCommand = null;
     this.cwd = null;
@@ -33,6 +34,7 @@ class InstanceConfig extends DataStructure {
   }
 
   parameters(cfg) {
+    this.nickname = cfg.nickname || this.nickname || "DefaultInstance_" + new Date().getTime();
     this.startCommand = cfg.startCommand || this.startCommand || "";
     this.stopCommand = cfg.stopCommand || this.stopCommand || "^C";
     this.cwd = cfg.cwd || this.cwd || ".";
@@ -162,7 +164,7 @@ Instance.STATUS_BUSY = -1;
 Instance.STATUS_STOP = 0;
 Instance.STATUS_STOPPING = 1;
 Instance.STATUS_STARTING = 2;
-Instance.STATUS_RUNNINGNING = 3;
+Instance.STATUS_RUNNING = 3;
 
 module.exports = {
   Instance
