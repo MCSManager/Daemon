@@ -1,8 +1,8 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-26 18:41:40
- * @LastEditTime: 2021-03-28 11:24:50
- * @Description:
+ * @LastEditTime: 2021-03-28 11:59:38
+ * @Description: 终端交互逻辑，由于逻辑简单且均无需认证与检查，所有UI业务代码将全部在一个文件。
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
@@ -13,18 +13,24 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log("[User Interface] 程序拥有简易的 UI 系统，请输入 help 以查看更多帮助.")
+console.log("[User Interface] 程序拥有简易的终端交互功能，键入 help 得以查看更多信息.")
 
 function stdin() {
   rl.question('> ', (answer) => {
-    const result = command(answer);
-    if (result)
-      console.log(result);
-    else
-      console.log(`命令 ${answer} 并不存在，请键入 help 得以获取帮助.`);
-
-    // next
-    stdin();
+    try {
+      const cmds = answer.split(" ");
+      logger.info(`[终端] ${answer}`);
+      const result = command(...cmds);
+      if (result)
+        console.log(result);
+      else
+        console.log(`命令 ${answer} 并不存在，键入 help 得以获取帮助.`);
+    } catch (err) {
+      logger.error("[终端]", err);
+    } finally {
+      // next
+      stdin();
+    }
   });
 }
 
@@ -34,6 +40,10 @@ const { instanceService } = require("./instance_service");
 const protocol = require("./protocol");
 const { config } = require("../entity/config");
 const { logger } = require('./log');
+const { StartCommand } = require('../entity/commands/start');
+const { StopCommand } = require('../entity/commands/stop');
+const { KillCommand } = require('../entity/commands/kill');
+const { SendCommand } = require('../entity/commands/cmd');
 // const { logger } = require('./log');
 
 /**
@@ -41,17 +51,36 @@ const { logger } = require('./log');
  * @param {String} cmd
  * @return {String}
  */
-function command(cmd) {
-  logger.warn(`[终端] 执行: ${cmd}`);
+function command(cmd, p1, p2, p3) {
+
+  if (cmd === "instance") {
+    if (p1 === "start") {
+      instanceService.getInstance(p2).exec(new StartCommand("Terminal"));
+      return "Done.";
+    }
+    if (p1 === "stop") {
+      instanceService.getInstance(p2).exec(new StopCommand());
+      return "Done.";
+    }
+    if (p1 === "kill") {
+      instanceService.getInstance(p2).exec(new KillCommand());
+      return "Done.";
+    }
+    if (p1 === "send") {
+      instanceService.getInstance(p2).exec(new SendCommand(p3));
+      return "Done.";
+    }
+    return "参数错误";
+  }
 
   if (cmd === "instances") {
     const objs = instanceService.getAllInstance();
-    let result = "实例名称 | 实例标识符 | 状态码\n";
+    let result = "实例名称 | 实例 UUID | 状态码\n";
     for (const id in objs) {
       const instance = objs[id];
       result += `${instance.config.nickname} ${instance.instanceUUID} ${instance.status()}\n`;
     }
-    result += "\n状态码解释:\n忙碌 = -1; 停止 = 0;\n停止中 = 1; 开始中 = 2;\n正在运行 = 3;\n";
+    result += "\n状态解释:\n 忙碌=-1;停止=0;停止中=1;开始中=2;正在运行=3;\n";
     return result;
   }
 
@@ -91,9 +120,13 @@ function command(cmd) {
     console.log(" instances     查看所有实例");
     console.log(" sockets       查看所有链接者");
     console.log(" key           查看密匙");
-    console.log(" exit          关闭本程序（推荐使用）");
+    console.log(" exit          关闭本程序（推荐方法）");
+    console.log(" instance start <UUID>       启动指定实例");
+    console.log(" instance stop <UUID>        启动指定实例");
+    console.log(" instance kill <UUID>        启动指定实例");
+    console.log(" instance send <UUID> <CMD>  向实例发送命令");
     console.log("----------- 帮助文档 -----------");
-    return "Good luck!\n";
+    return "\n";
   }
 
 }

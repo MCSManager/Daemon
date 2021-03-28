@@ -33,6 +33,11 @@ class InstanceConfig extends DataStructure {
     this.oe = "utf-8";
     this.createDatetime = new Date().toLocaleDateString();
     this.lastDatetime = "--";
+
+    // Instance type like: Minecraft,Webwhell...
+    this.type = Instance.TYPE_UNIVERSAL;
+    // Instance tag like: Cloud1 Group2...
+    this.tag = [];
   }
 
   parameters(cfg) {
@@ -40,8 +45,9 @@ class InstanceConfig extends DataStructure {
     this.startCommand = cfg.startCommand || this.startCommand || "";
     this.stopCommand = cfg.stopCommand || this.stopCommand || "^C";
     this.cwd = cfg.cwd || this.cwd || ".";
-    this.ie = cfg.ie || this.ie || "GBK";
-    this.oe = cfg.oe || this.oe || "GBK";
+    this.ie = cfg.ie || this.ie || "utf-8";
+    this.oe = cfg.oe || this.oe || "utf-8";
+    this.type = cfg.type || this.type || Instance.TYPE_UNIVERSA;
     this.save();
   }
 }
@@ -167,6 +173,13 @@ Instance.STATUS_STOP = 0;
 Instance.STATUS_STOPPING = 1;
 Instance.STATUS_STARTING = 2;
 Instance.STATUS_RUNNING = 3;
+
+// 实例类型
+Instance.TYPE_UNIVERSAL = "TYPE_UNIVERSAL"; // 通用
+Instance.TYPE_MINECRAFT = "TYPE_MINECRAFT"; // Minecraft 游戏服务端
+Instance.TYPE_WEB_SHELL = "TYPE_WEB_SHELL"; // WebShell 程序
+Instance.TYPE_LOW_PERMISSION = "TYPE_LOW_PERMISSION"; // 低权限程序
+
 
 module.exports = {
   Instance
