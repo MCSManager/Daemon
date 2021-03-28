@@ -1,7 +1,7 @@
 {
-  "name": "arkcontrolpanel-daemon",
+  "name": "mcsm-daemon",
   "version": "1.0.0",
-  "description": "方舟生存进化面板守护进程",
+  "description": "daemon",
   "main": "app.js",
   "scripts": {
     "test": "mocha",
