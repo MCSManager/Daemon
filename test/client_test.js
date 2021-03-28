@@ -2,13 +2,13 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 12:28:09
+ * @LastEditTime: 2021-03-28 14:04:46
  * @Description: Socket 基本通信与基本功能测试类
  */
 
 // const fs = require("fs-extra");
 const io = require("socket.io-client");
-// var should = require('should');
+require('should');
 
 const connectConfig = {
   multiplex: false,
@@ -20,14 +20,14 @@ const ip = "ws://127.0.0.1:24444";
 let testServerID = "7e498901057c41b097afdf38478ce89a";
 let preDelServerUUID = "";
 
+
+
 describe("基于 Socket.io 的控制器层测试", function () {
   it("身份验证", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
-      // 这里的 protocol 事件是固定的，由服务端返回
-      // console.log(">>>: ", msg);
-      // 判定返回状态码
-      if (msg.status === 200 && msg.data === true && msg.event == "auth") {
+    socket.on("auth", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status === 200 && msg.data === true) {
         socket.close();
         done(); // 成功执行 done
       } else done(new Error("测试失败")); // 失败执行
@@ -36,11 +36,11 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.emit("auth", "test_key");
   });
 
-  it("启动进程", function (done) {
+  it("创建实例", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
+    socket.on("instance/new", (msg) => {
       // console.log(">>>: ", msg);
-      if (msg.status === 200 && msg.event == "instance/new") {
+      if (msg.status === 200) {
         preDelServerUUID = msg.data.instanceUUID;
         socket.close();
         done();
@@ -57,15 +57,11 @@ describe("基于 Socket.io 的控制器层测试", function () {
 
   it("开启实例", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
-      if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/opened") {
-        // console.log(">>>: ", msg);
-        setTimeout(() => done(), 1000);
-      }
-      if (msg.event == "instance/stdout") {
-        // 这里后续的试输出也会用到
-        console.log("[Console]:", msg.data.text);
-        return;
+    socket.on("instance/opened", (msg) => {
+      console.log(">>>: ", msg);
+      if ((msg.data.instanceUUID === testServerID)) {
+        done()
+        socket.close();
       }
     });
     socket.emit("auth", "test_key");
@@ -77,17 +73,14 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("向实例发送命令", function (done) {
     const socket = io.connect(ip, connectConfig);
     var f = 0;
-    socket.on("protocol", (msg) => {
-      if (msg.status === 200 && msg.event == "instance/command") {
-        // console.log(">>>: ", msg);
-        // setTimeout(() => done(), 1200);
-        f++;
-      }
-      if (msg.event == "instance/stdout" && f == 1) {
-        if (msg.data.text.indexOf("Test你好123") !== -1) {
-          socket.close();
-          done();
-        }
+    socket.on("instance/command", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status === 200) f++;
+    });
+    socket.on("instance/stdout", (msg) => {
+      if (msg.data.text.indexOf("Test你好123") !== -1) {
+        socket.close();
+        setTimeout(() => { if (f == 1) done(); }, 1000);
       }
     });
     socket.emit("auth", "test_key");
@@ -99,9 +92,9 @@ describe("基于 Socket.io 的控制器层测试", function () {
 
   it("关闭实例", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
-      // console.log(">>>: ", msg);
-      if (msg.status === 200 && msg.event == "instance/stop") {
+    socket.on("instance/stop", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status === 200) {
         socket.close();
         done();
       }
@@ -114,8 +107,8 @@ describe("基于 Socket.io 的控制器层测试", function () {
 
   it("服务器总览", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
-      if (msg.status === 200 && msg.event == "instance/overview") {
+    socket.on("instance/overview", (msg) => {
+      if (msg.status === 200) {
         console.log(">>>: ", msg);
         socket.close();
         if (msg.data.length >= 1) {
@@ -139,14 +132,17 @@ describe("基于 Socket.io 的控制器层测试", function () {
 
   it("删除实例并验证", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
+    let f = 0;
+    socket.on("instance/delete", (msg) => {
       console.log(">>>: ", msg);
-      if (msg.status !== 200 && msg.event == "instance/delete") done(new Error("删除代码不等于 200"));
-      if (msg.status === 200 && msg.event == "instance/overview") {
-        if (msg.data.length != 0) {
-          socket.close();
-          done();
-        }
+      if (msg.status !== 200) done(new Error("删除代码不等于 200"));
+      f++;
+    });
+    socket.on("instance/overview", (msg) => {
+      console.log(">>>: ", msg);
+      if (msg.status === 200) {
+        socket.close();
+        if (f == 1) done();
       }
     });
     socket.emit("auth", "test_key");
@@ -161,9 +157,13 @@ describe("基于 Socket.io 的控制器层测试", function () {
   it("无权限情况下一些操作", function (done) {
     let count = 0;
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
+    socket.on("instance/overview", (msg) => {
+      console.log("Fail >>>: ", msg);
+      done(new Error("不应该返回的数据有返回"))
+    });
+    socket.on("error", (msg) => {
       console.log(">>>: ", msg);
-      if (msg.status == 500 && msg.event == "error") {
+      if (msg.status == 500) {
         count++;
         // 计算是否返回了 6个错误码（500）,如果是则测试成功
         if (count >= 6) {
@@ -201,18 +201,20 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
   });
 
-  it("操作一些不存在的服务器", function (done) {
-    let count = 0;
+  it("操作一些不存在的服务器", function () {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
-      console.log(">>>: ", msg);
-      if (msg.status == 500) {
-        count++;
-        if (count >= 4) {
-          done();
-          socket.close();
-        }
-      }
+    socket.on("instance/open", (msg) => {
+      Number(500).should.equal(msg.status);
+    });
+    socket.on("instance/stop", (msg) => {
+      Number(500).should.equal(msg.status);
+    });
+    socket.on("instance/delete", (msg) => {
+      Number(500).should.equal(msg.status);
+    });
+    socket.on("instance/command", (msg) => {
+      Number(500).should.equal(msg.status);
+      socket.close();
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/open", {
@@ -229,4 +231,6 @@ describe("基于 Socket.io 的控制器层测试", function () {
       command: "echo Test你好123"
     });
   });
+
+
 });

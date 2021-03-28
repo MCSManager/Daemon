@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 09:49:33
+ * @LastEditTime: 2021-03-28 16:10:11
  * @Description: 定义网络协议与常用发送/广播/解析功能，客户端也应当拥有此文件
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -40,7 +40,7 @@ module.exports.Packet = Packet;
  */
 module.exports.msg = (socket, event, data) => {
   const packet = new Packet(STATUS_OK, event, data);
-  socket.emit("protocol", packet);
+  socket.emit(event, packet);
 };
 
 /**
@@ -50,8 +50,8 @@ module.exports.msg = (socket, event, data) => {
  */
 module.exports.error = (socket, event, err) => {
   const packet = new Packet(STATUS_ERR, event, err);
-  logger.error(`会话 ${socket.id} 在 ${event} 事件中报告错误至客户端:\n`, err);
-  socket.emit("protocol", packet);
+  logger.error(`会话 ${socket.id} 在 ${event} 中发送错误:\n`, err);
+  socket.emit(event, packet);
 };
 
 /**
@@ -86,7 +86,7 @@ module.exports.addGlobalSocket = (socket) => {
  * @param {Socket} socket
  */
 module.exports.delGlobalSocket = (socket) => {
-  return globalSocket[socket.id];
+  delete globalSocket[socket.id];
 };
 
 module.exports.socketObjects = () => {
