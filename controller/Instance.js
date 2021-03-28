@@ -4,7 +4,7 @@
  * @License: MIT
  * @Description: 应用实例相关控制器
  */
-
+const uuid = require("uuid");
 const { routerApp } = require("../service/router");
 const protocol = require("../service/protocol");
 const { instanceService } = require("../service/instance_service");
@@ -56,23 +56,25 @@ routerApp.on("instance/overview", (socket) => {
 
 // 新建应用实例
 routerApp.on("instance/new", (socket, data) => {
-  const instanceName = data.instanceName;
+  const nickname = data.nickname;
   const command = data.command;
   const cwd = data.cwd;
   const stopCommand = data.stopCommand || "^C";
+  const id = uuid.v4().replace(/-/igm, "");
   try {
-    const instance = new Instance(instanceName);
+    const instance = new Instance(id);
     instance.parameters({
+      nickname: nickname,
       startCommand: command,
       stopCommand: stopCommand,
       cwd: cwd,
       ie: "GBK",
       oe: "GBK"
     });
-    instanceService.createInstance(instance);
-    protocol.msg(socket, "instance/new", { instanceName });
+    instanceService.addInstance(instance);
+    protocol.msg(socket, "instance/new", { instanceName: id, nickname: nickname });
   } catch (err) {
-    protocol.error(socket, "instance/new", { instanceName: instanceName, err: err.message });
+    protocol.error(socket, "instance/new", { instanceName: id, err: err.message });
   }
 });
 

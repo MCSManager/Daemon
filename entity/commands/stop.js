@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-03-26 17:42:35
+ * @LastEditTime: 2021-03-28 10:09:50
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -28,7 +28,7 @@ module.exports.StopCommand = class extends InstanceCommand {
   exec(instance) {
     const stopCommand = instance.config.stopCommand;
     if (instance.status() == Instance.STATUS_STOP || !instance.process || !instance.process.pid) {
-      throw new Error("The stop command cannot be executed due to some factors.")
+      throw new Error("The instance is not started and cannot be stopped.")
     }
     instance.status(Instance.STATUS_STOPPING);
     if (stopCommand.toLocaleLowerCase() == "^c") {

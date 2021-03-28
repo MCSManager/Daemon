@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 09:19:02
+ * @LastEditTime: 2021-03-28 10:11:40
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -16,6 +16,7 @@ const connectConfig = {
   timeout: 2000
 };
 const ip = "ws://127.0.0.1:24444";
+let testServerID = null;
 
 describe("基于 Socket.io 的控制器层测试", function () {
 
@@ -38,26 +39,27 @@ describe("基于 Socket.io 的控制器层测试", function () {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
       // console.log(">>>: ", msg);
-      if ((msg.status === 200 || msg.status === 500) && msg.event == "instance/new") {
+      if (msg.status === 200 && msg.event == "instance/new") {
+        testServerID = msg.data.instanceName;
         socket.close()
         done();
       }
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/new", {
-      instanceName: "TestServer",
+      nickname: "TestServer1",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"
     });
     socket.emit("instance/new", {
-      instanceName: "TestServer2",
+      nickname: "TestServer2",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"
     });
     socket.emit("instance/new", {
-      instanceName: "TestServer3",
+      nickname: "TestServer3",
       command: "cmd.exe",
       cwd: ".",
       stopCommand: "^c"
@@ -80,7 +82,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/open", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
   });
 
@@ -102,7 +104,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/command", {
-      instanceName: "TestServer",
+      instanceName: testServerID,
       command: "echo Test你好123"
     });
   });
@@ -118,7 +120,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/stop", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
   });
 
@@ -129,8 +131,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
         console.log(">>>: ", msg);
         socket.close()
         if (msg.data.length >= 1) {
-          if (msg.data[0].startCount == 1)
-            done();
+          done();
         } else {
           done(new Error("服务器消失，数量不足1"))
         }
@@ -138,15 +139,15 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/overview", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
   });
 
-  it("读本地服务器文件", function () {
-    const text = fs.readFileSync("./TestServer.json", "utf-8")
-    should(text).have.String();
-    console.log("本地文件储存如下:", text);
-  })
+  // it("读本地服务器文件", function () {
+  //   const text = fs.readFileSync(".data/TestServer.json", "utf-8")
+  //   should(text).have.String();
+  //   console.log("本地文件储存如下:", text);
+  // })
 
   it("删除实例并验证", function (done) {
     const socket = io.connect(ip, connectConfig);
@@ -155,7 +156,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
       if (msg.status !== 200 && msg.event == "instance/delete")
         done(new Error("删除代码不等于 200"));
       if (msg.status === 200 && msg.event == "instance/overview") {
-        if (msg.data.length === 0) {
+        if (msg.data.length != 0) {
           socket.close()
           done();
         }
@@ -163,10 +164,10 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_key");
     socket.emit("instance/delete", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/overview", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
   });
 
@@ -186,22 +187,22 @@ describe("基于 Socket.io 的控制器层测试", function () {
     });
     socket.emit("auth", "test_kedsdy1");
     socket.emit("instance/overview", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/new", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/open", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/stop", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/delete", {
-      instanceName: "TestServer"
+      instanceName: testServerID
     });
     socket.emit("instance/command", {
-      instanceName: "TestServer",
+      instanceName: testServerID,
       command: "echo Test你好123"
     });
   });

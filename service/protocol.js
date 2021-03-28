@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 15:47:49
+ * @LastEditTime: 2021-03-28 09:49:33
  * @Description: 定义网络协议与常用发送/广播/解析功能，客户端也应当拥有此文件
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -9,6 +9,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const { Socket } = require("socket.io");
+const { logger } = require("./log");
 
 const STATUS_OK = 200;
 const STATUS_ERR = 500;
@@ -49,6 +50,7 @@ module.exports.msg = (socket, event, data) => {
  */
 module.exports.error = (socket, event, err) => {
   const packet = new Packet(STATUS_ERR, event, err);
+  logger.error(`会话 ${socket.id} 在 ${event} 事件中报告错误至客户端:\n`, err);
   socket.emit("protocol", packet);
 };
 

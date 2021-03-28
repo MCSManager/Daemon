@@ -1,6 +1,7 @@
 # myself files
 server/
 users/
+data/
 .vscode/
 testServer/
 *.exe

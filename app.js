@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 08:50:33
+ * @LastEditTime: 2021-03-28 09:37:12
  * @Description: 守护进程启动文件
  */
 
@@ -10,6 +10,7 @@ const { logger } = require("./service/log");
 
 // eslint-disable-next-line no-unused-vars
 const { Socket } = require("socket.io");
+const fs = require("fs-extra");
 
 logger.info(`欢迎使用 Daemon 程序.`);
 
@@ -26,6 +27,11 @@ io.use((socket, next) => {
   if (!socket.session) socket.session = {};
   next();
 });
+
+// 配置文件与数据目录相关操作
+if (!fs.existsSync(config.instanceDirectory)) {
+  fs.mkdirsSync(config.instanceDirectory);
+}
 
 const router = require("./service/router");
 const protocol = require("./service/protocol");

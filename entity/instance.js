@@ -12,6 +12,8 @@ const iconv = require("iconv-lite");
 // eslint-disable-next-line no-unused-vars
 const { InstanceCommand } = require("./commands/command");
 const { DataStructure } = require("./structure");
+const globalConfig = require("./config");
+const path = require("path");
 // const fs = require("fs-extra");
 
 class InstanceCommandError extends Error {
@@ -59,7 +61,7 @@ class Instance extends EventEmitter {
     this.lock = false;
 
     // Config init
-    this.config = new InstanceConfig(instanceName);
+    this.config = new InstanceConfig(path.join(globalConfig.config.instanceDirectory, instanceName));
     this.config.load();
 
     this.process = null;
