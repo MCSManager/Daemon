@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 11:20:55
+ * @LastEditTime: 2021-03-28 11:26:20
  * @Description: 守护进程启动文件
  */
 
@@ -89,8 +89,8 @@ require("./service/ui");
 
 process.on("SIGINT", function () {
   console.log("\n\n\n\n")
-  logger.warn("检测到 Ctrl+C 关闭进程信号.");
-  logger.warn("建议您在正常情况下使用 exit 指令来关闭，否则容易损失数据.");
+  logger.warn("检测到 SIGINT 关闭进程信号.");
+  logger.warn("推荐正常情况下使用 exit 指令来关闭，否则有一定风险损失数据.");
   logger.warn("关闭中....");
   process.exit(0);
 });
