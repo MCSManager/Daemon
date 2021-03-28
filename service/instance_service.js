@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 10:32:41
+ * @LastEditTime: 2021-03-28 11:24:38
  * @Description: 
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -10,7 +10,9 @@
 const { Instance } = require("../entity/instance");
 const { EventEmitter } = require("events");
 const fs = require("fs-extra");
-const path = require("path")
+const path = require("path");
+const { KillCommand } = require("../entity/commands/kill");
+const { logger } = require("./log");
 
 class InstanceService extends EventEmitter {
   constructor() {
@@ -88,6 +90,27 @@ class InstanceService extends EventEmitter {
     // eslint-disable-next-line no-unused-vars
     for (const _key in this.instances) i++;
     return i;
+  }
+
+  /**
+   * @param {(instance: Instance,id: string) => void} callback
+   * @return {*}
+   */
+  forEachInstances(callback) {
+    for (const id in this.instances) {
+      callback(this.instances[id], id);
+    }
+  }
+
+  exit() {
+    this.forEachInstances((instance) => {
+      if (instance.status() != Instance.STATUS_STOP) {
+        logger.info(`实例 ${instance.config.nickname} (${instance.instanceUUID}) 正在运行或忙碌，正在强制结束.`);
+        instance.execCommand(new KillCommand());
+      }
+      instance.config.save();
+      logger.info(`实例 ${instance.config.nickname} (${instance.instanceUUID}) 数据保存成功.`);
+    });
   }
 }
 

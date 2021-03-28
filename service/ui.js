@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-26 18:41:40
- * @LastEditTime: 2021-03-28 10:51:28
+ * @LastEditTime: 2021-03-28 11:24:50
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -72,11 +72,26 @@ function command(cmd) {
     return config.key;
   }
 
+  if (cmd == "exit") {
+    try {
+      logger.info("正在准备关闭守护进程...");
+      config.save();
+      instanceService.exit();
+      logger.info("数据保存完毕，感谢使用，再见！");
+      logger.info("The data is saved, thanks for using, goodbye!");
+      logger.info("process.exit(0);");
+      process.exit(0);
+    } catch (err) {
+      logger.error("结束程序失败，请检查文件权限后重试几次，依然无法关闭请使用 Ctrl+C 关闭.", err);
+    }
+  }
+
   if (cmd == "help") {
     console.log("----------- 帮助文档 -----------");
     console.log(" instances     查看所有实例");
     console.log(" sockets       查看所有链接者");
     console.log(" key           查看密匙");
+    console.log(" exit          关闭本程序（推荐使用）");
     console.log("----------- 帮助文档 -----------");
     return "Good luck!\n";
   }
