@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-26 18:39:04
+ * @LastEditTime: 2021-03-28 08:43:37
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -18,6 +18,7 @@ routerApp.use((event, socket, data, next) => {
   if (event === "auth") return next();
   if (!socket.session)
     throw new Error("Session does not exist in authentication middleware.");
+  // 若未验证则阻止除 auth 事件外的所有事件
   if (socket.session.key !== config.key || !socket.session.login || !socket.session.id) {
     logger.warn(`会话 ${socket.id}(${socket.handshake.address}) 试图无权限访问 ${event} 现已阻止.`);
     return protocol.error(socket, "error", "权限不足，非法访问");
