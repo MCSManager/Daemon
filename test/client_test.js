@@ -2,7 +2,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-03-28 10:42:55
+ * @LastEditTime: 2021-03-28 12:28:09
  * @Description: Socket 基本通信与基本功能测试类
  */
 
@@ -24,20 +24,21 @@ describe("基于 Socket.io 的控制器层测试", function () {
 
   it("身份验证", function (done) {
     const socket = io.connect(ip, connectConfig);
-    socket.on("protocol", (msg) => {
+    socket.on("protocol", (msg) => { // 这里的 protocol 事件是固定的，由服务端返回
       // console.log(">>>: ", msg);
+      // 判定返回状态码
       if (msg.status === 200 && msg.data === true && msg.event == "auth") {
         socket.close()
-        done();
+        done(); // 成功执行 done
       }
       else
-        done(new Error("测试失败"));
+        done(new Error("测试失败")); // 失败执行
     });
     // client = socket;
     socket.emit("auth", "test_key");
   });
 
-  it("新建实例", function (done) {
+  it("启动进程", function (done) {
     const socket = io.connect(ip, connectConfig);
     socket.on("protocol", (msg) => {
       // console.log(">>>: ", msg);
@@ -169,29 +170,31 @@ describe("基于 Socket.io 的控制器层测试", function () {
       console.log(">>>: ", msg);
       if (msg.status == 500 && msg.event == "error") {
         count++;
+        // 计算是否返回了 6个错误码（500）,如果是则测试成功
         if (count >= 6) {
           done();
           socket.close();
         }
       }
     });
+    // 身份认证
     socket.emit("auth", "test_kedsdy1");
-    socket.emit("instance/overview", {
+    socket.emit("instance/overview", { // 无权限状态查看所有远程程序
       instanceUUID: testServerID
     });
-    socket.emit("instance/new", {
+    socket.emit("instance/new", {// 无权限状态创建远程程序
       instanceUUID: testServerID
     });
-    socket.emit("instance/open", {
+    socket.emit("instance/open", {// 无权限状态开启远程程序
       instanceUUID: testServerID
     });
-    socket.emit("instance/stop", {
+    socket.emit("instance/stop", {// 无权限状态停止远程程序
       instanceUUID: testServerID
     });
-    socket.emit("instance/delete", {
+    socket.emit("instance/delete", {// 无权限状态删除远程程序
       instanceUUID: testServerID
     });
-    socket.emit("instance/command", {
+    socket.emit("instance/command", {// 无权限状态发送远程程序命令
       instanceUUID: testServerID,
       command: "echo Test你好123"
     });
