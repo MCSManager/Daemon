@@ -61,7 +61,6 @@ class RouterApp extends EventEmitter {
 const routerApp = new RouterApp();
 module.exports.routerApp = routerApp;
 
-
 /**
  * 基于 Socket.io 进行路由分散与二次转发
  * @param {Socket} socket
@@ -79,7 +78,7 @@ module.exports.navigation = (socket) => {
       fn(packet[0], socket, packet[1], next);
     });
   }
-}
+};
 
 // 导入所有路由层类
 function importController() {

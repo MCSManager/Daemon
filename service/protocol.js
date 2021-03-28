@@ -54,7 +54,6 @@ module.exports.error = (socket, event, err) => {
   socket.emit("protocol", packet);
 };
 
-
 /**
  * @param {object} text
  */

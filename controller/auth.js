@@ -16,8 +16,7 @@ const { logger } = require("../service/log");
 routerApp.use((event, socket, data, next) => {
   // 除 auth 控制器是公开访问，其他控制器必须得到授权才可访问
   if (event === "auth") return next();
-  if (!socket.session)
-    throw new Error("Session does not exist in authentication middleware.");
+  if (!socket.session) throw new Error("Session does not exist in authentication middleware.");
   // 若未验证则阻止除 auth 事件外的所有事件
   if (socket.session.key !== config.key || !socket.session.login || !socket.session.id) {
     logger.warn(`会话 ${socket.id}(${socket.handshake.address}) 试图无权限访问 ${event} 现已阻止.`);
@@ -25,7 +24,6 @@ routerApp.use((event, socket, data, next) => {
   }
   next();
 });
-
 
 // 日志输出中间件
 routerApp.use((event, socket, data, next) => {
@@ -39,7 +37,6 @@ routerApp.use((event, socket, data, next) => {
   }
 });
 
-
 // 身份认证控制器
 routerApp.on("auth", (socket, data) => {
   if (data === config.key) {
@@ -51,7 +48,6 @@ routerApp.on("auth", (socket, data) => {
     protocol.msg(socket, "auth", false);
   }
 });
-
 
 // 登录成功后必须执行此函数
 function loginSuccessful(socket, data) {

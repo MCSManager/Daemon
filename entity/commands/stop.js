@@ -28,7 +28,7 @@ module.exports.StopCommand = class extends InstanceCommand {
   exec(instance) {
     const stopCommand = instance.config.stopCommand;
     if (instance.status() == Instance.STATUS_STOP || !instance.process || !instance.process.pid) {
-      throw new Error("The instance is not started and cannot be stopped.")
+      throw new Error("The instance is not started and cannot be stopped.");
     }
     instance.status(Instance.STATUS_STOPPING);
     if (stopCommand.toLocaleLowerCase() == "^c") {

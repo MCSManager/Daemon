@@ -15,7 +15,7 @@ const { SendCommand } = require("../entity/commands/cmd");
 // const { StopCommand } = require("../entity/commands/stop");
 // const { describe, it } = require("mocha");
 
-var assert = require('assert');
+var assert = require("assert");
 describe("实例应用的基本测试", function () {
   it("创建实例", function () {
     const instance = new Instance("XXX");
@@ -59,5 +59,4 @@ describe("实例应用的基本测试", function () {
     const obj = instanceService.getAllInstance();
     assert.equal(obj["XXX"], null);
   });
-
 });

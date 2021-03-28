@@ -7,24 +7,22 @@
  * @License: MIT
  */
 
-const readline = require('readline');
+const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-console.log("[User Interface] 程序拥有简易的终端交互功能，键入 help 得以查看更多信息.")
+console.log("[User Interface] 程序拥有简易的终端交互功能，键入 help 得以查看更多信息.");
 
 function stdin() {
-  rl.question('> ', (answer) => {
+  rl.question("> ", (answer) => {
     try {
       const cmds = answer.split(" ");
       logger.info(`[终端] ${answer}`);
       const result = command(...cmds);
-      if (result)
-        console.log(result);
-      else
-        console.log(`命令 ${answer} 并不存在，键入 help 得以获取帮助.`);
+      if (result) console.log(result);
+      else console.log(`命令 ${answer} 并不存在，键入 help 得以获取帮助.`);
     } catch (err) {
       logger.error("[终端]", err);
     } finally {
@@ -39,11 +37,11 @@ stdin();
 const { instanceService } = require("./instance_service");
 const protocol = require("./protocol");
 const { config } = require("../entity/config");
-const { logger } = require('./log');
-const { StartCommand } = require('../entity/commands/start');
-const { StopCommand } = require('../entity/commands/stop');
-const { KillCommand } = require('../entity/commands/kill');
-const { SendCommand } = require('../entity/commands/cmd');
+const { logger } = require("./log");
+const { StartCommand } = require("../entity/commands/start");
+const { StopCommand } = require("../entity/commands/stop");
+const { KillCommand } = require("../entity/commands/kill");
+const { SendCommand } = require("../entity/commands/cmd");
 // const { logger } = require('./log');
 
 /**
@@ -52,7 +50,6 @@ const { SendCommand } = require('../entity/commands/cmd');
  * @return {String}
  */
 function command(cmd, p1, p2, p3) {
-
   if (cmd === "instance") {
     if (p1 === "start") {
       instanceService.getInstance(p2).exec(new StartCommand("Terminal"));
@@ -93,7 +90,7 @@ function command(cmd, p1, p2, p3) {
       count++;
       result += `${sockets[id].handshake.address}  ${id}\n`;
     }
-    result += (`总计 ${count} 在线.\n`);
+    result += `总计 ${count} 在线.\n`;
     return result;
   }
 
@@ -128,5 +125,4 @@ function command(cmd, p1, p2, p3) {
     console.log("----------- 帮助文档 -----------");
     return "\n";
   }
-
 }

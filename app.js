@@ -14,12 +14,12 @@ const fs = require("fs-extra");
 
 logger.info(`欢迎使用 Daemon 程序.`);
 
-const io = global.io = require("socket.io")(config.port, {
+const io = (global.io = require("socket.io")(config.port, {
   serveClient: false,
   pingInterval: 10000,
   pingTimeout: 10000,
   cookie: false
-});
+}));
 
 // 初始化 Session 会话变量
 // 使用轻量级的会话功能
@@ -41,7 +41,7 @@ const { instanceService } = require("./service/instance_service");
 try {
   logger.info("正在装载本地实例文件...");
   instanceService.loadInstances(config.instanceDirectory);
-  logger.info(`全部本地实例装载完毕，总计 ${instanceService.getInstancesSize()} 个.`)
+  logger.info(`全部本地实例装载完毕，总计 ${instanceService.getInstancesSize()} 个.`);
 } catch (err) {
   logger.error("读取本地实例文件失败，此问题必须修复才可启动:", err);
   process.exit(-1);
@@ -88,7 +88,7 @@ console.log("");
 require("./service/ui");
 
 process.on("SIGINT", function () {
-  console.log("\n\n\n\n")
+  console.log("\n\n\n\n");
   logger.warn("检测到 SIGINT 关闭进程信号.");
   logger.warn("推荐正常情况下使用 exit 指令来关闭，否则有一定风险损失数据.");
   logger.warn("关闭中....");

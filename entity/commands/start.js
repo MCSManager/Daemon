@@ -39,8 +39,7 @@ module.exports.StartCommand = class extends InstanceCommand {
     if (instanceStatus != Instance.STATUS_STOP) {
       throw new StartupError("This instance status is NOT STATUS_STOP.");
     }
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      throw new StartupError("Startup command or working directory cannot be null.");
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) throw new StartupError("Startup command or working directory cannot be null.");
 
     instance.setLock(true);
 
@@ -54,12 +53,12 @@ module.exports.StartCommand = class extends InstanceCommand {
       const commandExeFile = commandList[0];
       const commnadParameters = commandList.slice(1);
 
-      logger.info("----------------")
+      logger.info("----------------");
       logger.info(`Object ${this.Source} sends a command to open ${instance.instanceUUID} instance.`);
       logger.info(`Starting instance: [${instance.instanceUUID}]`);
       logger.info(`Command: ${commandExeFile} ${commnadParameters.join(" ")}`);
       logger.info(`Directory: ${instance.config.cwd}`);
-      logger.info("----------------")
+      logger.info("----------------");
 
       // Create process.
       const process = childProcess.spawn(commandExeFile, commnadParameters, {

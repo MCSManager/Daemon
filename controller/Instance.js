@@ -34,7 +34,6 @@ routerApp.use((event, socket, data, next) => {
   next();
 });
 
-
 // 获取本守护进程实例总览
 routerApp.on("instance/overview", (socket) => {
   const instances = instanceService.getAllInstance();
@@ -48,12 +47,11 @@ routerApp.on("instance/overview", (socket) => {
       createDatetime: instance.config.createDatetime,
       lastDatetime: instance.config.lastDatetime,
       startCount: instance.startCount,
-      status: instance.status(),
+      status: instance.status()
     });
   }
   protocol.msg(socket, "instance/overview", overview);
 });
-
 
 // 新建应用实例
 routerApp.on("instance/new", (socket, data) => {
@@ -61,7 +59,7 @@ routerApp.on("instance/new", (socket, data) => {
   const command = data.command;
   const cwd = data.cwd;
   const stopCommand = data.stopCommand || "^C";
-  const newUUID = uuid.v4().replace(/-/igm, "");
+  const newUUID = uuid.v4().replace(/-/gim, "");
   try {
     const instance = new Instance(newUUID);
     instance.parameters({
@@ -79,7 +77,6 @@ routerApp.on("instance/new", (socket, data) => {
   }
 });
 
-
 // 开启实例
 routerApp.on("instance/open", (socket, data) => {
   const instanceUUID = data.instanceUUID;
@@ -93,7 +90,6 @@ routerApp.on("instance/open", (socket, data) => {
   }
 });
 
-
 // 关闭实例
 routerApp.on("instance/stop", (socket, data) => {
   const instanceUUID = data.instanceUUID;
@@ -106,7 +102,6 @@ routerApp.on("instance/stop", (socket, data) => {
   }
 });
 
-
 // 删除实例
 routerApp.on("instance/delete", (socket, data) => {
   const instanceUUID = data.instanceUUID;
@@ -117,7 +112,6 @@ routerApp.on("instance/delete", (socket, data) => {
     protocol.error(socket, "instance/delete", { instanceUUID: instanceUUID, err: err.message });
   }
 });
-
 
 // 向应用实例发送命令
 routerApp.on("instance/command", (socket, data) => {
@@ -131,7 +125,6 @@ routerApp.on("instance/command", (socket, data) => {
     protocol.error(socket, "instance/command", { instanceUUID: instanceUUID, err: err.message });
   }
 });
-
 
 // 杀死应用实例方法
 routerApp.on("instance/kill", (socket, data) => {

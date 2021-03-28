@@ -2,7 +2,7 @@
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
  * @LastEditTime: 2021-03-26 16:55:36
- * @Description:
+ * @Description: 日志
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
@@ -37,7 +37,6 @@ log4js.configure({
 });
 
 const logger = log4js.getLogger("default");
-
 
 function fullTime() {
   const date = new Date();

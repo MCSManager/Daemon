@@ -88,10 +88,8 @@ class Instance extends EventEmitter {
    * @return {void}
    */
   execCommand(command) {
-    if (this.lock)
-      throw new InstanceCommandError(`This ${command.info} operation cannot be completed because the command executes a deadlock.`);
-    if (this.status() == Instance.STATUS_BUSY)
-      throw new InstanceCommandError(`The status of ${this.instanceUUID} instance is busy and cannot do anything.`);
+    if (this.lock) throw new InstanceCommandError(`This ${command.info} operation cannot be completed because the command executes a deadlock.`);
+    if (this.status() == Instance.STATUS_BUSY) throw new InstanceCommandError(`The status of ${this.instanceUUID} instance is busy and cannot do anything.`);
     command.exec(this);
   }
 
@@ -164,7 +162,6 @@ class Instance extends EventEmitter {
     const date = new Date();
     return date.toLocaleDateString() + " " + date.getHours() + ":" + date.getMinutes();
   }
-
 }
 
 // 实例类静态变量
@@ -179,7 +176,6 @@ Instance.TYPE_UNIVERSAL = "TYPE_UNIVERSAL"; // 通用
 Instance.TYPE_MINECRAFT = "TYPE_MINECRAFT"; // Minecraft 游戏服务端
 Instance.TYPE_WEB_SHELL = "TYPE_WEB_SHELL"; // WebShell 程序
 Instance.TYPE_LOW_PERMISSION = "TYPE_LOW_PERMISSION"; // 低权限程序
-
 
 module.exports = {
   Instance
