@@ -8,7 +8,7 @@
 
 // const fs = require("fs-extra");
 const io = require("socket.io-client");
-require('should');
+require("should");
 
 const connectConfig = {
   multiplex: false,
@@ -19,8 +19,6 @@ const ip = "ws://127.0.0.1:24444";
 
 let testServerID = "7e498901057c41b097afdf38478ce89a";
 let preDelServerUUID = "";
-
-
 
 describe("基于 Socket.io 的控制器层测试", function () {
   it("身份验证", function (done) {
@@ -59,8 +57,8 @@ describe("基于 Socket.io 的控制器层测试", function () {
     const socket = io.connect(ip, connectConfig);
     socket.on("instance/opened", (msg) => {
       console.log(">>>: ", msg);
-      if ((msg.data.instanceUUID === testServerID)) {
-        done()
+      if (msg.data.instanceUUID === testServerID) {
+        done();
         socket.close();
       }
     });
@@ -80,7 +78,9 @@ describe("基于 Socket.io 的控制器层测试", function () {
     socket.on("instance/stdout", (msg) => {
       if (msg.data.text.indexOf("Test你好123") !== -1) {
         socket.close();
-        setTimeout(() => { if (f == 1) done(); }, 1000);
+        setTimeout(() => {
+          if (f == 1) done();
+        }, 1000);
       }
     });
     socket.emit("auth", "test_key");
@@ -159,7 +159,7 @@ describe("基于 Socket.io 的控制器层测试", function () {
     const socket = io.connect(ip, connectConfig);
     socket.on("instance/overview", (msg) => {
       console.log("Fail >>>: ", msg);
-      done(new Error("不应该返回的数据有返回"))
+      done(new Error("不应该返回的数据有返回"));
     });
     socket.on("error", (msg) => {
       console.log(">>>: ", msg);
@@ -231,6 +231,4 @@ describe("基于 Socket.io 的控制器层测试", function () {
       command: "echo Test你好123"
     });
   });
-
-
 });

@@ -8,13 +8,12 @@
 
 const io = require("socket.io-client");
 const test = require("./test");
-require('should');
+require("should");
 
 let testServerID = "7e498901057c41b097afdf38478ce89a";
 let key = "test_key";
 
 describe("第二代 Socket.io 业务逻辑测试", function () {
-
   it("身份验证测试", function () {
     test.io({
       key: key,
@@ -26,7 +25,7 @@ describe("第二代 Socket.io 业务逻辑测试", function () {
           Number(200).should.equal(msg.status);
         });
       }
-    })
+    });
   });
 
   it("身份验证测试2", function () {
@@ -39,5 +38,4 @@ describe("第二代 Socket.io 业务逻辑测试", function () {
       socket.close();
     });
   });
-
 });

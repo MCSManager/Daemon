@@ -8,7 +8,7 @@
  */
 
 const io = require("socket.io-client");
-require('should');
+require("should");
 
 const connectConfig = {
   multiplex: false,
@@ -27,12 +27,11 @@ module.exports.io = (config) => {
       config.req(socket);
       return;
     }
-    throw new Error(`身份认证失败`)
+    throw new Error(`身份认证失败`);
   });
-}
-
+};
 
 module.exports.config = {
   connect: connectConfig,
   ip: ip
-}
+};
