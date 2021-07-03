@@ -1,2 +1,1 @@
-# MCSManager-Daemon
-适用于 MCSManager 的守护进程项目，可进行分布式管理
+Copyright © 2021 [Suwings](https://github.com/Suwings). All Rights Reserved.

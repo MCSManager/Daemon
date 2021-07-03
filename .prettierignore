@@ -1,17 +1,30 @@
-# myself files
+public/common/bootstrap/
+public/common/echarts-dist/
+public/common/vue/
+public/common/jquery-3.2.1.min.js
+public/common/xterm.css
+public/common/xterm.js
+public/common/xterm.js.map
+public/common/echarts.js
+public/onlinefs_public/
+public/login/static/
+public/login2/static/
+public/login3/static/
+README.md
+README-traditional.md
+
+*.json
+
+# self files
 server/
 users/
-data/
 .vscode/
 testServer/
 *.exe
 *.zip
 docker_temp/
-toprettier.bat
 
-config.json
-*.bat
-test_file/
+
 # config files
 users/*.json
 server/*.json
