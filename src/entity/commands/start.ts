@@ -29,10 +29,8 @@ export default class StartCommand extends InstanceCommand {
 
   exec(instance: Instance) {
     const instanceStatus = instance.status();
-    if (instanceStatus != Instance.STATUS_STOP)
-      return instance.failure(new StartupError("实例未处于关闭状态，无法再进行启动"));
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
+    if (instanceStatus != Instance.STATUS_STOP) return instance.failure(new StartupError("实例未处于关闭状态，无法再进行启动"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
 
     try {
       instance.setLock(true);
@@ -41,7 +39,7 @@ export default class StartCommand extends InstanceCommand {
       // 启动次数增加
       instance.startCount++;
       // 命令解析
-      const commandList = instance.config.startCommand.replace(/  /igm, " ").split(" ");
+      const commandList = instance.config.startCommand.replace(/  /gim, " ").split(" ");
       const commandExeFile = commandList[0];
       const commnadParameters = commandList.slice(1);
 

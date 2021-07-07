@@ -58,22 +58,34 @@ class InstanceSubsystem extends EventEmitter {
       this.emit("data", instance.instanceUuid, ...arr);
     });
     instance.on("exit", (...arr) => {
-      this.emit("exit", {
-        instanceUuid: instance.instanceUuid,
-        instanceName: instance.config.nickname
-      }, ...arr);
+      this.emit(
+        "exit",
+        {
+          instanceUuid: instance.instanceUuid,
+          instanceName: instance.config.nickname
+        },
+        ...arr
+      );
     });
     instance.on("open", (...arr) => {
-      this.emit("open", {
-        instanceUuid: instance.instanceUuid,
-        instanceName: instance.config.nickname
-      }, ...arr);
+      this.emit(
+        "open",
+        {
+          instanceUuid: instance.instanceUuid,
+          instanceName: instance.config.nickname
+        },
+        ...arr
+      );
     });
     instance.on("failure", (...arr) => {
-      this.emit("failure", {
-        instanceUuid: instance.instanceUuid,
-        instanceName: instance.config.nickname
-      }, ...arr);
+      this.emit(
+        "failure",
+        {
+          instanceUuid: instance.instanceUuid,
+          instanceName: instance.config.nickname
+        },
+        ...arr
+      );
     });
   }
 
@@ -88,13 +100,13 @@ class InstanceSubsystem extends EventEmitter {
   forward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.requestForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   stopForward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.cannelForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   forEachForward(instanceUuid: string, callback: (socket: Socket) => void) {

@@ -11,8 +11,6 @@ import RouterContext from "../entity/ctx";
 import * as protocol from "../service/protocol";
 import InstanceSubsystem from "../service/system_instance";
 
-
-
 // 程序输出流日志广播
 InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
   InstanceSubsystem.forEachForward(instanceUuid, (socket) => {
@@ -39,7 +37,6 @@ InstanceSubsystem.on("open", (obj: any) => {
   });
 });
 
-
 // 实例失败事件（一般用于启动失败，也可能是其他操作失败）
 InstanceSubsystem.on("failure", (obj: any) => {
   protocol.broadcast("instance/failure", {
@@ -47,4 +44,3 @@ InstanceSubsystem.on("failure", (obj: any) => {
     instanceName: obj.instanceName
   });
 });
-
