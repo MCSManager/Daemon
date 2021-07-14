@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-14 16:39:35
+ * @LastEditTime: 2021-07-14 17:23:32
  * @Description: Daemon service startup file
  */
 
@@ -19,11 +19,8 @@ _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 
 import http from "http";
 import Koa from "koa";
-import Router from "@koa/router";
-// import bodyParser from "koa-bodyparser";
 import koaBody from "koa-body";
 import { Server, Socket } from "socket.io";
-import fs from "fs-extra";
 
 import logger from "./service/log";
 logger.info(`Welcome to use MCSManager daemon.`);
@@ -33,13 +30,12 @@ import * as router from "./service/router";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 
-// 初始化全局变量服务
+// 初始化全局配置服务
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
 // 初始化 Koa 框架
 const koaApp = new Koa();
-// koaApp.use(bodyParser());
 koaApp.use(koaBody({
   multipart: true,
 }))
@@ -60,7 +56,7 @@ const io = new Server(httpServer, {
   cookie: false
 });
 
-// Load instance
+// 初始化应用实例系统 & 装载应用实例
 try {
   logger.info("Loading local instance file...");
   InstanceSubsystem.loadInstances();
@@ -70,7 +66,7 @@ try {
   process.exit(-1);
 }
 
-// Register link event
+// 注册 Websocket 连接事件
 io.on("connection", (socket: Socket) => {
   logger.info(`Session ${socket.id}(${socket.handshake.address}) is connected.`);
 
@@ -108,6 +104,7 @@ logger.info("It is recommended to use the exit command to close the exit program
 logger.info("--------------------");
 console.log("");
 
+// 装载 终端界面UI
 import "./service/ui";
 
 process.on("SIGINT", function () {
