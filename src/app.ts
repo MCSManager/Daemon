@@ -36,9 +36,11 @@ const config = globalConfiguration.config;
 
 // 初始化 Koa 框架
 const koaApp = new Koa();
-koaApp.use(koaBody({
-  multipart: true,
-}))
+koaApp.use(
+  koaBody({
+    multipart: true
+  })
+);
 
 // 装载 HTTP 服务路由
 import koaRouter from "./routers/http_router";
