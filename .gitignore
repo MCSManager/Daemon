@@ -8,6 +8,7 @@ testServer/
 *.zip
 docker_temp/
 toprettier.bat
+upload/
 
 config.json
 *.bat

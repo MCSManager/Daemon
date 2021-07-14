@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-06-27 20:14:45
+ * @LastEditTime: 2021-07-14 16:39:35
  * @Description: Daemon service startup file
  */
 
@@ -17,7 +17,13 @@ _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/ Version 1.0
 `);
 
+import http from "http";
+import Koa from "koa";
+import Router from "@koa/router";
+// import bodyParser from "koa-bodyparser";
+import koaBody from "koa-body";
 import { Server, Socket } from "socket.io";
+import fs from "fs-extra";
 
 import logger from "./service/log";
 logger.info(`Welcome to use MCSManager daemon.`);
@@ -27,22 +33,32 @@ import * as router from "./service/router";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 
-// init gloabal config
+// 初始化全局变量服务
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// Websocket server
-const io = new Server(config.port, {
+// 初始化 Koa 框架
+const koaApp = new Koa();
+// koaApp.use(bodyParser());
+koaApp.use(koaBody({
+  multipart: true,
+}))
+
+// 装载 HTTP 服务路由
+import koaRouter from "./routers/http_router";
+koaApp.use(koaRouter.routes()).use(koaRouter.allowedMethods());
+
+// 初始化 HTTP 服务
+const httpServer = http.createServer(koaApp.callback());
+httpServer.listen(config.port);
+
+// 初始化 Websocket 服务
+const io = new Server(httpServer, {
   serveClient: false,
-  pingInterval: 10000,
-  pingTimeout: 10000,
+  pingInterval: 3000,
+  pingTimeout: 5000,
   cookie: false
 });
-
-// Configuration file and data directory related operations
-// if (!fs.existsSync(config.instanceDirectory)) {
-//   fs.mkdirsSync(config.instanceDirectory);
-// }
 
 // Load instance
 try {
