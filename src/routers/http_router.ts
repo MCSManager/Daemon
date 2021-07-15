@@ -25,7 +25,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
   try {
     // 从任务中心取任务
     const mission = missionPassport.getMission(key, "download");
-    if (!mission) throw new Error(ctx.body = "No task, Access denied | 无下载任务，非法访问");
+    if (!mission) throw new Error((ctx.body = "No task, Access denied | 无下载任务，非法访问"));
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
     if (!instance) throw new Error("实例不存在");
 
@@ -34,7 +34,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
     const ext = path.extname(fileRelativePath);
     // 检查文件跨目录安全隐患
     const fileManager = new FileManager(cwd);
-    if (!fileManager.check(fileRelativePath)) throw new Error(ctx.body = "Access denied | 参数不正确");
+    if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied | 参数不正确"));
 
     // 开始给用户下载文件
     ctx.type = ext;
@@ -73,7 +73,7 @@ router.post("/upload/:key", async (ctx) => {
       // 检查文件跨目录安全隐患
       const fileManager = new FileManager(cwd);
       if (!fileManager.checkPath(fileSaveRelativePath)) throw new Error("Access denied 0x064");
-      const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath)
+      const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath);
 
       // 禁止覆盖原文件
       // if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("文件存在，无法覆盖");
@@ -82,7 +82,7 @@ router.post("/upload/:key", async (ctx) => {
       const reader = fs.createReadStream(file.path);
       const upStream = fs.createWriteStream(fileSaveAbsolutePath);
       reader.pipe(upStream);
-      return ctx.body = "OK";
+      return (ctx.body = "OK");
     }
     ctx.body = "未知原因: 上传失败";
   } catch (error) {

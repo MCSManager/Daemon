@@ -42,10 +42,9 @@ koaApp.use(
   })
 );
 
-
 // 装载 Koa 最高级中间件
 koaApp.use(async (ctx, next) => {
-  await next()
+  await next();
   // 因所有HTTP请求必须由面板端创建任务护照才可使用，因此准许跨域请求，也可保证安全
   ctx.response.set("Access-Control-Allow-Origin", "*");
   ctx.response.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
