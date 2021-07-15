@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-07-15 15:08:01
+ * @LastEditTime: 2021-07-15 21:39:48
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
@@ -92,5 +92,13 @@ export default class FileManager {
 
   async copy(fileName: string, destPath: string) {
     if (!this.checkPath(destPath) || !this.check(fileName)) throw new Error(ERROR_MSG_01);
+  }
+
+  public static checkFileName(fileName: string) {
+    const blackKeys = ["/", "\\", "|", "?", "*", ">", "<", ";", '"', "'"];
+    for (const ch of blackKeys) {
+      if (fileName.includes(ch)) return false;
+    }
+    return true;
   }
 }

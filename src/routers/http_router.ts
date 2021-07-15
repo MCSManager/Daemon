@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright 2021 Suwings
  * @Date: 2021-07-14 16:13:18
- * @LastEditTime: 2021-07-15 17:44:59
+ * @LastEditTime: 2021-07-15 22:03:34
  * @Description:
  */
 import Router from "@koa/router";
@@ -20,7 +20,7 @@ router.all("/", async (ctx) => {
 });
 
 // 文件下载路由
-router.get("/download/:key", async (ctx) => {
+router.get("/download/:key/:fileName", async (ctx) => {
   try {
     const key = ctx.params.key;
     // 从任务中心取任务
@@ -32,7 +32,7 @@ router.get("/download/:key", async (ctx) => {
       return (ctx.body = "Access denied | 实例不存在");
     }
     const cwd = instance.config.cwd;
-    const target = path.join(cwd, mission.parameter.fileName);
+    const target = mission.parameter.fileName;
     const ext = path.extname(target);
     // 检查文件跨目录安全隐患
     const fileManager = new FileManager(cwd);
@@ -42,7 +42,7 @@ router.get("/download/:key", async (ctx) => {
     }
     // 开始给用户下载文件
     ctx.type = ext;
-    ctx.body = fs.createReadStream(target);
+    ctx.body = fs.createReadStream(fileManager.toAbsolutePath(target));
     // 任务已执行，销毁护照
     missionPassport.deleteMission(key);
   } catch (error) {
@@ -52,31 +52,45 @@ router.get("/download/:key", async (ctx) => {
 });
 
 // 文件上载路由
-router.post("/upload/:id", async (ctx) => {
+router.post("/upload/:key", async (ctx) => {
   try {
+    // 领取任务 & 检查任务 & 检查实例是否存在
+    const key = ctx.params.key;
+    const mission = missionPassport.getMission(key, "upload");
+    if (!mission) throw new Error("Access denied 0x061");
+    const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
+    if (!instance) throw new Error("Access denied 0x062");
+    const uploadDir = mission.parameter.uploadDir;
+    const cwd = instance.config.cwd;
+
     const file = ctx.request.files.file as any;
     if (file) {
-      // 确认文件夹名和后缀
+      // 确认存储位置
       const fullFileName = file.name as string;
-      const fullFileNameArray = fullFileName.split(".");
-      const ext = fullFileNameArray.pop() || "";
-      const fileName = fullFileNameArray.join(".");
-      const fileSavePath = `upload/${fileName}.${ext}`;
+      const fileSaveRelativePath = path.normalize(path.join(uploadDir, fullFileName));
 
-      // 特殊字符过滤
-      const blackKeys = ["/", "\\", "|", "?", "*", ">", "<", ";", '"', "'"];
-      for (const ch of blackKeys) if (fileName.includes(ch)) throw new Error("0x044");
+      // 文件名特殊字符过滤(杜绝任何跨目录入侵手段)
+      if (!FileManager.checkFileName(fullFileName)) throw new Error("Access denied 0x063");
+
+      // 检查文件跨目录安全隐患
+      const fileManager = new FileManager(cwd);
+      if (!fileManager.checkPath(fileSaveRelativePath)) throw new Error("Access denied 0x064");
+      const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath)
+
+      // 禁止覆盖原文件
+      if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("文件存在，无法覆盖");
 
       // 将文件从临时文件夹复制到指定目录
       const reader = fs.createReadStream(file.path);
-      const upStream = fs.createWriteStream(fileSavePath);
+      const upStream = fs.createWriteStream(fileSaveAbsolutePath);
       reader.pipe(upStream);
+      return ctx.body = "OK";
     }
+    ctx.body = "未知原因: 上传失败";
   } catch (error) {
-    ctx.body = "ERROR";
+    ctx.body = error.message;
     ctx.status = 500;
   }
-  ctx.body = "OK";
 });
 
 export default router;
