@@ -21,7 +21,7 @@ McserverConfig.json
 core/*.json
 public/common/URL.js
 property.js
-
+test.txt
 #vscode
 *.code-workspace
 
