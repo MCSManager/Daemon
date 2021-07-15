@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright 2021 Suwings
  * @Date: 2021-07-14 16:13:18
- * @LastEditTime: 2021-07-15 22:03:34
+ * @LastEditTime: 2021-07-15 22:08:43
  * @Description:
  */
 import Router from "@koa/router";
@@ -21,41 +21,39 @@ router.all("/", async (ctx) => {
 
 // 文件下载路由
 router.get("/download/:key/:fileName", async (ctx) => {
+  const key = ctx.params.key;
   try {
-    const key = ctx.params.key;
     // 从任务中心取任务
     const mission = missionPassport.getMission(key, "download");
-    if (!mission) return (ctx.body = "No task, Access denied | 无下载任务，非法访问");
+    if (!mission) throw new Error(ctx.body = "No task, Access denied | 无下载任务，非法访问");
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
-    if (!instance) {
-      missionPassport.deleteMission(key);
-      return (ctx.body = "Access denied | 实例不存在");
-    }
+    if (!instance) throw new Error("实例不存在");
+
     const cwd = instance.config.cwd;
-    const target = mission.parameter.fileName;
-    const ext = path.extname(target);
+    const fileRelativePath = mission.parameter.fileName;
+    const ext = path.extname(fileRelativePath);
     // 检查文件跨目录安全隐患
     const fileManager = new FileManager(cwd);
-    if (!fileManager.check(target)) {
-      missionPassport.deleteMission(key);
-      return (ctx.body = "Access denied | 参数不正确");
-    }
+    if (!fileManager.check(fileRelativePath)) throw new Error(ctx.body = "Access denied | 参数不正确");
+
     // 开始给用户下载文件
     ctx.type = ext;
-    ctx.body = fs.createReadStream(fileManager.toAbsolutePath(target));
+    ctx.body = fs.createReadStream(fileManager.toAbsolutePath(fileRelativePath));
     // 任务已执行，销毁护照
     missionPassport.deleteMission(key);
   } catch (error) {
     ctx.body = `下载出错: ${error.message}`;
     ctx.status = 500;
+  } finally {
+    missionPassport.deleteMission(key);
   }
 });
 
 // 文件上载路由
 router.post("/upload/:key", async (ctx) => {
+  const key = ctx.params.key;
   try {
     // 领取任务 & 检查任务 & 检查实例是否存在
-    const key = ctx.params.key;
     const mission = missionPassport.getMission(key, "upload");
     if (!mission) throw new Error("Access denied 0x061");
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
@@ -90,6 +88,8 @@ router.post("/upload/:key", async (ctx) => {
   } catch (error) {
     ctx.body = error.message;
     ctx.status = 500;
+  } finally {
+    missionPassport.deleteMission(key);
   }
 });
 
