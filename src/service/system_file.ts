@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-06-23 16:02:55
+ * @LastEditTime: 2021-07-15 15:08:01
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
@@ -22,9 +22,9 @@ export default class FileManager {
   public topPath: string = null;
   public cwd: string = ".";
 
-  constructor(topPath: string = null) {
-    if (!topPath || !path.isAbsolute(topPath)) {
-      this.topPath = path.normalize(process.cwd());
+  constructor(topPath: string = "") {
+    if (!path.isAbsolute(topPath)) {
+      this.topPath = path.normalize(path.join(process.cwd(), topPath));
     } else {
       this.topPath = path.normalize(topPath);
     }
@@ -52,16 +52,30 @@ export default class FileManager {
   list() {
     const fileNames = fs.readdirSync(this.toAbsolutePath());
     const files: IFile[] = [];
+    const dirs: IFile[] = [];
     fileNames.forEach((name) => {
       const info = fs.statSync(this.toAbsolutePath(name));
-      files.push({
-        name: name,
-        type: info.isFile() ? 1 : 0,
-        size: info.size,
-        time: info.atime.toString()
-      });
+      if (info.isFile()) {
+        files.push({
+          name: name,
+          type: 1,
+          size: info.size,
+          time: info.atime.toString()
+        });
+      } else {
+        dirs.push({
+          name: name,
+          type: 0,
+          size: info.size,
+          time: info.atime.toString()
+        });
+
+      }
     });
-    return files;
+    files.sort((a, b) => a.name > b.name ? 1 : -1);
+    dirs.sort((a, b) => a.name > b.name ? 1 : -1);
+    const resultList = dirs.concat(files);
+    return resultList;
   }
 
   async readFile(fileName: string) {
