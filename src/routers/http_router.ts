@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright 2021 Suwings
  * @Date: 2021-07-14 16:13:18
- * @LastEditTime: 2021-07-15 22:08:43
+ * @LastEditTime: 2021-07-15 23:13:54
  * @Description:
  */
 import Router from "@koa/router";
@@ -76,7 +76,7 @@ router.post("/upload/:key", async (ctx) => {
       const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath)
 
       // 禁止覆盖原文件
-      if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("文件存在，无法覆盖");
+      // if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("文件存在，无法覆盖");
 
       // 将文件从临时文件夹复制到指定目录
       const reader = fs.createReadStream(file.path);
