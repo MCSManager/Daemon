@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright 2021 Suwings
  * @Date: 2021-07-14 16:13:18
- * @LastEditTime: 2021-07-15 17:37:52
+ * @LastEditTime: 2021-07-15 17:44:59
  * @Description:
  */
 import Router from "@koa/router";
@@ -38,7 +38,7 @@ router.get("/download/:key", async (ctx) => {
     const fileManager = new FileManager(cwd);
     if (!fileManager.check(target)) {
       missionPassport.deleteMission(key);
-      return ctx.body = "Access denied | 参数有攻击行为，已阻止";
+      return ctx.body = "Access denied | 参数不正确";
     }
     // 开始给用户下载文件
     ctx.type = ext;
