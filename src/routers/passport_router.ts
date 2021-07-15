@@ -20,11 +20,15 @@ routerApp.on("passport/register", (ctx, data) => {
   const password = data.password;
   const parameter = data.parameter;
   const count = data.count;
-  const start = new Date().getTime()
-  const end = start + (ONE_HOUR_TIME * TASK_MAX_TIME);
+  const start = new Date().getTime();
+  const end = start + ONE_HOUR_TIME * TASK_MAX_TIME;
   if (!name || !password) throw new Error("不可定义任务名或密钥为空");
   missionPassport.registerMission(password, {
-    name, parameter, count, start, end
+    name,
+    parameter,
+    count,
+    start,
+    end
   });
   protocol.response(ctx, true);
 });

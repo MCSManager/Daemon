@@ -25,11 +25,11 @@ router.get("/download/:key", async (ctx) => {
     const key = ctx.params.key;
     // 从任务中心取任务
     const mission = missionPassport.getMission(key, "download");
-    if (!mission) return ctx.body = "No task, Access denied | 无下载任务，非法访问";
+    if (!mission) return (ctx.body = "No task, Access denied | 无下载任务，非法访问");
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
     if (!instance) {
       missionPassport.deleteMission(key);
-      return ctx.body = "Access denied | 实例不存在";
+      return (ctx.body = "Access denied | 实例不存在");
     }
     const cwd = instance.config.cwd;
     const target = path.join(cwd, mission.parameter.fileName);
@@ -38,11 +38,11 @@ router.get("/download/:key", async (ctx) => {
     const fileManager = new FileManager(cwd);
     if (!fileManager.check(target)) {
       missionPassport.deleteMission(key);
-      return ctx.body = "Access denied | 参数不正确";
+      return (ctx.body = "Access denied | 参数不正确");
     }
     // 开始给用户下载文件
     ctx.type = ext;
-    ctx.body = fs.createReadStream(target)
+    ctx.body = fs.createReadStream(target);
     // 任务已执行，销毁护照
     missionPassport.deleteMission(key);
   } catch (error) {

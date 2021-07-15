@@ -7,16 +7,15 @@
 
 // 任务接口
 interface IMission {
-  name: string,
-  parameter: any,
-  start: number,
-  end: number,
-  count?: number,
+  name: string;
+  parameter: any;
+  start: number;
+  end: number;
+  count?: number;
 }
 
 // 任务护照管理器
 class MissionPassport {
-
   // 临时任务护照列表
   public readonly missions = new Map<string, IMission>();
 
@@ -32,8 +31,7 @@ class MissionPassport {
 
   // 注册任务护照
   public registerMission(password: string, mission: IMission) {
-    if (this.missions.has(password))
-      throw new Error("Duplicate primary key, failed to create task");
+    if (this.missions.has(password)) throw new Error("Duplicate primary key, failed to create task");
     this.missions.set(password, mission);
   }
 
@@ -48,12 +46,8 @@ class MissionPassport {
   public deleteMission(password: string) {
     this.missions.delete(password);
   }
-
 }
 
 const missionPassport = new MissionPassport();
 
-export {
-  missionPassport,
-  IMission
-}
+export { missionPassport, IMission };

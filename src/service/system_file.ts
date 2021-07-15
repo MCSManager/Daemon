@@ -69,11 +69,10 @@ export default class FileManager {
           size: info.size,
           time: info.atime.toString()
         });
-
       }
     });
-    files.sort((a, b) => a.name > b.name ? 1 : -1);
-    dirs.sort((a, b) => a.name > b.name ? 1 : -1);
+    files.sort((a, b) => (a.name > b.name ? 1 : -1));
+    dirs.sort((a, b) => (a.name > b.name ? 1 : -1));
     const resultList = dirs.concat(files);
     return resultList;
   }
