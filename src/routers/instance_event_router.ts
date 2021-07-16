@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-02 19:38:02
+ * @LastEditTime: 2021-07-16 20:06:11
  * @Description: 应用实例所有主动性事件
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -23,6 +23,7 @@ InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
 
 // 实例退出事件
 InstanceSubsystem.on("exit", (obj: any) => {
+  // 警告，重构后的广播是不安全的
   protocol.broadcast("instance/stopped", {
     instanceUuid: obj.instanceUuid,
     instanceName: obj.instanceName

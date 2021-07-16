@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-06-21 18:12:27
+ * @LastEditTime: 2021-07-16 16:59:19
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -16,7 +16,9 @@ import RouterContext from "../entity/ctx";
 // 权限认证中间件
 routerApp.use((event, ctx, _, next) => {
   const socket = ctx.socket;
-  // 除 auth 控制器是公开访问，其他控制器必须得到授权才可访问
+  // 放行所有数据流控制器
+  if (event.startsWith("stream")) return next();
+  // 除 auth 控制器是公开访问，其他业务控制器必须得到授权才可访问
   if (event === "auth") return next();
   if (!ctx.session) throw new Error("Session does not exist in authentication middleware.");
   // 若未验证则阻止除 auth 事件外的所有事件
@@ -53,7 +55,7 @@ routerApp.on("auth", (ctx, data) => {
 });
 
 // 登录成功后必须执行此函数
-function loginSuccessful(ctx: RouterContext, data: any) {
+function loginSuccessful(ctx: RouterContext, data: string) {
   ctx.session.key = data;
   ctx.session.login = true;
   ctx.session.id = ctx.socket.id;

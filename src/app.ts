@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-15 22:50:51
+ * @LastEditTime: 2021-07-16 19:00:10
  * @Description: Daemon service startup file
  */
 
@@ -65,7 +65,13 @@ const io = new Server(httpServer, {
   serveClient: false,
   pingInterval: 3000,
   pingTimeout: 5000,
-  cookie: false
+  cookie: false,
+  path: "/socket.io",
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
 
 // 初始化应用实例系统 & 装载应用实例
