@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-16 16:59:19
+ * @LastEditTime: 2021-07-17 14:05:02
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -13,7 +13,7 @@ import { globalConfiguration } from "../entity/config";
 import logger from "../service/log";
 import RouterContext from "../entity/ctx";
 
-// 权限认证中间件
+// 顶级权限认证中间件（任何权限验证中间件此为第一位）
 routerApp.use((event, ctx, _, next) => {
   const socket = ctx.socket;
   // 放行所有数据流控制器
