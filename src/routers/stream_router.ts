@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 22:44:06
- * @LastEditTime: 2021-07-16 19:25:05
+ * @LastEditTime: 2021-07-17 13:21:26
  * @Description: 文件管理系统路由层
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -57,6 +57,23 @@ routerApp.on("stream/auth", (ctx, data) => {
       logger.info(`会话 ${ctx.socket.id} ${ctx.socket.handshake.address} 已与 ${instance.instanceUuid} 断开数据通道`);
     });
     protocol.response(ctx, true);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 获取实例详细信息
+routerApp.on("stream/detail", (ctx) => {
+  try {
+    const instanceUuid = ctx.session.stream.instanceUuid;
+    const instance = InstanceSubsystem.getInstance(instanceUuid);
+    protocol.response(ctx, {
+      instanceUuid: instance.instanceUuid,
+      started: instance.startCount,
+      status: instance.status(),
+      config: instance.config,
+      info: instance.info
+    });
   } catch (error) {
     protocol.responseError(ctx, error);
   }
