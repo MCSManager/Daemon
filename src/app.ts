@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-06-27 20:14:45
+ * @LastEditTime: 2021-07-16 19:00:10
  * @Description: Daemon service startup file
  */
 
@@ -17,6 +17,9 @@ _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/ Version 1.0
 `);
 
+import http from "http";
+import Koa from "koa";
+import koaBody from "koa-body";
 import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
@@ -27,24 +30,51 @@ import * as router from "./service/router";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 
-// init gloabal config
+// 初始化全局配置服务
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// Websocket server
-const io = new Server(config.port, {
-  serveClient: false,
-  pingInterval: 10000,
-  pingTimeout: 10000,
-  cookie: false
+// 初始化 Koa 框架
+const koaApp = new Koa();
+koaApp.use(
+  koaBody({
+    multipart: true
+  })
+);
+
+// 装载 Koa 最高级中间件
+koaApp.use(async (ctx, next) => {
+  await next();
+  // 因所有HTTP请求必须由面板端创建任务护照才可使用，因此准许跨域请求，也可保证安全
+  ctx.response.set("Access-Control-Allow-Origin", "*");
+  ctx.response.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  ctx.response.set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With");
+  ctx.response.set("X-Power-by", "MCSManager");
 });
 
-// Configuration file and data directory related operations
-// if (!fs.existsSync(config.instanceDirectory)) {
-//   fs.mkdirsSync(config.instanceDirectory);
-// }
+// 装载 HTTP 服务路由
+import koaRouter from "./routers/http_router";
+koaApp.use(koaRouter.routes()).use(koaRouter.allowedMethods());
 
-// Load instance
+// 初始化 HTTP 服务
+const httpServer = http.createServer(koaApp.callback());
+httpServer.listen(config.port);
+
+// 初始化 Websocket 服务
+const io = new Server(httpServer, {
+  serveClient: false,
+  pingInterval: 3000,
+  pingTimeout: 5000,
+  cookie: false,
+  path: "/socket.io",
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
+// 初始化应用实例系统 & 装载应用实例
 try {
   logger.info("Loading local instance file...");
   InstanceSubsystem.loadInstances();
@@ -54,7 +84,7 @@ try {
   process.exit(-1);
 }
 
-// Register link event
+// 注册 Websocket 连接事件
 io.on("connection", (socket: Socket) => {
   logger.info(`Session ${socket.id}(${socket.handshake.address}) is connected.`);
 
@@ -92,6 +122,7 @@ logger.info("It is recommended to use the exit command to close the exit program
 logger.info("--------------------");
 console.log("");
 
+// 装载 终端界面UI
 import "./service/ui";
 
 process.on("SIGINT", function () {

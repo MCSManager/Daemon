@@ -51,6 +51,27 @@ routerApp.on("instance/overview", (ctx) => {
   protocol.msg(ctx, "instance/overview", overview);
 });
 
+
+// 获取本守护进程部分实例总览
+routerApp.on("instance/section", (ctx, data) => {
+  const instanceUuids = data.instanceUuids as string[];
+  const overview: IInstanceDetail[] = [];
+  InstanceSubsystem.instances.forEach((instance) => {
+    instanceUuids.forEach((targetUuid) => {
+      if (targetUuid === instance.instanceUuid) {
+        overview.push({
+          instanceUuid: instance.instanceUuid,
+          started: instance.startCount,
+          status: instance.status(),
+          config: instance.config,
+          info: instance.info
+        });
+      }
+    })
+  });
+  protocol.msg(ctx, "instance/section", overview);
+});
+
 // 查看单个实例的详细情况
 routerApp.on("instance/detail", (ctx, data) => {
   try {
@@ -170,7 +191,7 @@ routerApp.on("instance/stdin", (ctx, data) => {
   try {
     if (data.ch == "\r") return instance.process.stdin.write("\n");
     instance.process.stdin.write(data.ch);
-  } catch (err) {}
+  } catch (err) { }
 });
 
 // 杀死应用实例方法

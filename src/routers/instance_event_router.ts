@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-02 19:38:02
+ * @LastEditTime: 2021-07-16 20:06:11
  * @Description: 应用实例所有主动性事件
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -10,8 +10,6 @@
 import RouterContext from "../entity/ctx";
 import * as protocol from "../service/protocol";
 import InstanceSubsystem from "../service/system_instance";
-
-
 
 // 程序输出流日志广播
 InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
@@ -25,6 +23,7 @@ InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
 
 // 实例退出事件
 InstanceSubsystem.on("exit", (obj: any) => {
+  // 警告，重构后的广播是不安全的
   protocol.broadcast("instance/stopped", {
     instanceUuid: obj.instanceUuid,
     instanceName: obj.instanceName
@@ -39,7 +38,6 @@ InstanceSubsystem.on("open", (obj: any) => {
   });
 });
 
-
 // 实例失败事件（一般用于启动失败，也可能是其他操作失败）
 InstanceSubsystem.on("failure", (obj: any) => {
   protocol.broadcast("instance/failure", {
@@ -47,4 +45,3 @@ InstanceSubsystem.on("failure", (obj: any) => {
     instanceName: obj.instanceName
   });
 });
-
