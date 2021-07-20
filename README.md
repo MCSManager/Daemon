@@ -20,6 +20,15 @@ _  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /
 
 <br />
 
+相关项目
+-----------
+
+[MCSManager 前端项目](https://github.com/Suwings/MCSManager-UI)
+
+[MCSManager 8.X 版本主项目](https://github.com/Suwings/MCSManager)
+
+
+<br />
 
 
 MCSManager 简介
@@ -53,6 +62,13 @@ MCSManager 简介
 - 文件管理
 - 高扩展性的路由设计
 
+<br />
+
+预览
+----------
+此项目无法预览，您下载源代码运行后只能得到无法直接控制的守护进程程序，因为它需要 Web 端的接口调用才能执行功能，而 Web 端源程序还未开源（计划开源时覆盖MCSManager主仓库），所以此项目下载后是基本无用的。
+
+<br />
 
 开源协议
 -----------

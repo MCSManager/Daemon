@@ -8,6 +8,7 @@ testServer/
 *.zip
 docker_temp/
 toprettier.bat
+upload/
 
 config.json
 *.bat
@@ -20,7 +21,7 @@ McserverConfig.json
 core/*.json
 public/common/URL.js
 property.js
-
+test.txt
 #vscode
 *.code-workspace
 
