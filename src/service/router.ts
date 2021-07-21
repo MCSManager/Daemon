@@ -68,7 +68,6 @@ export function navigation(socket: Socket) {
       routerApp.emitRouter(event as string, ctx, protocol.data);
     });
   }
-
 }
 
 logger.info("Loading routing controller and middleware...");

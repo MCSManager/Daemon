@@ -11,8 +11,8 @@ import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import { missionPassport } from "../service/mission_passport";
 import InstanceSubsystem from "../service/system_instance";
-import logger from '../service/log';
-import SendCommand from '../entity/commands/cmd';
+import logger from "../service/log";
+import SendCommand from "../entity/commands/cmd";
 
 // 权限认证中间件
 routerApp.use((event, ctx, data, next) => {
@@ -27,7 +27,6 @@ routerApp.use((event, ctx, data, next) => {
   }
   next();
 });
-
 
 // 可公开访问数据流身份验证路由
 routerApp.on("stream/auth", (ctx, data) => {
@@ -78,7 +77,6 @@ routerApp.on("stream/detail", (ctx) => {
     protocol.responseError(ctx, error);
   }
 });
-
 
 // 列出指定实例工作目录的文件列表
 routerApp.on("stream/input", (ctx, data) => {
