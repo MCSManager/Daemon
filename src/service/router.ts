@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-16 19:32:02
+ * @LastEditTime: 2021-07-22 10:21:59
  * @Description: Route navigator, used to analyze the Socket.io protocol and encapsulate and forward to a custom route
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -74,6 +74,7 @@ logger.info("Loading routing controller and middleware...");
 // 身份验证路由顺序必须是第一位装载，这些路由顺序均不可擅自改变
 import "../routers/auth_router";
 import "../routers/passport_router";
+import "../routers/info_router";
 import "../routers/Instance_router";
 import "../routers/instance_event_router";
 import "../routers/file_router";

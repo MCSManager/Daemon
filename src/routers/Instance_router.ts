@@ -21,6 +21,7 @@ import { IInstanceDetail } from "../service/interfaces";
 routerApp.use((event, ctx, data, next) => {
   if (event == "instance/new" && data) return next();
   if (event == "instance/overview") return next();
+  if (event == "instance/select") return next();
   // 类 AOP
   if (event.startsWith("instance")) {
     if (data.instanceUuids) return next();
@@ -33,6 +34,29 @@ routerApp.use((event, ctx, data, next) => {
     }
   }
   next();
+});
+
+// 获取本守护进程实例列表（查询式）
+routerApp.on("instance/select", (ctx, data) => {
+  const page = data.page || 1;
+  const pageSize = data.pageSize || 1;
+  const condition = data.condition;
+  const overview: IInstanceDetail[] = [];
+  InstanceSubsystem.instances.forEach((instance) => {
+    overview.push({
+      instanceUuid: instance.instanceUuid,
+      started: instance.startCount,
+      status: instance.status(),
+      config: instance.config,
+      info: instance.info
+    });
+  });
+  protocol.response(ctx, {
+    page,
+    pageSize,
+    maxPage: 10,
+    data: overview
+  });
 });
 
 // 获取本守护进程实例总览
