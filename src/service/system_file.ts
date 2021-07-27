@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-07-15 21:39:48
+ * @LastEditTime: 2021-07-26 17:41:56
  * @Projcet: MCSManager Daemon
  * @License: MIT
  */
@@ -87,11 +87,64 @@ export default class FileManager {
   async writeFile(fileName: string, data: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
-    await fs.writeFile(absPath, data, { encoding: "utf-8" });
+    return await fs.writeFile(absPath, data, { encoding: "utf-8" });
   }
 
-  async copy(fileName: string, destPath: string) {
-    if (!this.checkPath(destPath) || !this.check(fileName)) throw new Error(ERROR_MSG_01);
+  async copy(target1: string, target2: string) {
+    if (!this.checkPath(target2) || !this.check(target1)) throw new Error(ERROR_MSG_01);
+    const targetPath = this.toAbsolutePath(target1);
+    target2 = this.toAbsolutePath(target2);
+    return await fs.copy(targetPath, target2);
+  }
+
+  mkdir(target: string) {
+    if (!this.checkPath(target)) throw new Error(ERROR_MSG_01);
+    const targetPath = this.toAbsolutePath(target);
+    return fs.mkdirSync(targetPath);
+  }
+
+  async delete(target: string): Promise<boolean> {
+    if (!this.check(target)) throw new Error(ERROR_MSG_01);
+    const targetPath = this.toAbsolutePath(target);
+    return new Promise((r, j) => {
+      fs.remove(targetPath, (err) => {
+        if (!err) r(true);
+        else j(err);
+      });
+    });
+  }
+
+  async move(target: string, destPath: string) {
+    if (!this.check(target)) throw new Error(ERROR_MSG_01);
+    if (!this.checkPath(destPath)) throw new Error(ERROR_MSG_01);
+    const targetPath = this.toAbsolutePath(target);
+    destPath = this.toAbsolutePath(destPath);
+    await fs.move(targetPath, destPath);
+  }
+
+  async unzip(target: string) {
+    return true;
+  }
+
+  async zip(target: string) {
+    return true;
+  }
+
+  async edit(target: string, data?: string) {
+    if (!this.check(target)) throw new Error(ERROR_MSG_01);
+    if (!data) {
+      return await this.readFile(target);
+    } else {
+      return await this.writeFile(target, data);
+    }
+  }
+
+  rename(target: string, newName: string) {
+    if (!this.check(target)) throw new Error(ERROR_MSG_01);
+    if (!this.checkPath(newName)) throw new Error(ERROR_MSG_01);
+    const targetPath = this.toAbsolutePath(target);
+    const newPath = this.toAbsolutePath(newName);
+    fs.renameSync(targetPath, newPath);
   }
 
   public static checkFileName(fileName: string) {

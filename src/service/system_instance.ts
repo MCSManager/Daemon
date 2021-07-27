@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-02 19:36:21
+ * @LastEditTime: 2021-07-25 11:20:42
  * @Description: instance service
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -20,6 +20,7 @@ import { Socket } from "socket.io";
 import StorageSubsystem from "../common/system_storage";
 import InstanceConfig from "../entity/instance/Instance_config";
 import InstanceStreamListener from "../common/instance_stream";
+import { QueryMapWrapper } from "../common/query_wrapper";
 
 class InstanceSubsystem extends EventEmitter {
   public readonly instances = new Map<string, Instance>();
@@ -117,6 +118,10 @@ class InstanceSubsystem extends EventEmitter {
 
   getInstance(instanceUuid: string) {
     return this.instances.get(instanceUuid);
+  }
+
+  getQueryMapWrapper() {
+    return new QueryMapWrapper(this.instances);
   }
 
   exists(instanceUuid: string) {

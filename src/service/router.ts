@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-22 10:21:59
+ * @LastEditTime: 2021-07-26 15:18:58
  * @Description: Route navigator, used to analyze the Socket.io protocol and encapsulate and forward to a custom route
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -23,7 +23,11 @@ class RouterApp extends EventEmitter {
   }
 
   emitRouter(event: string, ctx: RouterContext, data: any) {
-    super.emit(event, ctx, data);
+    try {
+      super.emit(event, ctx, data);
+    } catch (error) {
+      logger.warn(`Routing non-self-handling exception: ${error.message}`);
+    }
     return this;
   }
 

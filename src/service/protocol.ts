@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-06-23 16:29:13
+ * @LastEditTime: 2021-07-26 15:26:59
  * @Description: 定义网络协议与常用发送/广播/解析功能，客户端也应当拥有此文件
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -35,7 +35,10 @@ export function response(ctx: RouterContext, data: any) {
 }
 
 export function responseError(ctx: RouterContext, err: Error | string) {
-  const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, err.toString());
+  let errinfo: any = "";
+  if (err) errinfo = err.toString();
+  else errinfo = err;
+  const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
   logger.error(`会话 ${ctx.socket.id} 在 ${ctx.event} 路由中处理时错误:\n`, err);
   ctx.socket.emit(ctx.event, packet);
 }

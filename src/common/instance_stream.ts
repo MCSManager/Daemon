@@ -1,8 +1,8 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-27 18:40:38
- * @LastEditTime: 2021-07-01 19:42:26
- * @Description:
+ * @LastEditTime: 2021-07-26 09:46:15
+ * @Description: 应用实例数据流转发适配器
  */
 
 import { Socket } from "socket.io";

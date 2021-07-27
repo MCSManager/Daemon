@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-16 19:00:10
+ * @LastEditTime: 2021-07-26 18:01:55
  * @Description: Daemon service startup file
  */
 
@@ -47,8 +47,9 @@ koaApp.use(async (ctx, next) => {
   await next();
   // 因所有HTTP请求必须由面板端创建任务护照才可使用，因此准许跨域请求，也可保证安全
   ctx.response.set("Access-Control-Allow-Origin", "*");
-  ctx.response.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  ctx.response.set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With");
+  ctx.response.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+  ctx.response.set("Access-Control-Allow-Headers", "Content-Type, Cookie, Accept-Encoding, User-Agent, Host, Referer, " + "X-Requested-With, Accept, Accept-Language, Cache-Control, Connection");
+  ctx.response.set("Access-Control-Allow-Credentials", "true");
   ctx.response.set("X-Power-by", "MCSManager");
 });
 
@@ -69,7 +70,7 @@ const io = new Server(httpServer, {
   path: "/socket.io",
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 });

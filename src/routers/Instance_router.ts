@@ -16,6 +16,7 @@ import StopCommand from "../entity/commands/stop";
 import SendCommand from "../entity/commands/cmd";
 import KillCommand from "../entity/commands/kill";
 import { IInstanceDetail } from "../service/interfaces";
+import { QueryMapWrapper } from "../common/query_wrapper";
 
 // 部分实例操作路由器验证中间件
 routerApp.use((event, ctx, data, next) => {
@@ -42,7 +43,16 @@ routerApp.on("instance/select", (ctx, data) => {
   const pageSize = data.pageSize || 1;
   const condition = data.condition;
   const overview: IInstanceDetail[] = [];
-  InstanceSubsystem.instances.forEach((instance) => {
+  // 关键字条件查询
+  const queryWrapper = InstanceSubsystem.getQueryMapWrapper();
+  let result = queryWrapper.select<Instance>((v) => {
+    if (!v.config.nickname.includes(condition.instanceName)) return false;
+    return true;
+  });
+  // 分页功能
+  const pageResult = queryWrapper.page<Instance>(result, page, pageSize);
+  // 过滤不需要的数据
+  pageResult.data.forEach((instance) => {
     overview.push({
       instanceUuid: instance.instanceUuid,
       started: instance.startCount,
@@ -52,9 +62,9 @@ routerApp.on("instance/select", (ctx, data) => {
     });
   });
   protocol.response(ctx, {
-    page,
-    pageSize,
-    maxPage: 10,
+    page: pageResult.page,
+    pageSize: pageResult.pageSize,
+    maxPage: pageResult.maxPage,
     data: overview
   });
 });
