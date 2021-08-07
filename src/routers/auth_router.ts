@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-17 14:05:02
+ * @LastEditTime: 2021-08-02 19:56:23
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -30,17 +30,17 @@ routerApp.use((event, ctx, _, next) => {
 });
 
 // 日志输出中间件
-routerApp.use((event, ctx, data, next) => {
-  try {
-    const socket = ctx.socket;
-    logger.info(`收到 ${socket.id}(${socket.handshake.address}) 的 ${event} 指令.`);
-    logger.info(` - 数据: ${JSON.stringify(data)}.`);
-  } catch (err) {
-    logger.error("日志记录错误:", err);
-  } finally {
-    next();
-  }
-});
+// routerApp.use((event, ctx, data, next) => {
+//   try {
+//     const socket = ctx.socket;
+//     logger.info(`收到 ${socket.id}(${socket.handshake.address}) 的 ${event} 指令.`);
+//     logger.info(` - 数据: ${JSON.stringify(data)}.`);
+//   } catch (err) {
+//     logger.error("日志记录错误:", err);
+//   } finally {
+//     next();
+//   }
+// });
 
 // 身份认证控制器
 routerApp.on("auth", (ctx, data) => {

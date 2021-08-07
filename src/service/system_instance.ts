@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-25 11:20:42
+ * @LastEditTime: 2021-07-29 15:56:54
  * @Description: instance service
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -21,6 +21,7 @@ import StorageSubsystem from "../common/system_storage";
 import InstanceConfig from "../entity/instance/Instance_config";
 import InstanceStreamListener from "../common/instance_stream";
 import { QueryMapWrapper } from "../common/query_wrapper";
+import FuntionDispatcher from "../entity/commands/dispatcher";
 
 class InstanceSubsystem extends EventEmitter {
   public readonly instances = new Map<string, Instance>();
@@ -36,6 +37,11 @@ class InstanceSubsystem extends EventEmitter {
     instanceConfigs.forEach((uuid) => {
       const instanceConfig = StorageSubsystem.load(InstanceConfig, uuid);
       const instance = new Instance(uuid, instanceConfig);
+      // 所有实例全部进行功能调度器
+      instance
+        .forceExec(new FuntionDispatcher())
+        .then((v) => {})
+        .catch((v) => {});
       this.addInstance(instance);
     });
   }
@@ -93,6 +99,9 @@ class InstanceSubsystem extends EventEmitter {
   removeInstance(instanceUuid: string) {
     const instance = this.getInstance(instanceUuid);
     if (instance) instance.destroy();
+    // 异步删除文件
+    // fs.remove(instance.config.cwd, (err) => { });
+    // 销毁记录
     this.instances.delete(instanceUuid);
     StorageSubsystem.delete(InstanceConfig, instanceUuid);
     return true;
@@ -128,15 +137,16 @@ class InstanceSubsystem extends EventEmitter {
     return this.instances.has(instanceUuid);
   }
 
-  exit() {
-    this.instances.forEach((instance) => {
+  async exit() {
+    for (const iterator of this.instances) {
+      const instance = iterator[1];
       if (instance.status() != Instance.STATUS_STOP) {
         logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) is running or busy, and is being forced to end.`);
-        instance.execCommand(new KillCommand());
+        await instance.execCommand(new KillCommand());
       }
       StorageSubsystem.store(InstanceConfig, instance.instanceUuid, instance.config);
       logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) saved successfully.`);
-    });
+    }
   }
 }
 

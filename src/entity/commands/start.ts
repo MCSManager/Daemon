@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-07-02 23:25:20
+ * @LastEditTime: 2021-07-29 16:01:02
  * @Description:
  * @Projcet: MCSManager Daemon
  * @License: MIT
@@ -9,9 +9,11 @@
 
 import Instance from "../instance/instance";
 import logger from "../../service/log";
+import fs from "fs-extra";
 
 import InstanceCommand from "./command";
 import * as childProcess from "child_process";
+import FuntionDispatcher from "./dispatcher";
 
 class StartupError extends Error {
   constructor(msg: string) {
@@ -27,10 +29,11 @@ export default class StartCommand extends InstanceCommand {
     this.source = source;
   }
 
-  exec(instance: Instance) {
+  async exec(instance: Instance) {
     const instanceStatus = instance.status();
     if (instanceStatus != Instance.STATUS_STOP) return instance.failure(new StartupError("实例未处于关闭状态，无法再进行启动"));
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
 
     try {
       instance.setLock(true);
@@ -38,6 +41,9 @@ export default class StartCommand extends InstanceCommand {
       instance.status(Instance.STATUS_STARTING);
       // 启动次数增加
       instance.startCount++;
+      // 强制执行实例进程配置文件调度器
+      // await instance.forceExec(new FuntionDispatcher());
+
       // 命令解析
       const commandList = instance.config.startCommand.replace(/  /gim, " ").split(" ");
       const commandExeFile = commandList[0];
