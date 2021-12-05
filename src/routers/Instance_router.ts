@@ -1,11 +1,4 @@
-import fs from 'fs-extra';
-/*
- * @Projcet: MCSManager Daemon
- * @Author: Copyright(c) 2020 Suwings
-
- * @Description: 应用实例相关控制器
- */
-
+import fs from "fs-extra";
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
@@ -122,7 +115,7 @@ routerApp.on("instance/detail", async (ctx, data) => {
       // 可能因文件权限导致错误的部分，避免影响整个配置的获取
       processInfo = await instance.forceExec(new ProcessInfoCommand());
       space = await instance.usedSpace(null, 2);
-    } catch (err) { }
+    } catch (err) {}
     protocol.msg(ctx, "instance/detail", {
       instanceUuid: instance.instanceUuid,
       started: instance.startCount,
@@ -261,7 +254,7 @@ routerApp.on("instance/delete", (ctx, data) => {
   for (const instanceUuid of instanceUuids) {
     try {
       InstanceSubsystem.removeInstance(instanceUuid, deleteFile);
-    } catch (err) { }
+    } catch (err) {}
   }
   protocol.msg(ctx, "instance/delete", instanceUuids);
 });
@@ -274,7 +267,7 @@ routerApp.on("instance/stdin", (ctx, data) => {
   try {
     if (data.ch == "\r") return instance.process.write("\n");
     instance.process.write(data.ch);
-  } catch (err) { }
+  } catch (err) {}
 });
 
 routerApp.on("instance/process_config/list", (ctx, data) => {
@@ -328,7 +321,6 @@ routerApp.on("instance/process_config/file", (ctx, data) => {
     protocol.responseError(ctx, err);
   }
 });
-
 
 // 获取实例终端日志
 routerApp.on("instance/outputlog", async (ctx, data) => {
