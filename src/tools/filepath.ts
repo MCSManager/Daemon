@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-07-15 16:57:17
  * @Description:
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 export function checkFileName(fileName: string) {

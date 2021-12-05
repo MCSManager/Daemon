@@ -1,10 +1,10 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-05-11 16:29:08
- * @LastEditTime: 2021-07-26 09:45:18
+ * @LastEditTime: 2021-09-08 22:52:25
  * @Description: 实例储存管理子系统，一个微型的ORM模块，可以用于较少量的数据储存和增删查改。
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import path from "path";
@@ -20,12 +20,9 @@ class StorageSubsystem {
 
   /**
    * 根据类定义和标识符储存成本地文件
-   * @param {any} classz 储存对象的类定义
-   * @param {string} uuid 储存对象的唯一标识符
-   * @param {any} object 储存对象
    */
-  public store(classz: IClassz, uuid: string, object: any) {
-    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, classz.name);
+  public store(category: string, uuid: string, object: any) {
+    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category);
     if (!fs.existsSync(dirPath)) fs.mkdirsSync(dirPath);
     const filePath = path.join(dirPath, `${uuid}.json`);
     const data = JSON.stringify(object, null, 4);
@@ -34,12 +31,9 @@ class StorageSubsystem {
 
   /**
    * 根据类定义和标识符实例化成对象
-   * @param {any} classz 储存对象的类定义
-   * @param {string} uuid 储存对象的唯一标识符
-   * @return {any} 返回类定义实例
    */
-  public load(classz: any, uuid: string) {
-    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, classz.name);
+  public load(category: string, classz: any, uuid: string) {
+    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category);
     if (!fs.existsSync(dirPath)) fs.mkdirsSync(dirPath);
     const filePath = path.join(dirPath, `${uuid}.json`);
     if (!fs.existsSync(filePath)) return null;
@@ -54,11 +48,10 @@ class StorageSubsystem {
 
   /**
    * 通过类定义返回所有与此类有关的标识符
-   * @param {any} classz 类定义
-   * @return {string[]} 唯一标识符列表
    */
-  public list(classz: IClassz) {
-    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, classz.name);
+  public list(category: string) {
+    const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category);
+    if (!fs.existsSync(dirPath)) fs.mkdirsSync(dirPath);
     const files = fs.readdirSync(dirPath);
     const result = new Array<string>();
     files.forEach((name) => {
@@ -69,11 +62,9 @@ class StorageSubsystem {
 
   /**
    * 通过类定义删除指定类型的标识符实例
-   * @param {any} classz 类定义
-   * @return {string[]} 唯一标识符列表
    */
-  public delete(classz: IClassz, uuid: string) {
-    const filePath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, classz.name, `${uuid}.json`);
+  public delete(category: string, uuid: string) {
+    const filePath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category, `${uuid}.json`);
     if (!fs.existsSync(filePath)) return;
     fs.removeSync(filePath);
   }

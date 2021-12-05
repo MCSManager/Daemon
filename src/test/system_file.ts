@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-06-22 22:52:11
  * @Description: Test
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 import { describe, it } from "mocha";
 import assert from "assert";

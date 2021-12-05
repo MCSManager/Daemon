@@ -3,7 +3,7 @@
  * @Date: 2020-11-23 17:45:02
  * @LastEditTime: 2021-05-11 09:40:31
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import * as log4js from "log4js";

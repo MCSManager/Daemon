@@ -8,7 +8,7 @@ import { ProcessConfig } from "../instance/process_config";
  */
 
 import pidusage from "pidusage";
-import InstanceCommand from "./command";
+import InstanceCommand from "./base/command";
 import Instance from "../instance/instance";
 
 export default class ProcessInfoCommand extends InstanceCommand {

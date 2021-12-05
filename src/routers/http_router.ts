@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright 2021 Suwings
  * @Date: 2021-07-14 16:13:18
- * @LastEditTime: 2021-07-26 16:47:57
+ * @LastEditTime: 2021-09-01 20:21:55
  * @Description:
  */
 import Router from "@koa/router";
@@ -52,6 +52,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
 // 文件上载路由
 router.post("/upload/:key", async (ctx) => {
   const key = ctx.params.key;
+  const unzip = ctx.query.unzip;
   try {
     // 领取任务 & 检查任务 & 检查实例是否存在
     const mission = missionPassport.getMission(key, "upload");
@@ -82,6 +83,13 @@ router.post("/upload/:key", async (ctx) => {
       const reader = fs.createReadStream(file.path);
       const upStream = fs.createWriteStream(fileSaveAbsolutePath);
       reader.pipe(upStream);
+      reader.on("close", () => {
+        if (unzip) {
+          // 如果需要解压则进行解压任务
+          const filemanager = new FileManager(instance.config.cwd);
+          filemanager.unzip(fullFileName, "");
+        }
+      });
       return (ctx.body = "OK");
     }
     ctx.body = "未知原因: 上传失败";

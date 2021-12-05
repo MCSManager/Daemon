@@ -1,9 +1,13 @@
 /*
- * @Author: Copyright(c) 2020 Suwings
+ * @Author: Copyright(c) 2021 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-07-31 15:33:16
+ * @LastEditTime: 2021-12-05 15:42:16
  * @Description: Daemon service startup file
  */
+
+import { getVersion, initVersionManager } from "./service/version";
+initVersionManager();
+const VERSION = getVersion();
 
 console.log(`______  _______________________  ___                                         
 ___   |/  /_  ____/_  ___/__   |/  /_____ _____________ _______ _____________
@@ -14,19 +18,23 @@ ________                                                /____/
 ___  __ \\_____ ____________ ________________ 
 __  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
 _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
-/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/ Version 1.0
+/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
+
+ + Released under the GPL-3.0 License
+ + Copyright 2021 Suwings
+ + Version ${VERSION}
 `);
 
 import http from "http";
-import Koa from "koa";
-import koaBody from "koa-body";
+
 import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
-logger.info(`Welcome to use MCSManager daemon.`);
+logger.info(`欢迎使用 MCSManager 守护进程`);
 
 import { globalConfiguration } from "./entity/config";
 import * as router from "./service/router";
+import * as koa from "./service/http";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 
@@ -34,60 +42,37 @@ import InstanceSubsystem from "./service/system_instance";
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// 初始化 Koa 框架
-const koaApp = new Koa();
-koaApp.use(
-  koaBody({
-    multipart: true
-  })
-);
-
-// 装载 Koa 最高级中间件
-koaApp.use(async (ctx, next) => {
-  await next();
-  // 因所有HTTP请求必须由面板端创建任务护照才可使用，因此准许跨域请求，也可保证安全
-  ctx.response.set("Access-Control-Allow-Origin", "*");
-  ctx.response.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-  ctx.response.set("Access-Control-Allow-Headers", "Content-Type, Cookie, Accept-Encoding, User-Agent, Host, Referer, " + "X-Requested-With, Accept, Accept-Language, Cache-Control, Connection");
-  ctx.response.set("Access-Control-Allow-Credentials", "true");
-  ctx.response.set("X-Power-by", "MCSManager");
-});
-
-// 装载 HTTP 服务路由
-import koaRouter from "./routers/http_router";
-koaApp.use(koaRouter.routes()).use(koaRouter.allowedMethods());
-
 // 初始化 HTTP 服务
+const koaApp = koa.initKoa();
 const httpServer = http.createServer(koaApp.callback());
-httpServer.listen(config.port);
+httpServer.listen(config.port, config.ip);
 
-// 初始化 Websocket 服务
+// 初始化 Websocket 服务到 HTTP 服务
 const io = new Server(httpServer, {
   serveClient: false,
-  pingInterval: 3000,
+  pingInterval: 5000,
   pingTimeout: 5000,
   cookie: false,
   path: "/socket.io",
   cors: {
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
 
 // 初始化应用实例系统 & 装载应用实例
 try {
-  logger.info("Loading local instance file...");
+  logger.info("正在读取本地应用实例中");
   InstanceSubsystem.loadInstances();
-  logger.info(`All local instances are loaded, a total of ${InstanceSubsystem.instances.size}.`);
+  logger.info(`所有应用实例已加载，总计 ${InstanceSubsystem.instances.size} 个`);
 } catch (err) {
-  logger.error("Failed to read the local instance file, this problem must be fixed to start:", err);
+  logger.error("读取本地实例文件失败:", err);
   process.exit(-1);
 }
 
 // 注册 Websocket 连接事件
 io.on("connection", (socket: Socket) => {
-  logger.info(`Session ${socket.id}(${socket.handshake.address}) is connected.`);
+  logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已连接.`);
 
   // Join the global Socket object
   protocol.addGlobalSocket(socket);
@@ -100,27 +85,27 @@ io.on("connection", (socket: Socket) => {
     // Remove from the global Socket object
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
-    logger.info(`Session ${socket.id}(${socket.handshake.address}) disconnected`);
+    logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已断开`);
   });
 });
 
 // Error report monitoring
 process.on("uncaughtException", function (err) {
-  logger.error(`Error report (uncaughtException):`, err);
+  logger.error(`错误报告 (uncaughtException):`, err);
 });
 
 // Error report monitoring
 process.on("unhandledRejection", (reason, p) => {
-  logger.error(`Error report (unhandledRejection):`, reason, p);
+  logger.error(`错误报告 (unhandledRejection):`, reason, p);
 });
 
 // Started up
-logger.info(`The daemon has started successfully.`);
-logger.info("--------------------");
-logger.info(`Monitoring ${config.port} port, waiting for data...`);
-logger.info(`Access Key (Key): ${config.key}`);
-logger.info("It is recommended to use the exit command to close the exit program.");
-logger.info("--------------------");
+logger.info(`守护进程现已成功启动`);
+logger.info("================================");
+logger.info(`访问地址 ${config.ip ? config.ip : "localhost"}:${config.port}`);
+logger.info(`访问密钥 ${config.key}`);
+logger.info("密钥作为守护进程唯一认证手段");
+logger.info("================================");
 console.log("");
 
 // 装载 终端界面UI

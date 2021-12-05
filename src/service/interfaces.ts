@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-06-27 14:31:13
  * @Description:
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 export interface IInstanceDetail {

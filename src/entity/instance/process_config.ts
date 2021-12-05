@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2021 Suwings
  * @Date: 2021-07-29 10:02:09
- * @LastEditTime: 2021-08-02 20:27:51
+ * @LastEditTime: 2021-08-08 17:24:07
  * @Description:
  * @Projcet: MCSManager Daemon
  */
@@ -20,7 +20,7 @@ export interface IProcessConfig {
   info: string;
   redirect: string;
   from?: string;
-  fromLink?: string
+  fromLink?: string;
 }
 
 export class ProcessConfig {
@@ -53,6 +53,7 @@ export class ProcessConfig {
     }
     if (this.iProcessConfig.type === "properties") {
       text = properties.stringify(object);
+      text = text.replace(/ = /gim, "=");
     }
     if (this.iProcessConfig.type === "json") {
       text = JSON.stringify(object);

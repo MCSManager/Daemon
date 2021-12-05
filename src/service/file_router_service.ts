@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-07-26 11:27:24
  * @Description:
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 import InstanceSubsystem from "../service/system_instance";
 import FileManager from "./system_file";

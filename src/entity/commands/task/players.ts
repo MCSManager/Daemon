@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2021 Suwings
  * @Date: 2021-07-29 11:32:08
- * @LastEditTime: 2021-07-29 14:43:42
+ * @LastEditTime: 2021-08-08 15:49:43
  * @Description:
  * @Projcet: MCSManager Daemon
  */
@@ -16,16 +16,31 @@ export default class RefreshPlayer implements ILifeCycleTask {
   private task: any = null;
 
   async start(instance: Instance) {
-    console.log("启动任务");
     this.task = setInterval(async () => {
-      console.log("定时任务执行中....");
-      const result = await instance.presetCommandManager.execPreset("getPlayer");
-      console.log("玩家人数获取结果:", result);
+      // {
+      //   host: 'localhost',
+      //   port: 28888,
+      //   status: true,
+      //   version: '1.17.1',
+      //   motd: 'A Minecraft Server',
+      //   current_players: '0',
+      //   max_players: '20',
+      //   latency: 1
+      // }
+      try {
+        const result = await instance.execPreset("getPlayer");
+        if (!result) return;
+        instance.info.maxPlayers = result.max_players ? result.max_players : -1;
+        instance.info.currentPlayers = result.current_players ? result.current_players : -1;
+        instance.info.version = result.version ? result.version : ""
+      } catch (error) { }
     }, 3000);
   }
 
   async stop(instance: Instance) {
-    console.log("任务结束");
+    instance.info.maxPlayers = -1;
+    instance.info.currentPlayers = -1;
+    instance.info.version = "";
     clearInterval(this.task);
   }
 }

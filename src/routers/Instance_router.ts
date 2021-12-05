@@ -1,7 +1,8 @@
+import fs from 'fs-extra';
 /*
  * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
- * @License: MIT
+
  * @Description: 应用实例相关控制器
  */
 
@@ -10,6 +11,7 @@ import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
 import Instance from "../entity/instance/instance";
 import logger from "../service/log";
+import path from "path";
 
 import StartCommand from "../entity/commands/start";
 import StopCommand from "../entity/commands/stop";
@@ -18,6 +20,9 @@ import KillCommand from "../entity/commands/kill";
 import { IInstanceDetail } from "../service/interfaces";
 import { QueryMapWrapper } from "../common/query_wrapper";
 import ProcessInfoCommand from "../entity/commands/process_info";
+import FileManager from "../service/system_file";
+import { ProcessConfig } from "../entity/instance/process_config";
+import RestartCommand from "../entity/commands/restart";
 
 // 部分实例操作路由器验证中间件
 routerApp.use((event, ctx, data, next) => {
@@ -137,7 +142,7 @@ routerApp.on("instance/new", (ctx, data) => {
   const config = data;
   try {
     const newInstance = InstanceSubsystem.createInstance(config);
-    protocol.msg(ctx, "instance/new", { instanceUuid: newInstance.instanceUuid });
+    protocol.msg(ctx, "instance/new", { instanceUuid: newInstance.instanceUuid, config: newInstance.config });
   } catch (err) {
     protocol.error(ctx, "instance/new", { instanceUuid: null, err: err.message });
   }
@@ -176,68 +181,89 @@ routerApp.on("instance/forward", (ctx, data) => {
 
 // 开启实例
 routerApp.on("instance/open", async (ctx, data) => {
+  const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
       await instance.exec(new StartCommand(ctx.socket.id));
-      protocol.msg(ctx, "instance/open", { instanceUuid });
+      if (!disableResponse) protocol.msg(ctx, "instance/open", { instanceUuid });
     } catch (err) {
-      logger.error(`实例${instanceUuid}启动时错误: `, err);
-      protocol.error(ctx, "instance/open", { instanceUuid: instanceUuid, err: err.message });
+      if (!disableResponse) {
+        logger.error(`实例${instanceUuid}启动时错误: `, err);
+        protocol.error(ctx, "instance/open", { instanceUuid: instanceUuid, err: err.message });
+      }
     }
   }
 });
 
 // 关闭实例
 routerApp.on("instance/stop", async (ctx, data) => {
+  const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
       await instance.exec(new StopCommand());
       //Note: 去掉此回复会导致前端响应慢，因为前端会等待面板端消息转发
-      protocol.msg(ctx, "instance/stop", { instanceUuid });
+      if (!disableResponse) protocol.msg(ctx, "instance/stop", { instanceUuid });
     } catch (err) {
-      protocol.error(ctx, "instance/stop", { instanceUuid: instanceUuid, err: err.message });
+      if (!disableResponse) protocol.error(ctx, "instance/stop", { instanceUuid: instanceUuid, err: err.message });
+    }
+  }
+});
+
+// 重启实例
+routerApp.on("instance/restart", async (ctx, data) => {
+  const disableResponse = data.disableResponse;
+  for (const instanceUuid of data.instanceUuids) {
+    const instance = InstanceSubsystem.getInstance(instanceUuid);
+    try {
+      await instance.exec(new RestartCommand());
+      if (!disableResponse) protocol.msg(ctx, "instance/restart", { instanceUuid });
+    } catch (err) {
+      if (!disableResponse) protocol.error(ctx, "instance/restart", { instanceUuid: instanceUuid, err: err.message });
     }
   }
 });
 
 // 终止实例方法
 routerApp.on("instance/kill", async (ctx, data) => {
+  const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     if (!instance) continue;
     try {
-      await instance.exec(new KillCommand());
-      protocol.msg(ctx, "instance/kill", { instanceUuid });
+      await instance.forceExec(new KillCommand());
+      if (!disableResponse) protocol.msg(ctx, "instance/kill", { instanceUuid });
     } catch (err) {
-      protocol.error(ctx, "instance/kill", { instanceUuid: instanceUuid, err: err.message });
+      if (!disableResponse) protocol.error(ctx, "instance/kill", { instanceUuid: instanceUuid, err: err.message });
     }
+  }
+});
+
+// 向应用实例发送命令
+routerApp.on("instance/command", async (ctx, data) => {
+  const disableResponse = data.disableResponse;
+  const instanceUuid = data.instanceUuid;
+  const command = data.command || "";
+  const instance = InstanceSubsystem.getInstance(instanceUuid);
+  try {
+    await instance.exec(new SendCommand(command));
+    if (!disableResponse) protocol.msg(ctx, "instance/command", { instanceUuid });
+  } catch (err) {
+    if (!disableResponse) protocol.error(ctx, "instance/command", { instanceUuid: instanceUuid, err: err.message });
   }
 });
 
 // 删除实例
 routerApp.on("instance/delete", (ctx, data) => {
   const instanceUuids = data.instanceUuids;
+  const deleteFile = data.deleteFile;
   for (const instanceUuid of instanceUuids) {
     try {
-      InstanceSubsystem.removeInstance(instanceUuid);
+      InstanceSubsystem.removeInstance(instanceUuid, deleteFile);
     } catch (err) { }
   }
   protocol.msg(ctx, "instance/delete", instanceUuids);
-});
-
-// 向应用实例发送命令
-routerApp.on("instance/command", async (ctx, data) => {
-  const instanceUuid = data.instanceUuid;
-  const command = data.command || "";
-  const instance = InstanceSubsystem.getInstance(instanceUuid);
-  try {
-    await instance.exec(new SendCommand(command));
-    protocol.msg(ctx, "instance/command", { instanceUuid });
-  } catch (err) {
-    protocol.error(ctx, "instance/command", { instanceUuid: instanceUuid, err: err.message });
-  }
 });
 
 // 向应用实例发送数据流
@@ -246,29 +272,26 @@ routerApp.on("instance/stdin", (ctx, data) => {
   // 因为此路由将会接收到每个字符
   const instance = InstanceSubsystem.getInstance(data.instanceUuid);
   try {
-    if (data.ch == "\r") return instance.process.stdin.write("\n");
-    instance.process.stdin.write(data.ch);
+    if (data.ch == "\r") return instance.process.write("\n");
+    instance.process.write(data.ch);
   } catch (err) { }
 });
 
-// 获取实例的进程配置文件
 routerApp.on("instance/process_config/list", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
+  const files = data.files;
   const result: any[] = [];
   try {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    instance.processConfigs.forEach((v) => {
-      if (v.exists()) {
+    const fileManager = new FileManager(instance.absoluteCwdPath());
+    for (const filePath of files) {
+      if (fileManager.check(filePath)) {
         result.push({
-          fileName: v.iProcessConfig.fileName,
-          info: v.iProcessConfig.info,
-          type: v.iProcessConfig.type,
-          from: v.iProcessConfig.from,
-          fromLink: v.iProcessConfig.fromLink,
-          redirect: v.iProcessConfig.redirect
+          file: filePath,
+          check: true
         });
       }
-    });
+    }
     protocol.response(ctx, result);
   } catch (err) {
     protocol.responseError(ctx, err);
@@ -280,24 +303,43 @@ routerApp.on("instance/process_config/file", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const fileName = data.fileName;
   const config = data.config || null;
+  const fileType = data.type;
   try {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    let f = true;
-    instance.processConfigs.forEach((v) => {
-      if (v.iProcessConfig.fileName === fileName) {
-        f = false;
-        if (config) {
-          v.write(config);
-          return protocol.response(ctx, true);
-        } else {
-          return protocol.response(ctx, {
-            fileName,
-            config: v.read()
-          });
-        }
-      }
+    const fileManager = new FileManager(instance.absoluteCwdPath());
+    if (!fileManager.check(fileName)) throw new Error("文件不存在或路径错误，文件访问被拒绝");
+    const filePath = path.normalize(path.join(instance.absoluteCwdPath(), fileName));
+    const processConfig = new ProcessConfig({
+      fileName: fileName,
+      redirect: fileName,
+      path: filePath,
+      type: fileType,
+      info: null,
+      fromLink: null
     });
-    if (f) throw new Error(`The file ${fileName} does not support!`);
+    if (config) {
+      processConfig.write(config);
+      return protocol.response(ctx, true);
+    } else {
+      const json = processConfig.read();
+      return protocol.response(ctx, json);
+    }
+  } catch (err) {
+    protocol.responseError(ctx, err);
+  }
+});
+
+
+// 获取实例终端日志
+routerApp.on("instance/outputlog", async (ctx, data) => {
+  const instanceUuid = data.instanceUuid;
+  try {
+    const filePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
+    if (fs.existsSync(filePath)) {
+      const text = await fs.readFile(filePath, { encoding: "utf-8" });
+      return protocol.response(ctx, text);
+    }
+    protocol.responseError(ctx, new Error("终端日志文件不存在"));
   } catch (err) {
     protocol.responseError(ctx, err);
   }

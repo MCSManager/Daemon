@@ -10,6 +10,9 @@ docker_temp/
 toprettier.bat
 upload/
 
+tmp/
+dist/
+
 config.json
 *.bat
 test_file/
@@ -90,3 +93,4 @@ typings/
 # dotenv environment variables file
 .env
 
+Note.txt

@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-08-02 19:56:23
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import { routerApp } from "../service/router";
@@ -13,20 +13,24 @@ import { globalConfiguration } from "../entity/config";
 import logger from "../service/log";
 import RouterContext from "../entity/ctx";
 
+// 最迟验证时间
+const AUTH_TIMEOUT = 6000;
+// 认证类型标识
+const TOP_LEVEL = "TOP_LEVEL";
+
 // 顶级权限认证中间件（任何权限验证中间件此为第一位）
-routerApp.use((event, ctx, _, next) => {
+routerApp.use(async (event, ctx, _, next) => {
   const socket = ctx.socket;
   // 放行所有数据流控制器
   if (event.startsWith("stream")) return next();
   // 除 auth 控制器是公开访问，其他业务控制器必须得到授权才可访问
-  if (event === "auth") return next();
+  if (event === "auth") return await next();
   if (!ctx.session) throw new Error("Session does not exist in authentication middleware.");
-  // 若未验证则阻止除 auth 事件外的所有事件
-  if (ctx.session.key !== globalConfiguration.config.key || !ctx.session.login || !ctx.session.id) {
-    logger.warn(`会话 ${socket.id}(${socket.handshake.address}) 试图无权限访问 ${event} 现已阻止.`);
-    return protocol.error(ctx, "error", "权限不足，非法访问");
+  if (ctx.session.key === globalConfiguration.config.key && ctx.session.type === TOP_LEVEL && ctx.session.login && ctx.session.id) {
+    return await next();
   }
-  next();
+  logger.warn(`会话 ${socket.id}(${socket.handshake.address}) 试图无权限访问 ${event} 现已阻止.`);
+  return protocol.error(ctx, "error", "权限不足，非法访问");
 });
 
 // 日志输出中间件
@@ -54,10 +58,22 @@ routerApp.on("auth", (ctx, data) => {
   }
 });
 
+// 已连接事件，用于超时身份认证关闭
+routerApp.on("connection", (ctx) => {
+  const session = ctx.session;
+  setTimeout(() => {
+    if (!session.login) {
+      ctx.socket.disconnect();
+      logger.info(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address}) 因长时间未验证身份而断开连接`);
+    }
+  }, AUTH_TIMEOUT);
+});
+
 // 登录成功后必须执行此函数
 function loginSuccessful(ctx: RouterContext, data: string) {
   ctx.session.key = data;
   ctx.session.login = true;
   ctx.session.id = ctx.socket.id;
+  ctx.session.type = TOP_LEVEL;
   return ctx.session;
 }

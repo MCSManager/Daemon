@@ -1,15 +1,17 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-07-26 17:41:56
+ * @LastEditTime: 2021-08-25 15:24:38
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import path from "path";
 import fs from "fs-extra";
+import { compress, decompress } from "../common/compress";
 
 const ERROR_MSG_01 = "非法访问路径";
+const MAX_EDIT_SIZE = 1024 * 1024 * 4
 
 interface IFile {
   name: string;
@@ -122,17 +124,29 @@ export default class FileManager {
     await fs.move(targetPath, destPath);
   }
 
-  async unzip(target: string) {
-    return true;
+  async unzip(sourceZip: string, destDir: string) {
+    if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
+    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir));
   }
 
-  async zip(target: string) {
-    return true;
+  async zip(sourceZip: string, files: string[]) {
+    if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);
+    const sourceZipPath = this.toAbsolutePath(sourceZip);
+    const filesPath = [];
+    for (const iterator of files) {
+      if (this.check(iterator)) filesPath.push(this.toAbsolutePath(iterator));
+    }
+    return await compress(sourceZipPath, filesPath);
   }
 
   async edit(target: string, data?: string) {
     if (!this.check(target)) throw new Error(ERROR_MSG_01);
     if (!data) {
+      const absPath = this.toAbsolutePath(target);
+      const info = fs.statSync(absPath);
+      if (info.size > MAX_EDIT_SIZE) {
+        throw new Error("超出最大文件编辑限制");
+      }
       return await this.readFile(target);
     } else {
       return await this.writeFile(target, data);

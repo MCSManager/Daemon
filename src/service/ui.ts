@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-06-21 18:12:07
  * @Description: Terminal interaction logic. Since the logic is simple and does not require authentication and inspection, all UI business codes will be in one file.
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import readline from "readline";
@@ -23,7 +23,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log('[User Interface] program has a simple terminal interaction function, type "help" to see more information.');
+console.log('[终端] 守护进程拥有基本的交互功能，请输入"help"查看更多信息');
 
 function stdin() {
   rl.question("> ", (answer) => {

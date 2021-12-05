@@ -1,8 +1,8 @@
-import InstanceCommand from "../commands/command";
+import InstanceCommand from "../commands/base/command";
 /*
  * @Author: Copyright(c) 2021 Suwings
  * @Date: 2021-07-29 14:15:00
- * @LastEditTime: 2021-07-29 14:47:15
+ * @LastEditTime: 2021-08-14 16:52:47
  * @Description:
  * @Projcet: MCSManager Daemon
  */

@@ -1,15 +1,7 @@
 /*
- * @Author: Copyright(c) 2020 Suwings
- * @Date: 2021-07-22 10:20:02
- * @LastEditTime: 2021-07-22 11:15:53
- * @Description:
- * @Projcet: MCSManager Daemon
- * @License: MIT
- */
-/*
  * @Projcet: MCSManager Daemon
  * @Author: Copyright(c) 2020 Suwings
- * @License: MIT
+
  * @Description: 应用实例相关控制器
  */
 import os from "os";

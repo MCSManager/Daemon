@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 22:44:06
- * @LastEditTime: 2021-07-26 16:18:13
+ * @LastEditTime: 2021-08-29 20:06:02
  * @Description: 文件管理系统路由层
  * @Projcet: MCSManager Daemon
  */
@@ -85,7 +85,8 @@ routerApp.on("file/delete", async (ctx, data) => {
     const targets = data.targets;
     const fileManager = getFileManager(data.instanceUuid);
     for (const target of targets) {
-      await fileManager.delete(target);
+      // 异步删除
+      fileManager.delete(target);
     }
     protocol.response(ctx, true);
   } catch (error) {
@@ -101,6 +102,35 @@ routerApp.on("file/edit", async (ctx, data) => {
     const fileManager = getFileManager(data.instanceUuid);
     const result = await fileManager.edit(target, text);
     protocol.response(ctx, result ? result : true);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 压缩/解压文件
+routerApp.on("file/compress", async (ctx, data) => {
+  try {
+    const source = data.source;
+    const targets = data.targets;
+    const type = data.type;
+    const fileManager = getFileManager(data.instanceUuid);
+    if (type === 1) {
+      // 异步执行
+      fileManager
+        .zip(source, targets)
+        .then(() => {})
+        .catch((error) => {
+          protocol.responseError(ctx, error);
+        });
+    } else {
+      // 异步执行
+      fileManager
+        .unzip(source, targets)
+        .then(() => {})
+        .catch((error) => {
+          protocol.responseError(ctx, error);
+        });
+    }
   } catch (error) {
     protocol.responseError(ctx, error);
   }

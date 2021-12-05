@@ -1,10 +1,9 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-07-25 10:03:28
- * @LastEditTime: 2021-07-26 09:44:40
+ * @LastEditTime: 2021-08-22 14:21:18
  * @Description:
  * @Projcet: MCSManager Daemon
- * @License: MIT
  */
 
 interface IMap {
@@ -12,9 +11,17 @@ interface IMap {
   forEach: (value: any, key?: any) => void;
 }
 
+interface Page<T> {
+  page: number
+  pageSize: number
+  maxPage: number
+  total: number
+  data: T[]
+}
+
 // 供给路由层使用的MAP型查询接口
 export class QueryMapWrapper {
-  constructor(public map: IMap) {}
+  constructor(public map: IMap) { }
 
   select<T>(condition: (v: T) => boolean): T[] {
     const result: T[] = [];
@@ -43,8 +50,8 @@ export class QueryMapWrapper {
 }
 
 // 供 QueryWrapper 使用的数据源接口
-export interface IDataSource {
-  selectPage: (condition: any, page: number, pageSize: number) => any;
+export interface IDataSource<T> {
+  selectPage: (condition: any, page: number, pageSize: number) => Page<T>;
   select: (condition: any) => any[];
   update: (condition: any, data: any) => void;
   delete: (condition: any) => void;
@@ -52,8 +59,8 @@ export interface IDataSource {
 }
 
 // MYSQL 数据源
-export class MySqlSource<T> implements IDataSource {
-  selectPage: (condition: any, page: number, pageSize: number) => any;
+export class MySqlSource<T> implements IDataSource<T> {
+  selectPage: (condition: any, page: number, pageSize: number) => Page<T>;
   select: (condition: any) => any[];
   update: (condition: any, data: any) => void;
   delete: (condition: any) => void;
@@ -61,8 +68,8 @@ export class MySqlSource<T> implements IDataSource {
 }
 
 // 本地文件数据源（内嵌式微型数据库）
-export class LocalFileSource<T> implements IDataSource {
-  constructor(public data: any) {}
+export class LocalFileSource<T> implements IDataSource<T>{
+  constructor(public data: any) { }
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     const result: T[] = [];
@@ -71,9 +78,11 @@ export class LocalFileSource<T> implements IDataSource {
         const dataValue = v[key];
         const targetValue = condition[key];
         if (targetValue[0] == "%") {
-          if (targetValue != null && !dataValue.includes(targetValue.slice(1, targetValue.length - 1))) return false;
+          if (!dataValue.includes(targetValue.slice(1, targetValue.length - 1)))
+            return false;
         } else {
-          if (targetValue != null && targetValue !== dataValue) return false;
+          if (targetValue !== dataValue)
+            return false;
         }
       }
       result.push(v);
@@ -94,6 +103,7 @@ export class LocalFileSource<T> implements IDataSource {
       page,
       pageSize,
       maxPage,
+      total: data.length,
       data: data.slice(start, end)
     };
   }
@@ -101,14 +111,14 @@ export class LocalFileSource<T> implements IDataSource {
   select(condition: any): any[] {
     return null;
   }
-  update(condition: any, data: any) {}
-  delete(condition: any) {}
-  insert(data: any) {}
+  update(condition: any, data: any) { }
+  delete(condition: any) { }
+  insert(data: any) { }
 }
 
 // 供给路由层使用的统一数据查询接口
-export class QueryWrapper {
-  constructor(public dataSource: IDataSource) {}
+export class QueryWrapper<T>{
+  constructor(public dataSource: IDataSource<T>) { }
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     return this.dataSource.selectPage(condition, page, pageSize);

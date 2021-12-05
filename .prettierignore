@@ -14,7 +14,7 @@ README.md
 README-traditional.md
 
 *.json
-
+test_file/
 # self files
 server/
 users/
@@ -23,7 +23,7 @@ testServer/
 *.exe
 *.zip
 docker_temp/
-
+data/
 
 # config files
 users/*.json

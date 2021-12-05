@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-07-15 16:32:50
  * @Description: 身份认证控制器组
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import { routerApp } from "../service/router";

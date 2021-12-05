@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-08-01 18:55:27
  * @Description: 文件管理系统路由层
  * @Projcet: MCSManager Daemon
- * @License: MIT
+
  */
 
 import * as protocol from "../service/protocol";
@@ -17,17 +17,17 @@ import ProcessInfo from "../entity/commands/process_info";
 import ProcessInfoCommand from "../entity/commands/process_info";
 
 // 权限认证中间件
-routerApp.use((event, ctx, data, next) => {
+routerApp.use(async (event, ctx, data, next) => {
   // 放行数据流身份验证路由
   if (event === "stream/auth") return next();
   // 检查数据流其他路由
   if (event.startsWith("stream")) {
-    if (ctx.session.stream && ctx.session.stream.check === true) {
-      return next();
+    if (ctx.session.stream && ctx.session.stream.check === true && ctx.session.type === "STREAM") {
+      return await next();
     }
     return protocol.error(ctx, "error", "权限不足，非法访问");
   }
-  next();
+  return await next();
 });
 
 // 可公开访问数据流身份验证路由
@@ -43,6 +43,9 @@ routerApp.on("stream/auth", (ctx, data) => {
 
     // 加入数据流认证标识
     logger.info(`会话 ${ctx.socket.id} ${ctx.socket.handshake.address} 数据流通道身份验证成功`);
+    ctx.session.id = ctx.socket.id;
+    ctx.session.login = true;
+    ctx.session.type = "STREAM";
     ctx.session.stream = {
       check: true,
       instanceUuid: instance.instanceUuid
@@ -68,14 +71,14 @@ routerApp.on("stream/detail", async (ctx) => {
   try {
     const instanceUuid = ctx.session.stream.instanceUuid;
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    const processInfo = await instance.forceExec(new ProcessInfoCommand());
+    // const processInfo = await instance.forceExec(new ProcessInfoCommand());
     protocol.response(ctx, {
       instanceUuid: instance.instanceUuid,
       started: instance.startCount,
       status: instance.status(),
       config: instance.config,
-      info: instance.info,
-      processInfo
+      info: instance.info
+      // processInfo
     });
   } catch (error) {
     protocol.responseError(ctx, error);
