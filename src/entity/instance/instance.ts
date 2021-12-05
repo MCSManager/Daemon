@@ -79,6 +79,12 @@ export default class Instance extends EventEmitter {
 
   // 传入实例配置，松散型动态的给实例参数设置配置项
   parameters(cfg: any) {
+    // 若实例类型改变，则必须重置预设命令与生命周期事件
+    if (cfg.type != null && cfg.type != this.config.type) {
+      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
+      this.configureParams(this.config, cfg, "type", String, "");
+      this.forceExec(new FuntionDispatcher());
+    }
     this.configureParams(this.config, cfg, "nickname", String, "");
     this.configureParams(this.config, cfg, "startCommand", String, "");
     this.configureParams(this.config, cfg, "stopCommand", String, "");
@@ -108,12 +114,7 @@ export default class Instance extends EventEmitter {
       this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Number, "");
       this.configureParams(this.config.eventTask, cfg.eventTask, "type", Number, "");
     }
-    // 若实例类型改变，则必须重置预设命令与生命周期事件
-    if (cfg.type != null) {
-      this.configureParams(this.config, cfg, "type", String, "");
-      this.forceExec(new FuntionDispatcher());
-      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
-    }
+
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
