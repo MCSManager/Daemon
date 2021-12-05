@@ -10,10 +10,6 @@ public/onlinefs_public/
 public/login/static/
 public/login2/static/
 public/login3/static/
-README.md
-README-traditional.md
-
-*.json
 test_file/
 # self files
 server/
