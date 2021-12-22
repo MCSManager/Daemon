@@ -97,33 +97,34 @@ export default class Instance extends EventEmitter {
       this.configureParams(this.config.docker, cfg.docker, "image", String, "");
       this.configureParams(this.config.docker, cfg.docker, "memory", Number, "");
       this.configureParams(this.config.docker, cfg.docker, "cpu", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "ports", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number, "");
+      this.configureParams(this.config.docker, cfg.docker, "ports", null, []);
+      this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number, 0);
       this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "io", Number, "");
-      this.configureParams(this.config.docker, cfg.docker, "network", Number, "");
-      this.configureParams(this.config.docker, cfg.docker, "networkMode", String, "");
+      this.configureParams(this.config.docker, cfg.docker, "io", Number, 0);
+      this.configureParams(this.config.docker, cfg.docker, "network", Number, 0);
+      this.configureParams(this.config.docker, cfg.docker, "networkMode", String, "bridge");
     }
     if (cfg.pingConfig) {
       this.configureParams(this.config.pingConfig, cfg.pingConfig, "ip", String, "");
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "port", Number, "");
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "type", Number, "");
+      this.configureParams(this.config.pingConfig, cfg.pingConfig, "port", Number, 25565);
+      this.configureParams(this.config.pingConfig, cfg.pingConfig, "type", Number, 1);
     }
     if (cfg.eventTask) {
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoStart", String, "");
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Number, "");
-      this.configureParams(this.config.eventTask, cfg.eventTask, "type", Number, "");
+      this.configureParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean, false);
+      this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean, false);
+      this.configureParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean, false);
     }
 
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
   // 修改实例信息
-  configureParams(self: any, args: any, key: string, typeFn: Function, defval = "") {
+  configureParams(self: any, args: any, key: string, typeFn: Function, defval: any) {
+    const v = args[key] != null ? args[key] : defval;
     if (typeFn) {
-      self[key] = typeFn(args[key]);
+      self[key] = typeFn(v);
     } else {
-      self[key] = args[key];
+      self[key] = v;
     }
   }
 
