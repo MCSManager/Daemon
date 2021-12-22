@@ -151,7 +151,7 @@ export default class Instance extends EventEmitter {
 
   // 设置实例状态或获取状态
   status(v?: number) {
-    if (v) this.instanceStatus = v;
+    if (v != null) this.instanceStatus = v;
     return this.instanceStatus;
   }
 
