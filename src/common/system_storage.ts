@@ -2,7 +2,7 @@
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-05-11 16:29:08
  * @LastEditTime: 2021-09-08 22:52:25
- * @Description: 实例储存管理子系统，一个微型的ORM模块，可以用于较少量的数据储存和增删查改。
+ * @Description: 实例储存管理子系统，一个微型的数据储存模块，可以用于较少量的数据储存和增删查改。
  * @Projcet: MCSManager Daemon
 
  */
