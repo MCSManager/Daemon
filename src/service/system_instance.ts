@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-12-25 16:37:51
+ * @LastEditTime: 2021-12-25 21:31:11
  * @Description: instance service
  * @Projcet: MCSManager Daemon
 
@@ -9,6 +9,7 @@
 
 import fs from "fs-extra";
 import path from "path";
+import os from "os";
 
 import Instance from "../entity/instance/instance";
 import EventEmitter from "events";
@@ -78,8 +79,14 @@ class InstanceSubsystem extends EventEmitter {
     const instance = new Instance(newUuid, new InstanceConfig());
     // 实例工作目录验证与自动创建
     if (!cfg.cwd || cfg.cwd === ".") {
-      cfg.cwd = `${INSTANCE_DATA_DIR}/${instance.instanceUuid}`;
+      cfg.cwd = path.normalize(`${INSTANCE_DATA_DIR}/${instance.instanceUuid}`);
       if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
+    }
+    // 针对中文操作系统编码自动选择
+    if (os.platform() === "win32") {
+      cfg.ie = cfg.oe = cfg.fileCode = "gbk";
+    } else {
+      cfg.ie = cfg.oe = cfg.fileCode = "utf-8";
     }
     // 根据参数构建并初始化类型
     instance.parameters(cfg);
