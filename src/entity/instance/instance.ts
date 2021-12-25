@@ -80,7 +80,7 @@ export default class Instance extends EventEmitter {
   // 传入实例配置，松散型动态的给实例参数设置配置项
   parameters(cfg: any) {
     // 若实例类型改变，则必须重置预设命令与生命周期事件
-    if (cfg.type != null && cfg.type != this.config.type) {
+    if (cfg.type && cfg.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
       this.configureParams(this.config, cfg, "type", String, "");
       this.forceExec(new FuntionDispatcher());
@@ -92,7 +92,7 @@ export default class Instance extends EventEmitter {
     this.configureParams(this.config, cfg, "ie", String, "");
     this.configureParams(this.config, cfg, "oe", String, "");
     this.configureParams(this.config, cfg, "endTime", String, "");
-    this.configureParams(this.config, cfg, "processType", String, "");
+    this.configureParams(this.config, cfg, "processType", String, "general");
     if (cfg.docker) {
       this.configureParams(this.config.docker, cfg.docker, "image", String, "");
       this.configureParams(this.config.docker, cfg.docker, "memory", Number, "");

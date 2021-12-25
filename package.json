@@ -10,7 +10,7 @@
     "build": "tsc"
   },
   "author": "Suwings",
-  "license": "ISC",
+  "license": "GPL",
   "dependencies": {
     "@koa/router": "^10.0.0",
     "compressing": "^1.5.1",

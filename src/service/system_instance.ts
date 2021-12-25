@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-09-08 22:53:06
+ * @LastEditTime: 2021-12-25 16:37:51
  * @Description: instance service
  * @Projcet: MCSManager Daemon
 
@@ -25,14 +25,12 @@ import FuntionDispatcher from "../entity/commands/dispatcher";
 import InstanceControl from "./system_instance_control";
 import StartCommand from "../entity/commands/start";
 
-
 const INSTANCE_DATA_DIR = path.join(process.cwd(), "data/InstanceData");
 if (!fs.existsSync(INSTANCE_DATA_DIR)) {
   fs.mkdirsSync(INSTANCE_DATA_DIR);
 }
 
 class InstanceSubsystem extends EventEmitter {
-
   public readonly LOG_DIR = "data/InstanceLog/";
 
   public readonly instances = new Map<string, Instance>();
@@ -46,7 +44,8 @@ class InstanceSubsystem extends EventEmitter {
   private autoStart() {
     this.instances.forEach((instance) => {
       if (instance.config.eventTask.autoStart) {
-        instance.exec(new StartCommand())
+        instance
+          .exec(new StartCommand())
           .then(() => {
             logger.info(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动指令已发出`);
           })
@@ -54,7 +53,7 @@ class InstanceSubsystem extends EventEmitter {
             logger.error(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动时错误: ${reason}`);
           });
       }
-    })
+    });
   }
 
   // init all instances from local files
@@ -66,8 +65,8 @@ class InstanceSubsystem extends EventEmitter {
       // 所有实例全部进行功能调度器
       instance
         .forceExec(new FuntionDispatcher())
-        .then((v) => { })
-        .catch((v) => { });
+        .then((v) => {})
+        .catch((v) => {});
       this.addInstance(instance);
     });
     // 处理自动启动
@@ -82,8 +81,9 @@ class InstanceSubsystem extends EventEmitter {
       cfg.cwd = `${INSTANCE_DATA_DIR}/${instance.instanceUuid}`;
       if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     }
-    // 根据参数构建
+    // 根据参数构建并初始化类型
     instance.parameters(cfg);
+    instance.forceExec(new FuntionDispatcher());
     this.addInstance(instance);
     return instance;
   }
@@ -140,22 +140,22 @@ class InstanceSubsystem extends EventEmitter {
       // 删除计划任务
       InstanceControl.deleteInstanceAllTask(instanceUuid);
       // 异步删除文件
-      if (deleteFile) fs.remove(instance.config.cwd, (err) => { });
+      if (deleteFile) fs.remove(instance.config.cwd, (err) => {});
       return true;
     }
-    throw new Error("Instance does not exist")
+    throw new Error("Instance does not exist");
   }
 
   forward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.requestForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   stopForward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.cannelForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   forEachForward(instanceUuid: string, callback: (socket: Socket) => void) {
@@ -188,6 +188,5 @@ class InstanceSubsystem extends EventEmitter {
     }
   }
 }
-
 
 export default new InstanceSubsystem();
