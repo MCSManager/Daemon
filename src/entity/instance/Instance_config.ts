@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-05-12 12:04:13
- * @LastEditTime: 2021-08-14 16:39:07
+ * @LastEditTime: 2021-12-25 17:35:54
  * @Description:
  * @Projcet: MCSManager Daemon
 
@@ -11,8 +11,6 @@ import { IDockerConfig } from "./interface";
 
 // @Entity
 export default class InstanceConfig {
-
-
   public nickname = "Undefined";
   public startCommand = "";
   public stopCommand = "^C";
@@ -23,7 +21,7 @@ export default class InstanceConfig {
   public lastDatetime = "--";
   public type = Instance.TYPE_UNIVERSAL; // Instance type like: Minecraft,Webwhell...
   public tag: string[] = []; // Instance tag like: Cloud1 Group2...
-  public endTime: number = null;
+  public endTime: string = "";
   public processType: string = "general";
 
   // Event task
@@ -31,7 +29,7 @@ export default class InstanceConfig {
     autoStart: false,
     autoRestart: false,
     ignore: false
-  }
+  };
 
   // Extend
   public docker: IDockerConfig = {
@@ -50,5 +48,5 @@ export default class InstanceConfig {
     ip: "",
     port: 25565,
     type: 1
-  }
+  };
 }

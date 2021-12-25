@@ -91,7 +91,7 @@ export default class Instance extends EventEmitter {
     this.configureParams(this.config, cfg, "cwd", String);
     this.configureParams(this.config, cfg, "ie", String);
     this.configureParams(this.config, cfg, "oe", String);
-    this.configureParams(this.config, cfg, "endTime", Number);
+    this.configureParams(this.config, cfg, "endTime", String);
     this.configureParams(this.config, cfg, "processType", String);
     if (cfg.docker) {
       this.configureParams(this.config.docker, cfg.docker, "image", String);
