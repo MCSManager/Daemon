@@ -1,35 +1,15 @@
 /*
- * @Projcet: MCSManager Daemon
- * @Author: Copyright(c) 2020 Suwings
-
- * @Description: 应用实例相关控制器
+ * @Author: Suwings
+ * @Date: 2021-12-05 15:43:50
+ * @LastEditTime: 2021-12-25 15:49:43
  */
-import os from "os";
-import osUtils from "os-utils";
 
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
 import Instance from "../entity/instance/instance";
 
-// 系统详细信息每一段时间更新一次
-var systemResources: any = null;
-setInterval(() => {
-  osUtils.cpuUsage((p) => {
-    systemResources = {
-      cpuUsage: p,
-      totalmem: os.totalmem(),
-      freemem: os.freemem(),
-      type: os.type(),
-      // cpus: os.cpus(),
-      hostname: os.hostname(),
-      loadavg: os.loadavg(),
-      platform: os.platform(),
-      release: os.release(),
-      uptime: os.uptime()
-    };
-  });
-}, 1000);
+import { systemInfo } from "../common/system_info";
 
 // 获取守护进程系统基本信息
 routerApp.on("info/overview", async (ctx) => {
@@ -49,7 +29,7 @@ routerApp.on("info/overview", async (ctx) => {
       running,
       total
     },
-    system: systemResources
+    system: systemInfo()
   };
   protocol.response(ctx, info);
 });
