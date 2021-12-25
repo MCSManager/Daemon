@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-08-25 15:24:38
+ * @LastEditTime: 2021-12-25 20:57:17
  * @Projcet: MCSManager Daemon
 
  */
@@ -9,9 +9,10 @@
 import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
+import os from "os";
 
 const ERROR_MSG_01 = "非法访问路径";
-const MAX_EDIT_SIZE = 1024 * 1024 * 4
+const MAX_EDIT_SIZE = 1024 * 1024 * 4;
 
 interface IFile {
   name: string;
@@ -21,14 +22,17 @@ interface IFile {
 }
 
 export default class FileManager {
-  public topPath: string = null;
   public cwd: string = ".";
 
-  constructor(topPath: string = "") {
+  constructor(public topPath: string = "", public fileCode?: string) {
     if (!path.isAbsolute(topPath)) {
       this.topPath = path.normalize(path.join(process.cwd(), topPath));
     } else {
       this.topPath = path.normalize(topPath);
+    }
+    if (!fileCode) {
+      if (os.platform() === "win32") this.fileCode = "gbk";
+      else this.fileCode = "utf-8";
     }
   }
 
@@ -82,14 +86,14 @@ export default class FileManager {
   async readFile(fileName: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
-    const text = await fs.readFile(absPath, { encoding: "utf-8" });
+    const text = await fs.readFile(absPath, { encoding: this.fileCode });
     return text;
   }
 
   async writeFile(fileName: string, data: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
-    return await fs.writeFile(absPath, data, { encoding: "utf-8" });
+    return await fs.writeFile(absPath, data, { encoding: this.fileCode });
   }
 
   async copy(target1: string, target2: string) {
@@ -126,7 +130,7 @@ export default class FileManager {
 
   async unzip(sourceZip: string, destDir: string) {
     if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
-    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir));
+    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), this.fileCode);
   }
 
   async zip(sourceZip: string, files: string[]) {
@@ -136,7 +140,7 @@ export default class FileManager {
     for (const iterator of files) {
       if (this.check(iterator)) filesPath.push(this.toAbsolutePath(iterator));
     }
-    return await compress(sourceZipPath, filesPath);
+    return await compress(sourceZipPath, filesPath, this.fileCode);
   }
 
   async edit(target: string, data?: string) {

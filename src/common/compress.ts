@@ -1,36 +1,48 @@
 /*
  * @Author: Copyright(c) 2021 Suwings
  * @Date: 2021-08-25 14:30:14
- * @LastEditTime: 2021-08-29 20:05:11
+ * @LastEditTime: 2021-12-25 20:58:22
  * @Description: 跨平台的高效率/低效率结合的解压缩方案
  * @Projcet: MCSManager Daemon
  */
 
-import os from "os";
-import path from "path";
 import fs from "fs-extra";
-
-const system = os.platform();
-
-// 此处使用临时解决方案
-const SYSTEM_CODE = "GBK";
 
 import * as compressing from "compressing";
 import child_process from "child_process";
 
-async function nodeCompress(zipPath: string, files: string[]) {
+async function nodeCompress(zipPath: string, files: string[], fileCode: string = "utf-8") {
   const stream = new compressing.zip.Stream();
   files.forEach((v) => {
-    stream.addEntry(v);
+    stream.addEntry(v, {});
   });
   const destStream = fs.createWriteStream(zipPath);
   stream.pipe(destStream);
 }
 
-async function nodeDecompress(sourceZip: string, destDir: string) {
+async function nodeDecompress(sourceZip: string, destDir: string, fileCode: string = "utf-8") {
   return await compressing.zip.uncompress(sourceZip, destDir, {
-    zipFileNameEncoding: SYSTEM_CODE
+    zipFileNameEncoding: fileCode
   });
+}
+
+export async function compress(sourceZip: string, files: string[], fileCode?: string) {
+  // TODO 与系统集成的解压缩功能
+  // if (system === "win32") {
+  //   await _7zipCompress(sourceZip, files);
+  // } else {
+
+  // }
+  return await nodeCompress(sourceZip, files, fileCode);
+}
+
+export async function decompress(zipPath: string, dest: string, fileCode?: string) {
+  // if (system === "win32") {
+  //   await _7zipDecompress(zipPath, dest);
+  // } else {
+
+  // }
+  return await nodeDecompress(zipPath, dest, fileCode);
 }
 
 async function _7zipCompress(zipPath: string, files: string[]) {
@@ -63,22 +75,4 @@ async function _7zipDecompress(sourceZip: string, destDir: string) {
       return resolve(true);
     });
   });
-}
-
-export async function compress(sourceZip: string, files: string[]) {
-  // if (system === "win32") {
-  //   await _7zipCompress(sourceZip, files);
-  // } else {
-
-  // }
-  return await nodeCompress(sourceZip, files);
-}
-
-export async function decompress(zipPath: string, dest: string) {
-  // if (system === "win32") {
-  //   await _7zipDecompress(zipPath, dest);
-  // } else {
-
-  // }
-  return await nodeDecompress(zipPath, dest);
 }
