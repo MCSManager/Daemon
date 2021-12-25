@@ -82,45 +82,46 @@ export default class Instance extends EventEmitter {
     // 若实例类型改变，则必须重置预设命令与生命周期事件
     if (cfg.type && cfg.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
-      this.configureParams(this.config, cfg, "type", String, "");
+      this.configureParams(this.config, cfg, "type", String);
       this.forceExec(new FuntionDispatcher());
     }
-    this.configureParams(this.config, cfg, "nickname", String, "");
-    this.configureParams(this.config, cfg, "startCommand", String, "");
-    this.configureParams(this.config, cfg, "stopCommand", String, "");
-    this.configureParams(this.config, cfg, "cwd", String, "");
-    this.configureParams(this.config, cfg, "ie", String, "");
-    this.configureParams(this.config, cfg, "oe", String, "");
-    this.configureParams(this.config, cfg, "endTime", String, "");
-    this.configureParams(this.config, cfg, "processType", String, "general");
+    this.configureParams(this.config, cfg, "nickname", String);
+    this.configureParams(this.config, cfg, "startCommand", String);
+    this.configureParams(this.config, cfg, "stopCommand", String);
+    this.configureParams(this.config, cfg, "cwd", String);
+    this.configureParams(this.config, cfg, "ie", String);
+    this.configureParams(this.config, cfg, "oe", String);
+    this.configureParams(this.config, cfg, "endTime", Number);
+    this.configureParams(this.config, cfg, "processType", String);
     if (cfg.docker) {
-      this.configureParams(this.config.docker, cfg.docker, "image", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "memory", Number, "");
-      this.configureParams(this.config.docker, cfg.docker, "cpu", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "ports", null, []);
-      this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number, 0);
-      this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String, "");
-      this.configureParams(this.config.docker, cfg.docker, "io", Number, 0);
-      this.configureParams(this.config.docker, cfg.docker, "network", Number, 0);
-      this.configureParams(this.config.docker, cfg.docker, "networkMode", String, "bridge");
+      this.configureParams(this.config.docker, cfg.docker, "image", String);
+      this.configureParams(this.config.docker, cfg.docker, "memory", Number);
+      this.configureParams(this.config.docker, cfg.docker, "cpu", String);
+      this.configureParams(this.config.docker, cfg.docker, "ports");
+      this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number);
+      this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String);
+      this.configureParams(this.config.docker, cfg.docker, "io", Number);
+      this.configureParams(this.config.docker, cfg.docker, "network", Number);
+      this.configureParams(this.config.docker, cfg.docker, "networkMode", String);
     }
     if (cfg.pingConfig) {
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "ip", String, "");
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "port", Number, 25565);
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "type", Number, 1);
+      this.configureParams(this.config.pingConfig, cfg.pingConfig, "ip", String);
+      this.configureParams(this.config.pingConfig, cfg.pingConfig, "port", Number);
+      this.configureParams(this.config.pingConfig, cfg.pingConfig, "type", Number);
     }
     if (cfg.eventTask) {
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean, false);
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean, false);
-      this.configureParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean, false);
+      this.configureParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean);
+      this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean);
+      this.configureParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean);
     }
 
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
   // 修改实例信息
-  configureParams(self: any, args: any, key: string, typeFn: Function, defval: any) {
-    const v = args[key] != null ? args[key] : defval;
+  configureParams(self: any, args: any, key: string, typeFn?: Function) {
+    const selfDefaultValue = self[key] ?? null;
+    const v = args[key] != null ? args[key] : selfDefaultValue;
     if (typeFn) {
       self[key] = typeFn(v);
     } else {
