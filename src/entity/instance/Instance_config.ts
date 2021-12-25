@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-05-12 12:04:13
- * @LastEditTime: 2021-12-25 17:35:54
+ * @LastEditTime: 2021-12-25 17:44:46
  * @Description:
  * @Projcet: MCSManager Daemon
 
@@ -19,9 +19,10 @@ export default class InstanceConfig {
   public oe = "utf-8";
   public createDatetime = new Date().toLocaleDateString();
   public lastDatetime = "--";
-  public type = Instance.TYPE_UNIVERSAL; // Instance type like: Minecraft,Webwhell...
-  public tag: string[] = []; // Instance tag like: Cloud1 Group2...
+  public type = Instance.TYPE_UNIVERSAL;
+  public tag: string[] = [];
   public endTime: string = "";
+  public fileCode: string = "utf-8";
   public processType: string = "general";
 
   // Event task
