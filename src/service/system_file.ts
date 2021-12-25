@@ -1,7 +1,7 @@
 /*
  * @Author: Copyright(c) 2020 Suwings
  * @Date: 2021-06-22 20:43:13
- * @LastEditTime: 2021-12-25 20:57:17
+ * @LastEditTime: 2021-12-25 21:11:13
  * @Projcet: MCSManager Daemon
 
  */
@@ -10,6 +10,7 @@ import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
 import os from "os";
+import iconv from "iconv-lite";
 
 const ERROR_MSG_01 = "非法访问路径";
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
@@ -86,14 +87,16 @@ export default class FileManager {
   async readFile(fileName: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
-    const text = await fs.readFile(absPath, { encoding: this.fileCode });
+    const buf = await fs.readFile(absPath);
+    const text = iconv.decode(buf, this.fileCode);
     return text;
   }
 
   async writeFile(fileName: string, data: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
-    return await fs.writeFile(absPath, data, { encoding: this.fileCode });
+    const buf = iconv.encode(data, this.fileCode);
+    return await fs.writeFile(absPath, buf);
   }
 
   async copy(target1: string, target2: string) {
