@@ -1,10 +1,23 @@
 /*
- * @Author: Copyright(c) 2020 Suwings
- * @Date: 2021-07-25 10:03:28
- * @LastEditTime: 2021-08-22 14:21:18
- * @Description:
- * @Projcet: MCSManager Daemon
- */
+  Copyright (C) 2022 Suwings(https://github.com/Suwings)
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+
+  版权所有 (C) 2021 Suwings(https://github.com/Suwings)
+
+  本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
+  该程序以具有实际用途为目的发布，但是并不包含任何担保，
+  也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+*/
 
 interface IMap {
   size: number;
@@ -12,16 +25,16 @@ interface IMap {
 }
 
 interface Page<T> {
-  page: number
-  pageSize: number
-  maxPage: number
-  total: number
-  data: T[]
+  page: number;
+  pageSize: number;
+  maxPage: number;
+  total: number;
+  data: T[];
 }
 
 // 供给路由层使用的MAP型查询接口
 export class QueryMapWrapper {
-  constructor(public map: IMap) { }
+  constructor(public map: IMap) {}
 
   select<T>(condition: (v: T) => boolean): T[] {
     const result: T[] = [];
@@ -68,8 +81,8 @@ export class MySqlSource<T> implements IDataSource<T> {
 }
 
 // 本地文件数据源（内嵌式微型数据库）
-export class LocalFileSource<T> implements IDataSource<T>{
-  constructor(public data: any) { }
+export class LocalFileSource<T> implements IDataSource<T> {
+  constructor(public data: any) {}
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     const result: T[] = [];
@@ -78,11 +91,9 @@ export class LocalFileSource<T> implements IDataSource<T>{
         const dataValue = v[key];
         const targetValue = condition[key];
         if (targetValue[0] == "%") {
-          if (!dataValue.includes(targetValue.slice(1, targetValue.length - 1)))
-            return false;
+          if (!dataValue.includes(targetValue.slice(1, targetValue.length - 1))) return false;
         } else {
-          if (targetValue !== dataValue)
-            return false;
+          if (targetValue !== dataValue) return false;
         }
       }
       result.push(v);
@@ -111,14 +122,14 @@ export class LocalFileSource<T> implements IDataSource<T>{
   select(condition: any): any[] {
     return null;
   }
-  update(condition: any, data: any) { }
-  delete(condition: any) { }
-  insert(data: any) { }
+  update(condition: any, data: any) {}
+  delete(condition: any) {}
+  insert(data: any) {}
 }
 
 // 供给路由层使用的统一数据查询接口
-export class QueryWrapper<T>{
-  constructor(public dataSource: IDataSource<T>) { }
+export class QueryWrapper<T> {
+  constructor(public dataSource: IDataSource<T>) {}
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     return this.dataSource.selectPage(condition, page, pageSize);

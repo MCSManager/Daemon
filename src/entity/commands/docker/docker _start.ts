@@ -1,11 +1,23 @@
 /*
- * @Author: Copyright(c) 2020 Suwings
- * @Date: 2021-03-24 19:51:50
- * @LastEditTime: 2021-09-08 15:54:51
- * @Description: Docker 启动方式
- * @Projcet: MCSManager Daemon
- */
+  Copyright (C) 2022 Suwings(https://github.com/Suwings)
 
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+
+  版权所有 (C) 2021 Suwings(https://github.com/Suwings)
+
+  本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
+  该程序以具有实际用途为目的发布，但是并不包含任何担保，
+  也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+*/
 
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
@@ -58,7 +70,7 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) { }
+    } catch (error) {}
   }
 
   private wait() {
@@ -129,7 +141,7 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`启动命令: ${commandList.join(" ")}`);
       logger.info(`工作目录: ${cwd}`);
       logger.info(`端口: ${JSON.stringify(publicPortArray)}`);
-      logger.info(`内存限制: ${maxMemory} MB`)
+      logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
       logger.info("----------------");
 
@@ -151,7 +163,7 @@ export default class DockerStartCommand extends InstanceCommand {
           Memory: maxMemory,
           Binds: [`${cwd}:/workspace/`],
           AutoRemove: true,
-          PortBindings: publicPortArray,
+          PortBindings: publicPortArray
         }
       });
 

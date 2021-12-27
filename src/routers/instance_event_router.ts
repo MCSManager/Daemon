@@ -1,29 +1,41 @@
-import path from 'path';
-
 /*
- * @Author: Copyright(c) 2020 Suwings
- * @Date: 2020-11-23 17:45:02
- * @LastEditTime: 2021-08-02 19:54:21
- * @Description: 应用实例所有主动性事件
- * @Projcet: MCSManager Daemon
+  Copyright (C) 2022 Suwings(https://github.com/Suwings)
 
- */
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+
+  版权所有 (C) 2021 Suwings(https://github.com/Suwings)
+
+  本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
+  该程序以具有实际用途为目的发布，但是并不包含任何担保，
+  也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+*/
+
+import path from "path";
 
 import RouterContext from "../entity/ctx";
 import * as protocol from "../service/protocol";
 import InstanceSubsystem from "../service/system_instance";
-import fs from 'fs-extra';
+import fs from "fs-extra";
 const TIME_SPEED = 100;
 const MAX_CHAR_SIZE = 40;
 
 // 输出流记录到文本
 async function outputLog(instanceUuid: string, text: string) {
   const logFilePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
-  if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR)
+  if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR);
   try {
     const fileInfo = fs.statSync(logFilePath);
     if (fileInfo && fileInfo.size > 1024 * 1024 * 1) fs.removeSync(logFilePath);
-  } catch (err) { }
+  } catch (err) {}
   await fs.writeFile(logFilePath, text, { encoding: "utf-8", flag: "a" });
 }
 
@@ -47,15 +59,17 @@ setInterval(function () {
 // 默认加入到数据缓存中以控制发送速率确保其稳定性
 InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
   if (outputStreamCache[instanceUuid]) {
-    if (outputStreamCache[instanceUuid].length > 1000 * MAX_CHAR_SIZE) return (outputStreamCache[instanceUuid] += "\n[warning] the output data is too fast, more content has been blocked at this moment in order to ensure stability.\n[警告] 输出流数据过快，为保证稳定性，已屏蔽此刻更多内容....\n");
+    if (outputStreamCache[instanceUuid].length > 1000 * MAX_CHAR_SIZE)
+      return (outputStreamCache[instanceUuid] +=
+        "\n[warning] the output data is too fast, more content has been blocked at this moment in order to ensure stability.\n[警告] 输出流数据过快，为保证稳定性，已屏蔽此刻更多内容....\n");
     outputStreamCache[instanceUuid] += text;
   } else {
     outputStreamCache[instanceUuid] = text;
   }
   // 输出内容追加到log文件
   outputLog(instanceUuid, text)
-    .then(() => { })
-    .catch(() => { });
+    .then(() => {})
+    .catch(() => {});
 });
 
 // 实例退出事件
