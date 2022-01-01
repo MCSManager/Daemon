@@ -35,7 +35,7 @@ _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
 
  + Released under the GPL-3.0 License
- + Copyright 2021 Suwings
+ + Copyright 2022 Suwings
  + Version ${VERSION}
 `);
 
