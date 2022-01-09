@@ -106,6 +106,12 @@ export default class Instance extends EventEmitter {
       this.configureParams(this.config, cfg, "type", String);
       this.forceExec(new FuntionDispatcher());
     }
+    // 若进程类型改变，则必须重置预设命令与生命周期事件
+    if (cfg.processType && cfg.processType !== this.config.processType) {
+      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例进程类型");
+      this.configureParams(this.config, cfg, "processType", String);
+      this.forceExec(new FuntionDispatcher());
+    }
     this.configureParams(this.config, cfg, "nickname", String);
     this.configureParams(this.config, cfg, "startCommand", String);
     this.configureParams(this.config, cfg, "stopCommand", String);
@@ -114,7 +120,6 @@ export default class Instance extends EventEmitter {
     this.configureParams(this.config, cfg, "oe", String);
     this.configureParams(this.config, cfg, "endTime", String);
     this.configureParams(this.config, cfg, "fileCode", String);
-    this.configureParams(this.config, cfg, "processType", String);
     if (cfg.docker) {
       this.configureParams(this.config.docker, cfg.docker, "image", String);
       this.configureParams(this.config.docker, cfg.docker, "memory", Number);
