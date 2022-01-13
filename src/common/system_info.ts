@@ -103,8 +103,8 @@ function setLinuxSystemInfo() {
         infoTable[k] = vNumber;
       }
     });
-    info.freemem = infoTable["MemTotal"] ?? 0;
-    info.totalmem = infoTable["MemAvailable"] ?? 0;
+    info.freemem = infoTable["MemAvailable"] * 1024;
+    info.totalmem = infoTable["MemTotal"] * 1024;
     info.memUsage = (info.totalmem - info.freemem) / info.totalmem;
     osUtils.cpuUsage((p) => (info.cpuUsage = p));
   } catch (error) {
