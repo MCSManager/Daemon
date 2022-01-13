@@ -95,16 +95,18 @@ function setLinuxSystemInfo() {
     list.forEach((line) => {
       const kv = line.split(":");
       if (kv.length === 2) {
-        const k = kv[0].replace(/ /gim, "").replace(/\t/gim, "").trim();
-        let v = kv[1].replace(/ /gim, "").replace(/\t/gim, "").trim();
-        v = v.replace(/KB/gim, "").replace(/MB/gim, "").replace(/GB/gim, "");
+        const k = kv[0].replace(/ /gim, "").replace(/\t/gim, "").trim().toLowerCase();
+        let v = kv[1].replace(/ /gim, "").replace(/\t/gim, "").trim().toLowerCase();
+        v = v.replace(/kb/gim, "").replace(/mb/gim, "").replace(/gb/gim, "");
         let vNumber = parseInt(v);
         if (isNaN(vNumber)) vNumber = 0;
         infoTable[k] = vNumber;
       }
     });
-    info.freemem = infoTable["MemAvailable"] * 1024;
-    info.totalmem = infoTable["MemTotal"] * 1024;
+    const memAvailable = infoTable["memavailable"] ?? infoTable["memfree"];
+    const memTotal = infoTable["memtotal"];
+    info.freemem = memAvailable * 1024;
+    info.totalmem = memTotal * 1024;
     info.memUsage = (info.totalmem - info.freemem) / info.totalmem;
     osUtils.cpuUsage((p) => (info.cpuUsage = p));
   } catch (error) {
