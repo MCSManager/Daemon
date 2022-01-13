@@ -21,7 +21,12 @@
 
 import os from "os";
 import osUtils from "os-utils";
-import systeminformation from "systeminformation";
+import fs from "fs";
+// import systeminformation from "systeminformation";
+
+interface IInfoTable {
+  [key: string]: number;
+}
 
 interface ISystemInfo {
   cpuUsage: number;
@@ -40,7 +45,7 @@ interface ISystemInfo {
 }
 
 // 系统详细信息每一段时间更新一次
-let info: ISystemInfo = {
+const info: ISystemInfo = {
   type: os.type(),
   hostname: os.hostname(),
   platform: os.platform(),
@@ -58,15 +63,55 @@ let info: ISystemInfo = {
 
 // 定时刷新缓存
 setInterval(() => {
-  systeminformation.mem((data) => {
-    info.freemem = data.available;
-    info.totalmem = data.total;
-    info.memUsage = (data.total - data.available) / data.total;
-  });
-  osUtils.cpuUsage((p) => {
-    info.cpuUsage = p;
-  });
-}, 2000);
+  if (os.platform() === "linux") {
+    return setLinuxSystemInfo();
+  }
+  if (os.platform() === "win32") {
+    return setWindowsSystemInfo();
+  }
+  return otherSystemInfo();
+}, 3000);
+
+function otherSystemInfo() {
+  info.freemem = os.freemem();
+  info.totalmem = os.totalmem();
+  info.memUsage = (os.totalmem() - os.freemem()) / os.totalmem();
+  osUtils.cpuUsage((p) => (info.cpuUsage = p));
+}
+
+function setWindowsSystemInfo() {
+  info.freemem = os.freemem();
+  info.totalmem = os.totalmem();
+  info.memUsage = (os.totalmem() - os.freemem()) / os.totalmem();
+  osUtils.cpuUsage((p) => (info.cpuUsage = p));
+}
+
+function setLinuxSystemInfo() {
+  try {
+    // 基于 /proc/meminfo 的内存数据读取
+    const data = fs.readFileSync("/proc/meminfo", { encoding: "utf-8" });
+    const list = data.split("\n");
+    const infoTable: IInfoTable = {};
+    list.forEach((line) => {
+      const kv = line.split(":");
+      if (kv.length === 2) {
+        const k = kv[0].replace(/ /gim, "").replace(/\t/gim, "").trim();
+        let v = kv[1].replace(/ /gim, "").replace(/\t/gim, "").trim();
+        v = v.replace(/KB/gim, "").replace(/MB/gim, "").replace(/GB/gim, "");
+        let vNumber = parseInt(v);
+        if (isNaN(vNumber)) vNumber = 0;
+        infoTable[k] = vNumber;
+      }
+    });
+    info.freemem = infoTable["MemTotal"] ?? 0;
+    info.totalmem = infoTable["MemAvailable"] ?? 0;
+    info.memUsage = (info.totalmem - info.freemem) / info.totalmem;
+    osUtils.cpuUsage((p) => (info.cpuUsage = p));
+  } catch (error) {
+    // 若读取错误，则自动采用默认通用读取法
+    otherSystemInfo();
+  }
+}
 
 export function systemInfo() {
   return info;
