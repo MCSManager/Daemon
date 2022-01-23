@@ -11,12 +11,18 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
   
+  According to the GPL, it is forbidden to delete all copyright notices, 
+  and if you modify the source code, you must open source the
+  modified source code.
 
   版权所有 (C) 2022 Suwings(https://github.com/Suwings)
 
   本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
   该程序以具有实际用途为目的发布，但是并不包含任何担保，
   也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+
+  根据协议，您被禁止删除所有相关版权声明，若需修改源码则必须开源修改后的源码。
+  前往 https://mcsmanager.com/ 申请闭源开发授权或了解更多。
 */
 
 import fs from "fs-extra";
@@ -136,7 +142,7 @@ routerApp.on("instance/detail", async (ctx, data) => {
       // 可能因文件权限导致错误的部分，避免影响整个配置的获取
       processInfo = await instance.forceExec(new ProcessInfoCommand());
       space = await instance.usedSpace(null, 2);
-    } catch (err) {}
+    } catch (err) { }
     protocol.msg(ctx, "instance/detail", {
       instanceUuid: instance.instanceUuid,
       started: instance.startCount,
@@ -275,7 +281,7 @@ routerApp.on("instance/delete", (ctx, data) => {
   for (const instanceUuid of instanceUuids) {
     try {
       InstanceSubsystem.removeInstance(instanceUuid, deleteFile);
-    } catch (err) {}
+    } catch (err) { }
   }
   protocol.msg(ctx, "instance/delete", instanceUuids);
 });
@@ -288,7 +294,7 @@ routerApp.on("instance/stdin", (ctx, data) => {
   try {
     if (data.ch == "\r") return instance.process.write("\n");
     instance.process.write(data.ch);
-  } catch (err) {}
+  } catch (err) { }
 });
 
 routerApp.on("instance/process_config/list", (ctx, data) => {

@@ -11,12 +11,18 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
   
+  According to the GPL, it is forbidden to delete all copyright notices, 
+  and if you modify the source code, you must open source the
+  modified source code.
 
   版权所有 (C) 2022 Suwings(https://github.com/Suwings)
 
   本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
   该程序以具有实际用途为目的发布，但是并不包含任何担保，
   也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+
+  根据协议，您被禁止删除所有相关版权声明，若需修改源码则必须开源修改后的源码。
+  前往 https://mcsmanager.com/ 申请闭源开发授权或了解更多。
 */
 
 interface IMap {
@@ -34,7 +40,7 @@ interface Page<T> {
 
 // 供给路由层使用的MAP型查询接口
 export class QueryMapWrapper {
-  constructor(public map: IMap) {}
+  constructor(public map: IMap) { }
 
   select<T>(condition: (v: T) => boolean): T[] {
     const result: T[] = [];
@@ -82,7 +88,7 @@ export class MySqlSource<T> implements IDataSource<T> {
 
 // 本地文件数据源（内嵌式微型数据库）
 export class LocalFileSource<T> implements IDataSource<T> {
-  constructor(public data: any) {}
+  constructor(public data: any) { }
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     const result: T[] = [];
@@ -122,14 +128,14 @@ export class LocalFileSource<T> implements IDataSource<T> {
   select(condition: any): any[] {
     return null;
   }
-  update(condition: any, data: any) {}
-  delete(condition: any) {}
-  insert(data: any) {}
+  update(condition: any, data: any) { }
+  delete(condition: any) { }
+  insert(data: any) { }
 }
 
 // 供给路由层使用的统一数据查询接口
 export class QueryWrapper<T> {
-  constructor(public dataSource: IDataSource<T>) {}
+  constructor(public dataSource: IDataSource<T>) { }
 
   selectPage(condition: any, page = 1, pageSize = 10) {
     return this.dataSource.selectPage(condition, page, pageSize);
