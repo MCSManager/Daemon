@@ -1,6 +1,6 @@
 {
-  "name": "mcsm-daemon",
-  "version": "1.0.0",
+  "name": "mcsmanager-daemon",
+  "version": "1.2.0",
   "description": "daemon",
   "main": "app.js",
   "scripts": {
