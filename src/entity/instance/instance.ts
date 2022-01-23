@@ -123,13 +123,13 @@ export default class Instance extends EventEmitter {
     if (cfg.docker) {
       this.configureParams(this.config.docker, cfg.docker, "image", String);
       this.configureParams(this.config.docker, cfg.docker, "memory", Number);
-      this.configureParams(this.config.docker, cfg.docker, "cpu", String);
       this.configureParams(this.config.docker, cfg.docker, "ports");
       this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number);
-      this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String);
       this.configureParams(this.config.docker, cfg.docker, "io", Number);
       this.configureParams(this.config.docker, cfg.docker, "network", Number);
       this.configureParams(this.config.docker, cfg.docker, "networkMode", String);
+      this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String);
+      this.configureParams(this.config.docker, cfg.docker, "cpuUsage", Number);
     }
     if (cfg.pingConfig) {
       this.configureParams(this.config.pingConfig, cfg.pingConfig, "ip", String);
@@ -149,7 +149,14 @@ export default class Instance extends EventEmitter {
   configureParams(self: any, args: any, key: string, typeFn?: Function) {
     const selfDefaultValue = self[key] ?? null;
     const v = args[key] != null ? args[key] : selfDefaultValue;
-    if (typeFn) {
+    // 数字类型的特殊处理
+    if (typeFn === Number) {
+      if (v === "" || v === null)
+        self[key] = null
+      else
+        self[key] = Number(v);
+    }
+    else if (typeFn) {
       self[key] = typeFn(v);
     } else {
       self[key] = v;

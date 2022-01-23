@@ -48,14 +48,14 @@ export default class InstanceConfig {
   // Extend
   public docker: IDockerConfig = {
     image: "",
-    memory: 1024,
     ports: [],
-    cpu: 1,
-    maxSpace: 0,
+    memory: null,
+    networkMode: "bridge",
     cpusetCpus: "",
-    io: 0,
-    network: 0,
-    networkMode: "bridge"
+    cpuUsage: null,
+    maxSpace: null,
+    io: null,
+    network: null,
   };
 
   public pingConfig = {

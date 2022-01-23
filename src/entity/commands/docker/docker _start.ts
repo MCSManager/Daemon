@@ -70,7 +70,7 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) {}
+    } catch (error) { }
   }
 
   private wait() {
@@ -131,8 +131,27 @@ export default class DockerStartCommand extends InstanceCommand {
       }
 
       // 内存限制
-      let maxMemory = 0;
+      let maxMemory = undefined;
       if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
+
+      // CPU使用率计算
+      let cpuQuota = undefined;
+      let cpuPeriod = undefined;
+      if (instance.config.docker.cpuUsage) {
+        cpuQuota = instance.config.docker.cpuUsage * 10 * 1000;
+        cpuPeriod = 1000 * 1000;
+      }
+
+      // CPU 核心数校验
+      let cpusetCpus = undefined;
+      if (instance.config.docker.cpusetCpus) {
+        const arr = instance.config.docker.cpusetCpus.split(",");
+        arr.forEach((v) => {
+          if (isNaN(Number(v))) throw new Error(`非法的CPU核心指定: ${v}`);
+        });
+        cpusetCpus = instance.config.docker.cpusetCpus;
+        // Note: 检验
+      }
 
       // 输出启动日志
       logger.info("----------------");
@@ -163,7 +182,10 @@ export default class DockerStartCommand extends InstanceCommand {
           Memory: maxMemory,
           Binds: [`${cwd}:/workspace/`],
           AutoRemove: true,
-          PortBindings: publicPortArray
+          CpusetCpus: cpusetCpus,
+          CpuPeriod: cpuPeriod,
+          CpuQuota: cpuQuota,
+          PortBindings: publicPortArray,
         }
       });
 
