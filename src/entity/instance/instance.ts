@@ -151,7 +151,7 @@ export default class Instance extends EventEmitter {
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
-  // 修改实例信息
+  // 修改实例配置时，类型检查
   configureParams(self: any, args: any, key: string, typeFn?: Function) {
     const selfDefaultValue = self[key] ?? null;
     const v = args[key] != null ? args[key] : selfDefaultValue;
@@ -159,10 +159,11 @@ export default class Instance extends EventEmitter {
     if (typeFn === Number) {
       if (v === "" || v === null)
         self[key] = null
-      else
+      else {
+        if (isNaN(Number(v))) throw new Error("实体配置类型不正确，期望 Number，得到 NaN");
         self[key] = Number(v);
-    }
-    if (typeFn === String) {
+      }
+    } else if (typeFn === String) {
       if (v === null) {
         self[key] = null;
       } else {
