@@ -37,6 +37,7 @@ import { PresetCommandManager } from "./preset";
 import FuntionDispatcher from "../commands/dispatcher";
 import { IInstanceProcess } from "./interface";
 import StartCommand from "../commands/start";
+import { configureEntityParams } from "../../common/typecheck";
 
 // 实例无需持久化储存的额外信息
 interface IInstanceInfo {
@@ -109,71 +110,45 @@ export default class Instance extends EventEmitter {
     // 若实例类型改变，则必须重置预设命令与生命周期事件
     if (cfg.type && cfg.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
-      this.configureParams(this.config, cfg, "type", String);
+      configureEntityParams(this.config, cfg, "type", String);
       this.forceExec(new FuntionDispatcher());
     }
     // 若进程类型改变，则必须重置预设命令与生命周期事件
     if (cfg.processType && cfg.processType !== this.config.processType) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例进程类型");
-      this.configureParams(this.config, cfg, "processType", String);
+      configureEntityParams(this.config, cfg, "processType", String);
       this.forceExec(new FuntionDispatcher());
     }
-    this.configureParams(this.config, cfg, "nickname", String);
-    this.configureParams(this.config, cfg, "startCommand", String);
-    this.configureParams(this.config, cfg, "stopCommand", String);
-    this.configureParams(this.config, cfg, "cwd", String);
-    this.configureParams(this.config, cfg, "ie", String);
-    this.configureParams(this.config, cfg, "oe", String);
-    this.configureParams(this.config, cfg, "endTime", String);
-    this.configureParams(this.config, cfg, "fileCode", String);
+    configureEntityParams(this.config, cfg, "nickname", String);
+    configureEntityParams(this.config, cfg, "startCommand", String);
+    configureEntityParams(this.config, cfg, "stopCommand", String);
+    configureEntityParams(this.config, cfg, "cwd", String);
+    configureEntityParams(this.config, cfg, "ie", String);
+    configureEntityParams(this.config, cfg, "oe", String);
+    configureEntityParams(this.config, cfg, "endTime", String);
+    configureEntityParams(this.config, cfg, "fileCode", String);
     if (cfg.docker) {
-      this.configureParams(this.config.docker, cfg.docker, "image", String);
-      this.configureParams(this.config.docker, cfg.docker, "memory", Number);
-      this.configureParams(this.config.docker, cfg.docker, "ports");
-      this.configureParams(this.config.docker, cfg.docker, "maxSpace", Number);
-      this.configureParams(this.config.docker, cfg.docker, "io", Number);
-      this.configureParams(this.config.docker, cfg.docker, "network", Number);
-      this.configureParams(this.config.docker, cfg.docker, "networkMode", String);
-      this.configureParams(this.config.docker, cfg.docker, "cpusetCpus", String);
-      this.configureParams(this.config.docker, cfg.docker, "cpuUsage", Number);
+      configureEntityParams(this.config.docker, cfg.docker, "image", String);
+      configureEntityParams(this.config.docker, cfg.docker, "memory", Number);
+      configureEntityParams(this.config.docker, cfg.docker, "ports");
+      configureEntityParams(this.config.docker, cfg.docker, "maxSpace", Number);
+      configureEntityParams(this.config.docker, cfg.docker, "io", Number);
+      configureEntityParams(this.config.docker, cfg.docker, "network", Number);
+      configureEntityParams(this.config.docker, cfg.docker, "networkMode", String);
+      configureEntityParams(this.config.docker, cfg.docker, "cpusetCpus", String);
+      configureEntityParams(this.config.docker, cfg.docker, "cpuUsage", Number);
     }
     if (cfg.pingConfig) {
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "ip", String);
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "port", Number);
-      this.configureParams(this.config.pingConfig, cfg.pingConfig, "type", Number);
+      configureEntityParams(this.config.pingConfig, cfg.pingConfig, "ip", String);
+      configureEntityParams(this.config.pingConfig, cfg.pingConfig, "port", Number);
+      configureEntityParams(this.config.pingConfig, cfg.pingConfig, "type", Number);
     }
     if (cfg.eventTask) {
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean);
-      this.configureParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean);
-      this.configureParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean);
     }
-
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
-  }
-
-  // 修改实例配置时，类型检查
-  configureParams(self: any, args: any, key: string, typeFn?: Function) {
-    const selfDefaultValue = self[key] ?? null;
-    const v = args[key] != null ? args[key] : selfDefaultValue;
-    // 数字类型的特殊处理
-    if (typeFn === Number) {
-      if (v === "" || v === null)
-        self[key] = null
-      else {
-        if (isNaN(Number(v))) throw new Error("实体配置类型不正确，期望 Number，得到 NaN");
-        self[key] = Number(v);
-      }
-    } else if (typeFn === String) {
-      if (v === null) {
-        self[key] = null;
-      } else {
-        self[key] = String(v);
-      }
-    } else if (typeFn) {
-      self[key] = typeFn(v);
-    } else {
-      self[key] = v;
-    }
   }
 
   setLock(bool: boolean) {
