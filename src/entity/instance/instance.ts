@@ -162,7 +162,13 @@ export default class Instance extends EventEmitter {
       else
         self[key] = Number(v);
     }
-    else if (typeFn) {
+    if (typeFn === String) {
+      if (v === null) {
+        self[key] = null;
+      } else {
+        self[key] = String(v);
+      }
+    } else if (typeFn) {
       self[key] = typeFn(v);
     } else {
       self[key] = v;
