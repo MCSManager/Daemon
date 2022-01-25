@@ -61,31 +61,43 @@ _  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /
 
 <br />
 
-## 安装
+## 一键安装
 
-您需要安装[面板部分](https://gitee.com/mcsmanager/MCSManager-UI)才能正常使用本软件。
+暂无
 
-安装npm，并克隆[部署用Daemon代码](https://gitee.com/mcsmanager/MCSManager-Daemon-Production)，然后使用以下命令初始化并启动daemon端。
+<br />
+
+## 手动安装
+
+先决条件：需要安装[Web 端程序](https://github.com/MCSManager/MCSManager-Web-Production)才能正常使用本软件。
+
+安装 `Node 14+` 与 `npm` 工具，并克隆[部署用 Daemon 代码](https://gitee.com/mcsmanager/MCSManager-Daemon-Production)，然后使用以下命令初始化并启动 Daemon 端。
+
+> 名词 Daemon 中文代表“守护进程”之意，在此处代表本地或远程主机的守护进程，用于真实运行服务端程序的进程，Web 端面板用于管理与调控，不与服务端程序实际文件进行任何接触。
+
 ```bash
+# cd MCSManager-Daemon-Production
 npm install
 node app.js
 ```
+
 程序会输出以下内容
+
 ```log
  访问地址 localhost:24444
  访问密钥 [你的密钥，是一串16进制数字]
  密钥作为守护进程唯一认证手段
 ```
+
 使用密钥在web端添加实例即可。
 如需停止直接输入:
+
 ```bash
 exit
 ```
-下次启动直接在daemon存放地点执行
-```bash
-node app.js
-```
-即可。
+
+如需长期后台运行请使用 `Screen` 软件配合使用，或者手动写入到系统服务。
+
 <br />
 
 ## 版权信息
