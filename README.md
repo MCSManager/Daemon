@@ -61,14 +61,11 @@ _  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /
 
 <br />
 
-## 预览
+## 安装
 
-您需要安装[面板部分](https://gitee.com/mcsmanager/MCSManager-Daemon-Production)并正确启动,安装npm，并将本仓库的
-> app.js
-> package.json
-> package-lock.json
+您需要安装[面板部分](https://gitee.com/mcsmanager/MCSManager-UI)才能正常使用本软件。
 
-下载到服务器同一位置，然后使用以下命令初始化并启动daemon端。
+安装npm，并克隆[部署用Daemon代码](https://gitee.com/mcsmanager/MCSManager-Daemon-Production)，然后使用以下命令初始化并启动daemon端。
 ```bash
 npm install
 node app.js
@@ -80,6 +77,15 @@ node app.js
  密钥作为守护进程唯一认证手段
 ```
 使用密钥在web端添加实例即可。
+如需停止直接输入:
+```bash
+exit
+```
+下次启动直接在daemon存放地点执行
+```bash
+node app.js
+```
+即可。
 <br />
 
 ## 版权信息
