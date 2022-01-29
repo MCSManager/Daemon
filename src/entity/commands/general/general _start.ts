@@ -86,7 +86,7 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
         this.process.stdout.destroy();
         this.process.stderr.destroy();
       }
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 
@@ -96,8 +96,6 @@ export default class GeneralStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    const instanceStatus = instance.status();
-    if (instanceStatus != Instance.STATUS_STOP) return instance.failure(new StartupError("实例未处于关闭状态，无法再进行启动"));
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
 

@@ -48,13 +48,28 @@ export default class StartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
+    // 状态检查
+    const instanceStatus = instance.status();
+    if (instanceStatus !== Instance.STATUS_STOP) return instance.failure(new StartupError("实例未处于关闭状态，无法再进行启动"));
+
+    // 到期时间检查
     const endTime = new Date(instance.config.endTime).getTime();
     if (endTime) {
       const currentTime = new Date().getTime();
       if (endTime <= currentTime) {
-        throw new Error("实例使用到期时间已到，无法再启动实例");
+        return instance.failure(new Error("实例使用到期时间已到，无法再启动实例"));
       }
     }
+
+    // 无限启动检查
+    const currentTimestamp = new Date().getTime();
+    const intervals = 3 * 1000;
+    if (instance.startTimestamp && currentTimestamp - instance.startTimestamp < intervals) {
+      return instance.failure(new Error("两次启动时间间隔太短，本次请求被拒绝，请稍后重试"));
+    }
+    // 更新上次启动时间戳
+    instance.startTimestamp = currentTimestamp;
+
     return await instance.execPreset("start", this.source);
   }
 }

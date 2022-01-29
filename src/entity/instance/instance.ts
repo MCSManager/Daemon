@@ -67,6 +67,7 @@ export default class Instance extends EventEmitter {
   public instanceUuid: string;
   public lock: boolean;
   public startCount: number;
+  public startTimestamp: number = 0;
 
   // 生命周期任务，定时任务管理器
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);
