@@ -44,6 +44,11 @@ export default class InstanceConfig {
   public fileCode: string = "utf-8";
   public processType: string = "general";
 
+  // terminal option
+  public terminalOption = {
+    haveColor: true
+  };
+
   // Event task
   public eventTask = {
     autoStart: false,
@@ -61,7 +66,7 @@ export default class InstanceConfig {
     cpuUsage: null,
     maxSpace: null,
     io: null,
-    network: null,
+    network: null
   };
 
   public pingConfig = {

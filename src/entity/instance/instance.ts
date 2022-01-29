@@ -148,6 +148,9 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean);
       configureEntityParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean);
     }
+    if (cfg.terminalOption) {
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);
+    }
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
