@@ -76,7 +76,7 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) { }
+    } catch (error) {}
   }
 
   private wait() {
@@ -166,7 +166,7 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`启动命令: ${commandList.join(" ")}`);
       logger.info(`工作目录: ${cwd}`);
       logger.info(`端口: ${JSON.stringify(publicPortArray)}`);
-      logger.info(`内存限制: ${maxMemory} MB`);
+      if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
       logger.info("----------------");
 
@@ -191,7 +191,7 @@ export default class DockerStartCommand extends InstanceCommand {
           CpusetCpus: cpusetCpus,
           CpuPeriod: cpuPeriod,
           CpuQuota: cpuQuota,
-          PortBindings: publicPortArray,
+          PortBindings: publicPortArray
         }
       });
 
