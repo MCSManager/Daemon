@@ -1,36 +1,26 @@
-```
-______  _______________________  ___
-___   |/  /_  ____/_  ___/__   |/  /_____ _____________ _______ _____________
-__  /|_/ /_  /    _____ \__  /|_/ /_  __  /_  __ \  __  /_  __  /  _ \_  ___/
-_  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /
-/_/  /_/  \____/  /____/ /_/  /_/  \__,_/ /_/ /_/\__,_/ _\__, / \___//_/
-                                                        /____/
-```
+<img src="https://public-link.oss-cn-shenzhen.aliyuncs.com/mcsm_picture/logo.png" alt="MCSManager 图标.png" width="500px" />
 
-[![Status](https://img.shields.io/badge/npm-v8.1.0-blue.svg)](https://www.npmjs.com/)
+<br />
+
+[![Status](https://img.shields.io/badge/npm-v6.14.15-blue.svg)](https://www.npmjs.com/)
 [![Status](https://img.shields.io/badge/node-v14.17.6-blue.svg)](https://nodejs.org/en/download/)
 [![Status](https://img.shields.io/badge/License-GPL-red.svg)](https://github.com/Suwings/MCSManager)
 
+[官方网站](http://mcsmanager.com/) | [使用文档](https://docs.mcsmanager.com/) | [团队主页](https://github.com/MCSManager) | [面板端项目](https://github.com/MCSManager/MCSManager) | [网页前端项目](https://github.com/MCSManager/UI) | [守护进程项目](https://github.com/MCSManager/Daemon)
 
 适用于 MCSManager 未来版本的分布式守护进程程序，当前正在开发阶段。
 
-[官方网站](http://mcsm.suwings.top/) | 当前正在开发中
 
 <br />
 
-## 相关项目
-
-[MCSManager 前端项目](https://github.com/Suwings/MCSManager-UI)
-
-[MCSManager 8.X 版本主项目](https://github.com/Suwings/MCSManager)
-
-<br />
 
 ## MCSManager 简介
+  
+**分布式，稳定可靠，开箱即用，高扩展性，支持 Minecraft 和其他少数游戏的控制面板。**
 
-这是一款可以管理多个 Minecraft 服务端（支持群组端）的 Web 管理面板，并且可以分配多个子账号来分别管理不同的 Minecraft 服务端，支持绝大部分主流的服务端，甚至是其他非 Minecraft 的程序。
+MCSManager 面板（简称：MCSM 面板）是一款全中文，轻量级，开箱即用，多实例和支持 Docker 的 Minecraft 服务端管理面板。
 
-控制面板可运行在 Windows 与 Linux 平台，无需数据库与任何系统配置，只需安装 node 环境即可快速运行，属于轻量级的 Minecraft 服务端控制面板。
+此软件在 Minecraft 和其他游戏社区内中已有一定的流行程度，它可以帮助你集中管理多个物理服务器，动态在任何主机上创建游戏服务端，并且提供安全可靠的多用户权限系统，可以很轻松的帮助你管理多个服务器。
 
 <br />
 
@@ -44,28 +34,6 @@ _  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /
 
 <br />
 
-## 运行环境
-
-推荐 `Node 10.16.0` 以上，无需数据库和更改任何系统配置，开箱即可运行。
-
-<br />
-
-## 预计功能
-
-- 基于 Socket.io 的通信接口
-- 应用实例管理
-- 身份验证
-- 面板与守护进程多对多关联
-- 文件管理
-- 高扩展性的路由设计
-
-<br />
-
-## 一键安装
-
-暂无
-
-<br />
 
 ## 手动安装
 
@@ -100,10 +68,24 @@ exit
 
 <br />
 
-## 版权信息
+## 版权约束
 
-使用 GNU General Public License v3.0 开源协议。
+此开源项目使用 [GPL 协议](LICENSE) 作为开源协议，未经过官方闭源开发授权，您如果对代码有任何修改，则必须要公开您修改后的源代码，具体约束如下。
 
-您可以对代码进行修改，复制和商业使用，但您必须将您修改后的源代码无条件的免费公开下载。另外，修改后的程序必须携带原有的版权声明与原作者信息声明。
+**准许**
+
+- 对软件源代码进行修改，复制，分发。
+- 利用软件进行商业使用，赚取利润。
+
+**必须**
+
+- 公开提供您修改后的完整源代码。
+- 在代码文件、界面中保留版权声明。
+
+**禁止**
+
+- 禁止售卖此软件，申请专利，著作权等。
+
+> 更多授权与版权约束详情，请前往官方网站界面了解更多。
 
 <br />
