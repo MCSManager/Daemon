@@ -8,7 +8,7 @@
 
 [官方网站](http://mcsmanager.com/) | [使用文档](https://docs.mcsmanager.com/) | [团队主页](https://github.com/MCSManager) | [面板端项目](https://github.com/MCSManager/MCSManager) | [网页前端项目](https://github.com/MCSManager/UI) | [守护进程项目](https://github.com/MCSManager/Daemon)
 
-适用于 MCSManager 未来版本的分布式守护进程程序，当前正在开发阶段。
+适用于 MCSManager 的分布式守护进程程序，与面板端分离直接管理和控制真实程序。
 
 
 <br />
@@ -24,11 +24,9 @@ MCSManager 面板（简称：MCSM 面板）是一款全中文，轻量级，开�
 
 <br />
 
-## 当前状态
+## 项目状态
 
-项目处于开发阶段，如果想促进开发或关注进度您可以点击左上角的 `star` 给予我们基本的支持。
-
-项目已发布第一个release，可以投入生产环境。
+项目处于发行状态，如果想促进开发或关注进度您可以点击右上角的 `star` `watch` 给予我们基本的支持。
 
 若您想成为本项目的赞助者，请访问官方网站浏览至最底下。
 
@@ -65,6 +63,14 @@ exit
 ```
 
 如需长期后台运行请使用 `Screen` 软件配合使用，或者手动写入到系统服务。
+
+<br />
+
+## 贡献
+
+如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 修改后提交 Pull Request。
+
+代码需要保持现有格式，不得格式化多余代码，具体可[参考这里](https://github.com/MCSManager/MCSManager/issues/544)。
 
 <br />
 
