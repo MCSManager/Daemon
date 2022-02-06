@@ -10,6 +10,7 @@
 
 适用于 MCSManager 的分布式守护进程程序，与面板端分离直接管理和控制真实程序。
 
+项目主仓库请前往：[https://github.com/MCSManager/MCSManager](https://github.com/MCSManager/MCSManager)
 
 <br />
 
