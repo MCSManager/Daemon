@@ -1,28 +1,22 @@
 /*
-  Copyright (C) 2022 Suwings(https://github.com/Suwings)
+  Copyright (C) 2022 Suwings <Suwings@outlook.com>
 
   This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
+  it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
   
-  According to the GPL, it is forbidden to delete all copyright notices, 
+  According to the AGPL, it is forbidden to delete all copyright notices, 
   and if you modify the source code, you must open source the
   modified source code.
 
-  版权所有 (C) 2022 Suwings(https://github.com/Suwings)
+  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
 
-  本程序为自由软件，你可以依据 GPL 的条款（第三版或者更高），再分发和/或修改它。
-  该程序以具有实际用途为目的发布，但是并不包含任何担保，
-  也不包含基于特定商用或健康用途的默认担保。具体细节请查看 GPL 协议。
+  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
+  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
 
-  根据协议，您必须保留所有版权声明，如果修改源码则必须开源修改后的源码。
-  前往 https://mcsmanager.com/ 申请闭源开发授权或了解更多。
+  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
+  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
 
 import fs from "fs-extra";
@@ -84,8 +78,8 @@ class InstanceSubsystem extends EventEmitter {
       // 所有实例全部进行功能调度器
       instance
         .forceExec(new FuntionDispatcher())
-        .then((v) => { })
-        .catch((v) => { });
+        .then((v) => {})
+        .catch((v) => {});
       this.addInstance(instance);
     });
     // 处理自动启动
@@ -165,7 +159,7 @@ class InstanceSubsystem extends EventEmitter {
       // 删除计划任务
       InstanceControl.deleteInstanceAllTask(instanceUuid);
       // 异步删除文件
-      if (deleteFile) fs.remove(instance.config.cwd, (err) => { });
+      if (deleteFile) fs.remove(instance.config.cwd, (err) => {});
       return true;
     }
     throw new Error("Instance does not exist");
@@ -174,13 +168,13 @@ class InstanceSubsystem extends EventEmitter {
   forward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.requestForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   stopForward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.cannelForward(socket, targetInstanceUuid);
-    } catch (err) { }
+    } catch (err) {}
   }
 
   forEachForward(instanceUuid: string, callback: (socket: Socket) => void) {

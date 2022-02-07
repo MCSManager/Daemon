@@ -4,7 +4,7 @@
 
 [![Status](https://img.shields.io/badge/npm-v6.14.15-blue.svg)](https://www.npmjs.com/)
 [![Status](https://img.shields.io/badge/node-v14.17.6-blue.svg)](https://nodejs.org/en/download/)
-[![Status](https://img.shields.io/badge/License-GPL-red.svg)](https://github.com/Suwings/MCSManager)
+[![Status](https://img.shields.io/badge/License-AGPL-red.svg)](https://github.com/Suwings/MCSManager)
 
 [官方网站](http://mcsmanager.com/) | [使用文档](https://docs.mcsmanager.com/) | [团队主页](https://github.com/MCSManager) | [面板端项目](https://github.com/MCSManager/MCSManager) | [网页前端项目](https://github.com/MCSManager/UI) | [守护进程项目](https://github.com/MCSManager/Daemon)
 
@@ -14,9 +14,8 @@
 
 <br />
 
-
 ## MCSManager 简介
-  
+
 **分布式，稳定可靠，开箱即用，高扩展性，支持 Minecraft 和其他少数游戏的控制面板。**
 
 MCSManager 面板（简称：MCSM 面板）是一款全中文，轻量级，开箱即用，多实例和支持 Docker 的 Minecraft 服务端管理面板。
@@ -32,7 +31,6 @@ MCSManager 面板（简称：MCSM 面板）是一款全中文，轻量级，开�
 若您想成为本项目的赞助者，请访问官方网站浏览至最底下。
 
 <br />
-
 
 ## 手动安装
 
@@ -56,7 +54,7 @@ node app.js
  密钥作为守护进程唯一认证手段
 ```
 
-使用密钥在web端添加实例即可。
+使用密钥在 web 端添加实例即可。
 如需停止直接输入:
 
 ```bash
