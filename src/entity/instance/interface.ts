@@ -23,6 +23,7 @@ import { EventEmitter } from "events";
 
 // interface of docker config
 export interface IDockerConfig {
+  containerName: string;
   image: string;
   memory: number; //以字节为单位的内存限制。
   ports: string[];

@@ -75,7 +75,8 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) {}
+    } catch (error) {
+    }
   }
 
   private wait() {
@@ -160,9 +161,12 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例`);
       logger.info(`实例标识符: [${instance.instanceUuid}]`);
+      logger.info(`容器名称: [${instance.config.docker.containerName}]`);
       logger.info(`启动命令: ${commandList.join(" ")}`);
       logger.info(`工作目录: ${cwd}`);
-      logger.info(`端口: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`网络模式: ${instance.config.docker.networkMode}`);
+      logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
       if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
       logger.info("----------------");
@@ -170,6 +174,7 @@ export default class DockerStartCommand extends InstanceCommand {
       // 开始 Docker 容器创建并运行
       const docker = new Docker();
       const container = await docker.createContainer({
+        name: instance.config.docker.containerName,
         Image: instance.config.docker.image,
         AttachStdin: true,
         AttachStdout: true,
