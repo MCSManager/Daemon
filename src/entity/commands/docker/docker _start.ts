@@ -52,7 +52,12 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async start() {
     await this.container.start();
     this.pid = this.container.id;
-    const stream = (this.stream = await this.container.attach({ stream: true, stdout: true, stderr: true, stdin: true }));
+    const stream = (this.stream = await this.container.attach({
+      stream: true,
+      stdout: true,
+      stderr: true,
+      stdin: true
+    }));
     stream.on("data", (data) => this.emit("data", data));
     stream.on("error", (data) => this.emit("data", data));
     this.wait();
@@ -183,7 +188,15 @@ export default class DockerStartCommand extends InstanceCommand {
           CpusetCpus: cpusetCpus,
           CpuPeriod: cpuPeriod,
           CpuQuota: cpuQuota,
-          PortBindings: publicPortArray
+          PortBindings: publicPortArray,
+          NetworkMode: instance.config.docker.networkMode
+        },
+        NetworkingConfig: {
+          EndpointsConfig: {
+            "aliases": {
+              "Aliases": instance.config.docker.networkAliases
+            }
+          }
         }
       });
 

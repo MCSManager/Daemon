@@ -30,8 +30,8 @@ import os from "os";
 
 // 获取本系统镜像列表
 routerApp.on("environment/images", async (ctx, data) => {
+  if (os.platform() === "win32") return protocol.responseError(ctx, "[Unsupported] Windows 系统暂不支持此功能");
   try {
-    if (os.platform() === "win32") return protocol.responseError(ctx, "[Unsupported] Windows 系统暂不支持此功能");
     const docker = new DockerManager().getDocker();
     const result = await docker.listImages();
     protocol.response(ctx, result);
@@ -45,6 +45,18 @@ routerApp.on("environment/containers", async (ctx, data) => {
   try {
     const docker = new DockerManager().getDocker();
     const result = await docker.listContainers();
+    protocol.response(ctx, result);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 获取本系统网络列表
+routerApp.on("environment/networkModes", async (ctx, data) => {
+  if (os.platform() === "win32") return protocol.responseError(ctx, "[Unsupported] Windows 系统暂不支持此功能");
+  try {
+    const docker = new DockerManager().getDocker();
+    const result = await docker.listNetworks();
     protocol.response(ctx, result);
   } catch (error) {
     protocol.responseError(ctx, error);

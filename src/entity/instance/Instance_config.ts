@@ -56,6 +56,7 @@ export default class InstanceConfig {
     ports: [],
     memory: null,
     networkMode: "bridge",
+    networkAliases: [],
     cpusetCpus: "",
     cpuUsage: null,
     maxSpace: null,

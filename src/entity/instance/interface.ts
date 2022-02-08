@@ -30,6 +30,7 @@ export interface IDockerConfig {
   network: number;
   io: number;
   networkMode: string;
+  networkAliases: string[];
   cpusetCpus: string; //允许执行的 CPU（例如0-3，，0,1）
   cpuUsage: number;
 }
