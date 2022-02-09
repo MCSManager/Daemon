@@ -20,6 +20,7 @@
 */
 
 import { getVersion, initVersionManager } from "./service/version";
+
 initVersionManager();
 const VERSION = getVersion();
 
@@ -44,6 +45,7 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
+
 logger.info(`欢迎使用 MCSManager 守护进程`);
 
 import { globalConfiguration } from "./entity/config";
@@ -104,7 +106,7 @@ io.on("connection", (socket: Socket) => {
 });
 
 // Error report monitoring
-process.on("uncaughtException", function (err) {
+process.on("uncaughtException", function(err) {
   logger.error(`错误报告 (uncaughtException):`, err);
 });
 
@@ -125,16 +127,18 @@ console.log("");
 // 装载 终端界面UI
 import "./service/ui";
 
-process.on("SIGINT", function () {
-  try {
-    console.log("\n\n\n\n");
-    logger.warn("SIGINT close process signal detected.");
-    InstanceSubsystem.exit();
-    logger.info("The data is saved, thanks for using, goodbye!");
-    logger.info("Closed.");
-  } catch (err) {
-    logger.error("ERROR:", err);
-  } finally {
-    process.exit(0);
-  }
+['SIGINT', 'SIGQUIT'].forEach(function (sig) {
+  process.on(sig, function () {
+    try {
+      console.log("\n\n\n\n");
+      logger.warn(`${sig} close process signal detected.`);
+      InstanceSubsystem.exit();
+      logger.info("The data is saved, thanks for using, goodbye!");
+      logger.info("Closed.");
+    } catch (err) {
+      logger.error("ERROR:", err);
+    } finally {
+      process.exit(0);
+    }
+  });
 });

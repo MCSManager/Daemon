@@ -81,7 +81,7 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
 
   private wait() {
     this.container.wait(async (v) => {
-      this.destroy();
+      await this.destroy();
       this.emit("exit", v);
     });
   }
@@ -93,8 +93,10 @@ export default class DockerStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
+    if (!fs.existsSync(instance.absoluteCwdPath()))
+      return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
 
     try {
       // 锁死实例
@@ -157,11 +159,17 @@ export default class DockerStartCommand extends InstanceCommand {
         // Note: 检验
       }
 
+      // 容器名校验
+      let containerName = instance.config.docker.containerName;
+      if (containerName && (containerName.length > 64 || containerName.length < 2)) {
+        throw new Error(`非法的容器名: ${containerName}`);
+      }
+
       // 输出启动日志
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例`);
       logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`容器名称: [${instance.config.docker.containerName}]`);
+      logger.info(`容器名称: [${containerName}]`);
       logger.info(`启动命令: ${commandList.join(" ")}`);
       logger.info(`工作目录: ${cwd}`);
       logger.info(`网络模式: ${instance.config.docker.networkMode}`);
@@ -174,7 +182,7 @@ export default class DockerStartCommand extends InstanceCommand {
       // 开始 Docker 容器创建并运行
       const docker = new Docker();
       const container = await docker.createContainer({
-        name: instance.config.docker.containerName,
+        name: containerName,
         Image: instance.config.docker.image,
         AttachStdin: true,
         AttachStdout: true,
@@ -198,7 +206,7 @@ export default class DockerStartCommand extends InstanceCommand {
         },
         NetworkingConfig: {
           EndpointsConfig: {
-            "aliases": {
+            [instance.config.docker.networkMode]: {
               "Aliases": instance.config.docker.networkAliases
             }
           }
