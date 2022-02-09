@@ -38,6 +38,7 @@ interface IInstanceInfo {
   currentPlayers: number;
   maxPlayers: number;
   version: string;
+  fileLock: number;
 }
 
 // 实例类
@@ -75,7 +76,8 @@ export default class Instance extends EventEmitter {
   public info: IInstanceInfo = {
     currentPlayers: -1,
     maxPlayers: -1,
-    version: ""
+    version: "",
+    fileLock: 0
   };
 
   // 实例的真实进程

@@ -127,23 +127,35 @@ routerApp.on("file/compress", async (ctx, data) => {
     const targets = data.targets;
     const type = data.type;
     const fileManager = getFileManager(data.instanceUuid);
+    const instance = InstanceSubsystem.getInstance(data.instanceUuid);
+    if (instance.info.fileLock !== 0) {
+      throw new Error("超出最大同时解压缩任务量，请等待其他解压缩任务完成后再执行。");
+    }
+    instance.info.fileLock = 1;
     if (type === 1) {
       // 异步执行
       fileManager
         .zip(source, targets)
-        .then(() => {})
+        .then(() => {
+          instance.info.fileLock = 0;
+        })
         .catch((error) => {
+          instance.info.fileLock = 0;
           protocol.responseError(ctx, error);
         });
     } else {
       // 异步执行
       fileManager
         .unzip(source, targets)
-        .then(() => {})
+        .then(() => {
+          instance.info.fileLock = 0;
+        })
         .catch((error) => {
+          instance.info.fileLock = 0;
           protocol.responseError(ctx, error);
         });
     }
+    protocol.response(ctx, true);
   } catch (error) {
     protocol.responseError(ctx, error);
   }
