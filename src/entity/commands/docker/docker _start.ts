@@ -51,6 +51,11 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
 
   public async start() {
     await this.container.start();
+    //防止部分程序爆炸 (除0)
+    await this.container.resize({
+      h: 40,
+      w: 80
+    });
     this.pid = this.container.id;
     const stream = (this.stream = await this.container.attach({
       stream: true,
