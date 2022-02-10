@@ -31,6 +31,7 @@ import GeneralKillCommand from "./general/general _kill";
 import GeneralSendCommand from "./general/general _command";
 import GeneralRestartCommand from "./general/general _restart";
 import DockerStartCommand from "./docker/docker _start";
+import DockerResizeCommand from "./docker/docker _resize";
 import GeneralInputCommand from "./general/general _input";
 import TimeCheck from "./task/time";
 import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock";
@@ -66,6 +67,7 @@ export default class FuntionDispatcher extends InstanceCommand {
       instance.setPreset("stop", new GeneralStopCommand());
       instance.setPreset("kill", new GeneralKillCommand());
       instance.setPreset("restart", new GeneralRestartCommand());
+      instance.setPreset("resize", new DockerResizeCommand())
     }
 
     // 根据不同类型设置不同预设功能与作用

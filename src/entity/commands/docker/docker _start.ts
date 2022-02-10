@@ -40,12 +40,12 @@ class StartupDockerProcessError extends Error {
 }
 
 // Docker 进程适配器
-class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
+export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
   private stream: NodeJS.ReadWriteStream;
 
-  constructor(private container: Docker.Container) {
+  constructor(public container: Docker.Container) {
     super();
   }
 
