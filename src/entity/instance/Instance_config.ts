@@ -52,10 +52,12 @@ export default class InstanceConfig {
 
   // Extend
   public docker: IDockerConfig = {
+    containerName: "",
     image: "",
     ports: [],
     memory: null,
     networkMode: "bridge",
+    networkAliases: [],
     cpusetCpus: "",
     cpuUsage: null,
     maxSpace: null,

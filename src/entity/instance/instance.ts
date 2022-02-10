@@ -125,6 +125,7 @@ export default class Instance extends EventEmitter {
     configureEntityParams(this.config, cfg, "endTime", String);
     configureEntityParams(this.config, cfg, "fileCode", String);
     if (cfg.docker) {
+      configureEntityParams(this.config.docker, cfg.docker, "containerName", String);
       configureEntityParams(this.config.docker, cfg.docker, "image", String);
       configureEntityParams(this.config.docker, cfg.docker, "memory", Number);
       configureEntityParams(this.config.docker, cfg.docker, "ports");
@@ -132,6 +133,7 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.docker, cfg.docker, "io", Number);
       configureEntityParams(this.config.docker, cfg.docker, "network", Number);
       configureEntityParams(this.config.docker, cfg.docker, "networkMode", String);
+      configureEntityParams(this.config.docker, cfg.docker, "networkAliases");
       configureEntityParams(this.config.docker, cfg.docker, "cpusetCpus", String);
       configureEntityParams(this.config.docker, cfg.docker, "cpuUsage", Number);
     }

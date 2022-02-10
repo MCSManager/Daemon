@@ -94,3 +94,6 @@ typings/
 .env
 
 Note.txt
+
+# IntelliJ IDEA project files
+/.idea/*

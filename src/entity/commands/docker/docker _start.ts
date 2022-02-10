@@ -52,7 +52,12 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async start() {
     await this.container.start();
     this.pid = this.container.id;
-    const stream = (this.stream = await this.container.attach({ stream: true, stdout: true, stderr: true, stdin: true }));
+    const stream = (this.stream = await this.container.attach({
+      stream: true,
+      stdout: true,
+      stderr: true,
+      stdin: true
+    }));
     stream.on("data", (data) => this.emit("data", data));
     stream.on("error", (data) => this.emit("data", data));
     this.wait();
@@ -70,12 +75,13 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) {}
+    } catch (error) {
+    }
   }
 
   private wait() {
     this.container.wait(async (v) => {
-      this.destroy();
+      await this.destroy();
       this.emit("exit", v);
     });
   }
@@ -87,8 +93,10 @@ export default class DockerStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
+    if (!fs.existsSync(instance.absoluteCwdPath()))
+      return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
 
     try {
       // 锁死实例
@@ -151,13 +159,22 @@ export default class DockerStartCommand extends InstanceCommand {
         // Note: 检验
       }
 
+      // 容器名校验
+      let containerName = instance.config.docker.containerName;
+      if (containerName && (containerName.length > 64 || containerName.length < 2)) {
+        throw new Error(`非法的容器名: ${containerName}`);
+      }
+
       // 输出启动日志
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例`);
       logger.info(`实例标识符: [${instance.instanceUuid}]`);
+      logger.info(`容器名称: [${containerName}]`);
       logger.info(`启动命令: ${commandList.join(" ")}`);
       logger.info(`工作目录: ${cwd}`);
-      logger.info(`端口: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`网络模式: ${instance.config.docker.networkMode}`);
+      logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
       if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
       logger.info("----------------");
@@ -165,6 +182,7 @@ export default class DockerStartCommand extends InstanceCommand {
       // 开始 Docker 容器创建并运行
       const docker = new Docker();
       const container = await docker.createContainer({
+        name: containerName,
         Image: instance.config.docker.image,
         AttachStdin: true,
         AttachStdout: true,
@@ -183,7 +201,15 @@ export default class DockerStartCommand extends InstanceCommand {
           CpusetCpus: cpusetCpus,
           CpuPeriod: cpuPeriod,
           CpuQuota: cpuQuota,
-          PortBindings: publicPortArray
+          PortBindings: publicPortArray,
+          NetworkMode: instance.config.docker.networkMode
+        },
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [instance.config.docker.networkMode]: {
+              "Aliases": instance.config.docker.networkAliases
+            }
+          }
         }
       });
 
