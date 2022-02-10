@@ -1,5 +1,5 @@
 {
-  "name": "mcsmanager-daemon",
+  "name": "daemon",
   "version": "1.4.0",
   "description": "daemon for mcsmanager",
   "main": "src/app.js",
