@@ -127,12 +127,12 @@ console.log("");
 // 装载 终端界面UI
 import "./service/ui";
 
-['SIGINT', 'SIGQUIT'].forEach(function (sig) {
-  process.on(sig, function () {
+["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function(sig) {
+  process.on(sig, async function() {
     try {
       console.log("\n\n\n\n");
       logger.warn(`${sig} close process signal detected.`);
-      InstanceSubsystem.exit();
+      await InstanceSubsystem.exit();
       logger.info("The data is saved, thanks for using, goodbye!");
       logger.info("Closed.");
     } catch (err) {

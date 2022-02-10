@@ -67,8 +67,8 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
     if (this.stream) this.stream.write(data);
   }
 
-  public kill(s?: string) {
-    this.container.kill();
+  public async kill(s?: string) {
+    await this.container.kill();
     return true;
   }
 
