@@ -24,25 +24,24 @@ import InstanceCommand from "../base/command";
 import { DockerProcessAdapter } from "./docker _start";
 
 export interface IResizeOptions {
-  h: number,
-  w: number,
+  h: number;
+  w: number;
 }
 
+// 适用于 Docker 终端高宽定义命令
 export default class DockerResizeCommand extends InstanceCommand {
   constructor() {
     super("ResizeTTY");
   }
 
   async exec(instance: Instance, size?: IResizeOptions): Promise<any> {
-    // 关服命令需要发送命令，但关服命令执行前会设置状态为关闭中状态。
-    // 所以这里只能通过进程是否存在来执行命令
     if (!instance.process) {
       instance.failure(new Error("命令执行失败，因为实例实际进程不存在."));
     }
-    if (!(instance.process instanceof DockerProcessAdapter)) {
+    if (!(instance.config.processType === "docker")) {
       instance.failure(new Error("重设TTY大小失败，因为实例不是Docker容器."));
     }
-    let dockerProcess = <DockerProcessAdapter>instance.process;
+    const dockerProcess = <DockerProcessAdapter>instance.process;
     await dockerProcess.container.resize({
       h: size.h,
       w: size.w
