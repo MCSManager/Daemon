@@ -25,6 +25,7 @@ import { missionPassport } from "../service/mission_passport";
 import InstanceSubsystem from "../service/system_instance";
 import logger from "../service/log";
 import SendCommand from "../entity/commands/cmd";
+import SendInput from "../entity/commands/input";
 
 // 权限认证中间件
 routerApp.use(async (event, ctx, data, next) => {
@@ -95,7 +96,7 @@ routerApp.on("stream/detail", async (ctx) => {
   }
 });
 
-// 执行命令
+// 执行命令，适用于普通进程的行式交互输入输出流
 routerApp.on("stream/command", async (ctx, data) => {
   try {
     const command = data.command;
@@ -107,15 +108,13 @@ routerApp.on("stream/command", async (ctx, data) => {
   }
 });
 
-// 处理终端输入
+// 处理终端输入，适用于伪终端的直连输入输出流。
 routerApp.on("stream/input", async (ctx, data) => {
   try {
     const input = data.input;
     const instanceUuid = ctx.session.stream.instanceUuid;
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    // 数据流命令，采用更高效率的方式。
-    // await instance.exec(new SendInput(input));
-    instance.process.write(input);
+    await instance.exec(new SendInput(input));
   } catch (error) {
     protocol.responseError(ctx, error);
   }
