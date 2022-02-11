@@ -28,7 +28,7 @@ export interface IResizeOptions {
   w: number;
 }
 
-// 适用于 Docker 终端高宽定义命令
+// 适用于 Docker 终端高宽定义命令，来自 @RimuruChan
 export default class DockerResizeCommand extends InstanceCommand {
   constructor() {
     super("ResizeTTY");
