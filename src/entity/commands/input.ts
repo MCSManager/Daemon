@@ -1,16 +1,16 @@
 /*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+  Copyright (C) 2022 RimuruChan <RealSprite233@outlook.com>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
+
+  According to the AGPL, it is forbidden to delete all copyright notices,
   and if you modify the source code, you must open source the
   modified source code.
 
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
+  版权所有 (C) 2022 RimuruChan <RealSprite233@outlook.com>
 
   该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
   由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
@@ -22,15 +22,15 @@
 import Instance from "../instance/instance";
 import InstanceCommand from "./base/command";
 
-export default class SendCommand extends InstanceCommand {
+export default class SendInput extends InstanceCommand {
   public cmd: string;
 
   constructor(cmd: string) {
-    super("SendCommand");
+    super("SendInput");
     this.cmd = cmd;
   }
 
   async exec(instance: Instance) {
-    return await instance.execPreset("command", this.cmd);
+    return await instance.execPreset("input", this.cmd);
   }
 }

@@ -40,17 +40,22 @@ class StartupDockerProcessError extends Error {
 }
 
 // Docker 进程适配器
-class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
+export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
   private stream: NodeJS.ReadWriteStream;
 
-  constructor(private container: Docker.Container) {
+  constructor(public container: Docker.Container) {
     super();
   }
 
   public async start() {
     await this.container.start();
+    //防止部分程序爆炸 (除0)
+    await this.container.resize({
+      h: 40,
+      w: 80
+    });
     this.pid = this.container.id;
     const stream = (this.stream = await this.container.attach({
       stream: true,
@@ -67,8 +72,8 @@ class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
     if (this.stream) this.stream.write(data);
   }
 
-  public kill(s?: string) {
-    this.container.kill();
+  public async kill(s?: string) {
+    await this.container.kill();
     return true;
   }
 

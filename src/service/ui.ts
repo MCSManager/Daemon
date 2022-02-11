@@ -37,11 +37,11 @@ const rl = readline.createInterface({
 console.log('[终端] 守护进程拥有基本的交互功能，请输入"help"查看更多信息');
 
 function stdin() {
-  rl.question("> ", (answer) => {
+  rl.question("> ", async (answer) => {
     try {
       const cmds = answer.split(" ");
       logger.info(`[Terminal] ${answer}`);
-      const result = command(cmds[0], cmds[1], cmds[2], cmds[3]);
+      const result = await command(cmds[0], cmds[1], cmds[2], cmds[3]);
       if (result) console.log(result);
       else console.log(`Command ${answer} does not exist, type help to get help.`);
     } catch (err) {
@@ -60,7 +60,7 @@ stdin();
  * @param {String} cmd
  * @return {String}
  */
-function command(cmd: string, p1: string, p2: string, p3: string) {
+async function command(cmd: string, p1: string, p2: string, p3: string) {
   if (cmd === "instance") {
     if (p1 === "start") {
       InstanceSubsystem.getInstance(p2).exec(new StartCommand("Terminal"));
@@ -108,7 +108,7 @@ function command(cmd: string, p1: string, p2: string, p3: string) {
   if (cmd == "exit") {
     try {
       logger.info("Preparing to shut down the daemon...");
-      InstanceSubsystem.exit();
+      await InstanceSubsystem.exit();
       // logger.info("Data saved, thanks for using, goodbye!");
       logger.info("The data is saved, thanks for using, goodbye!");
       logger.info("closed.");

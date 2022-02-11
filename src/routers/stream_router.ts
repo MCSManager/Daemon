@@ -25,8 +25,10 @@ import { missionPassport } from "../service/mission_passport";
 import InstanceSubsystem from "../service/system_instance";
 import logger from "../service/log";
 import SendCommand from "../entity/commands/cmd";
+import SendInput from "../entity/commands/input";
 import ProcessInfo from "../entity/commands/process_info";
 import ProcessInfoCommand from "../entity/commands/process_info";
+import { DockerProcessAdapter } from "../entity/commands/docker/docker _start";
 
 // 权限认证中间件
 routerApp.use(async (event, ctx, data, next) => {
@@ -98,12 +100,36 @@ routerApp.on("stream/detail", async (ctx) => {
 });
 
 // 执行命令
-routerApp.on("stream/input", async (ctx, data) => {
+routerApp.on("stream/command", async (ctx, data) => {
   try {
     const command = data.command;
     const instanceUuid = ctx.session.stream.instanceUuid;
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     await instance.exec(new SendCommand(command));
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 处理终端输入
+routerApp.on("stream/input", async (ctx, data) => {
+  try {
+    const input = data.input;
+    const instanceUuid = ctx.session.stream.instanceUuid;
+    const instance = InstanceSubsystem.getInstance(instanceUuid);
+    await instance.exec(new SendInput(input));
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 处理终端 resize
+routerApp.on("stream/resize", async (ctx, data) => {
+  try {
+    const instanceUuid = ctx.session.stream.instanceUuid;
+    const instance = InstanceSubsystem.getInstance(instanceUuid);
+    if (instance.process instanceof DockerProcessAdapter)
+      await instance.execPreset("resize", data);
   } catch (error) {
     protocol.responseError(ctx, error);
   }
