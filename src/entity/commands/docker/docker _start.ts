@@ -152,9 +152,9 @@ export default class DockerStartCommand extends InstanceCommand {
         let [hostPath, containerPath] = element;
 
         if (path.isAbsolute(containerPath)) {
-          containerPath = path.normalize(hostPath);
+          containerPath = path.normalize(containerPath);
         } else {
-          containerPath = path.normalize(path.join("/workspace/", hostPath));
+          containerPath = path.normalize(path.join("/workspace/", containerPath));
         }
         if (path.isAbsolute(hostPath)) {
           hostPath = path.normalize(hostPath);
