@@ -27,14 +27,16 @@ import InstanceSubsystem from "../service/system_instance";
 import fs from "fs-extra";
 const TIME_SPEED = 100;
 const MAX_CHAR_SIZE = 40;
+const MAX_LOG_SIZE = 256;
 
 // 输出流记录到文本
+// 此函数执行频率极快，可能有待优化效率
 async function outputLog(instanceUuid: string, text: string) {
   const logFilePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
   if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR);
   try {
     const fileInfo = fs.statSync(logFilePath);
-    if (fileInfo && fileInfo.size > 1024 * 1024 * 1) fs.removeSync(logFilePath);
+    if (fileInfo && fileInfo.size > 1024 * MAX_LOG_SIZE) fs.removeSync(logFilePath);
   } catch (err) {}
   await fs.writeFile(logFilePath, text, { encoding: "utf-8", flag: "a" });
 }
