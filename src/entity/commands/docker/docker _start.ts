@@ -202,7 +202,9 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`工作目录: ${cwd}`);
       logger.info(`网络模式: ${instance.config.docker.networkMode}`);
       logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
-      if(extraBinds.length > 0)
+      if (instance.config.docker.workspaceVolumes !== "")
+        logger.info(`Docker 挂载工作目录: ${instance.config.docker.workspaceVolumes}`);
+      if (extraBinds.length > 0)
         logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
       logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
       if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
@@ -226,7 +228,7 @@ export default class DockerStartCommand extends InstanceCommand {
         ExposedPorts: exposedPorts,
         HostConfig: {
           Memory: maxMemory,
-          Binds: [`${cwd}:/workspace/`, ...extraBinds],
+          Binds: [`${instance.config.docker.workspaceVolumes || cwd}:/workspace/`, ...extraBinds],
           AutoRemove: true,
           CpusetCpus: cpusetCpus,
           CpuPeriod: cpuPeriod,

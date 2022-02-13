@@ -55,6 +55,7 @@ export default class InstanceConfig {
     containerName: "",
     image: "",
     ports: [],
+    workspaceVolumes: "",
     extraVolumes: [],
     memory: null,
     networkMode: "bridge",

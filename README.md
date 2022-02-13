@@ -65,6 +65,31 @@ exit
 
 <br />
 
+## Docker 部署
+
+拉取代码并构建镜像
+
+```console
+$ git clone https://github.com/MCSManager/Daemon
+$ cd Daemon
+$ docker build -t mcs-daemon .
+```
+
+运行
+
+```console
+$ docker run -d \
+    --name mcs-daemon \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v $(pwd)/data:/app/data \
+    -p 24444:24444 \
+    mcs-daemon
+```
+
+> 必须将 `/var/run/docker.sock` 映射至容器内才能正常使用 docker 实例
+
+<br />
+
 ## 贡献
 
 如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 修改后提交 Pull Request。

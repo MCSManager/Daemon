@@ -27,6 +27,7 @@ export interface IDockerConfig {
   image: string;
   memory: number; //以字节为单位的内存限制。
   ports: string[];
+  workspaceVolumes: string, //宿主机工作目录，当 daemon 处于容器中时指定
   extraVolumes: string[];
   maxSpace: number;
   network: number;
