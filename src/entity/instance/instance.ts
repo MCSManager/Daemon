@@ -5,8 +5,8 @@
   it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
+
+  According to the AGPL, it is forbidden to delete all copyright notices,
   and if you modify the source code, you must open source the
   modified source code.
 
@@ -129,6 +129,7 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.docker, cfg.docker, "image", String);
       configureEntityParams(this.config.docker, cfg.docker, "memory", Number);
       configureEntityParams(this.config.docker, cfg.docker, "ports");
+      configureEntityParams(this.config.docker, cfg.docker, "extraVolumes");
       configureEntityParams(this.config.docker, cfg.docker, "maxSpace", Number);
       configureEntityParams(this.config.docker, cfg.docker, "io", Number);
       configureEntityParams(this.config.docker, cfg.docker, "network", Number);

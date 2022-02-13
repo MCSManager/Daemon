@@ -5,8 +5,8 @@
   it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
+
+  According to the AGPL, it is forbidden to delete all copyright notices,
   and if you modify the source code, you must open source the
   modified source code.
 
@@ -27,6 +27,7 @@ import { EventEmitter } from "events";
 import { IInstanceProcess } from "../../instance/interface";
 import fs from "fs-extra";
 import { commandStringToArray } from "../base/command_parser";
+import path from "path";
 
 // 用户身份函数
 const processUserUid = process.getuid ? process.getuid : () => 0;
@@ -141,6 +142,28 @@ export default class DockerStartCommand extends InstanceCommand {
         exposedPorts[`${publicAndPrivatePort[1]}/${protocol}`] = {};
       }
 
+      // 解析额外路径挂载
+      const extraVolumes = instance.config.docker.extraVolumes;
+      const extraBinds = [];
+      for (let it of extraVolumes) {
+        if (!it) continue;
+        const element = it.split(":");
+        if (element.length != 2) continue;
+        let [hostPath, containerPath] = element;
+
+        if (path.isAbsolute(containerPath)) {
+          containerPath = path.normalize(containerPath);
+        } else {
+          containerPath = path.normalize(path.join("/workspace/", containerPath));
+        }
+        if (path.isAbsolute(hostPath)) {
+          hostPath = path.normalize(hostPath);
+        } else {
+          hostPath = path.normalize(path.join(process.cwd(), hostPath));
+        }
+        extraBinds.push(`${hostPath}:${containerPath}`);
+      }
+
       // 内存限制
       let maxMemory = undefined;
       if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
@@ -179,6 +202,8 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`工作目录: ${cwd}`);
       logger.info(`网络模式: ${instance.config.docker.networkMode}`);
       logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
+      if(extraBinds.length > 0)
+        logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
       logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
       if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
@@ -201,7 +226,7 @@ export default class DockerStartCommand extends InstanceCommand {
         ExposedPorts: exposedPorts,
         HostConfig: {
           Memory: maxMemory,
-          Binds: [`${cwd}:/workspace/`],
+          Binds: [`${cwd}:/workspace/`, ...extraBinds],
           AutoRemove: true,
           CpusetCpus: cpusetCpus,
           CpuPeriod: cpuPeriod,
