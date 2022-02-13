@@ -5,8 +5,8 @@
   it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
+
+  According to the AGPL, it is forbidden to delete all copyright notices,
   and if you modify the source code, you must open source the
   modified source code.
 
@@ -27,6 +27,7 @@ export interface IDockerConfig {
   image: string;
   memory: number; //以字节为单位的内存限制。
   ports: string[];
+  extraVolumes: string[];
   maxSpace: number;
   network: number;
   io: number;

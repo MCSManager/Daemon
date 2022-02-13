@@ -26,9 +26,6 @@ import InstanceSubsystem from "../service/system_instance";
 import logger from "../service/log";
 import SendCommand from "../entity/commands/cmd";
 import SendInput from "../entity/commands/input";
-import ProcessInfo from "../entity/commands/process_info";
-import ProcessInfoCommand from "../entity/commands/process_info";
-import { DockerProcessAdapter } from "../entity/commands/docker/docker _start";
 
 // 权限认证中间件
 routerApp.use(async (event, ctx, data, next) => {
@@ -99,7 +96,7 @@ routerApp.on("stream/detail", async (ctx) => {
   }
 });
 
-// 执行命令
+// 执行命令，适用于普通进程的行式交互输入输出流
 routerApp.on("stream/command", async (ctx, data) => {
   try {
     const command = data.command;
@@ -111,7 +108,7 @@ routerApp.on("stream/command", async (ctx, data) => {
   }
 });
 
-// 处理终端输入
+// 处理终端输入，适用于伪终端的直连输入输出流。
 routerApp.on("stream/input", async (ctx, data) => {
   try {
     const input = data.input;
@@ -128,8 +125,7 @@ routerApp.on("stream/resize", async (ctx, data) => {
   try {
     const instanceUuid = ctx.session.stream.instanceUuid;
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    if (instance.process instanceof DockerProcessAdapter)
-      await instance.execPreset("resize", data);
+    if (instance.config.processType === "docker") await instance.execPreset("resize", data);
   } catch (error) {
     protocol.responseError(ctx, error);
   }
