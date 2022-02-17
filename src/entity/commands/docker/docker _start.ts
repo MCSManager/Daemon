@@ -81,8 +81,7 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
   public async destroy() {
     try {
       await this.container.remove();
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   private wait() {
@@ -99,10 +98,8 @@ export default class DockerStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath()))
-      return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
 
     try {
       // 锁死实例
@@ -145,23 +142,25 @@ export default class DockerStartCommand extends InstanceCommand {
       // 解析额外路径挂载
       const extraVolumes = instance.config.docker.extraVolumes;
       const extraBinds = [];
-      for (let it of extraVolumes) {
-        if (!it) continue;
-        const element = it.split(":");
-        if (element.length != 2) continue;
-        let [hostPath, containerPath] = element;
+      if (extraVolumes) {
+        for (let it of extraVolumes) {
+          if (!it) continue;
+          const element = it.split(":");
+          if (element.length != 2) continue;
+          let [hostPath, containerPath] = element;
 
-        if (path.isAbsolute(containerPath)) {
-          containerPath = path.normalize(containerPath);
-        } else {
-          containerPath = path.normalize(path.join("/workspace/", containerPath));
+          if (path.isAbsolute(containerPath)) {
+            containerPath = path.normalize(containerPath);
+          } else {
+            containerPath = path.normalize(path.join("/workspace/", containerPath));
+          }
+          if (path.isAbsolute(hostPath)) {
+            hostPath = path.normalize(hostPath);
+          } else {
+            hostPath = path.normalize(path.join(process.cwd(), hostPath));
+          }
+          extraBinds.push(`${hostPath}:${containerPath}`);
         }
-        if (path.isAbsolute(hostPath)) {
-          hostPath = path.normalize(hostPath);
-        } else {
-          hostPath = path.normalize(path.join(process.cwd(), hostPath));
-        }
-        extraBinds.push(`${hostPath}:${containerPath}`);
       }
 
       // 内存限制
@@ -202,8 +201,7 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`工作目录: ${cwd}`);
       logger.info(`网络模式: ${instance.config.docker.networkMode}`);
       logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
-      if(extraBinds.length > 0)
-        logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
+      if (extraBinds.length > 0) logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
       logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
       if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
       logger.info(`类型: Docker 容器`);
@@ -237,7 +235,7 @@ export default class DockerStartCommand extends InstanceCommand {
         NetworkingConfig: {
           EndpointsConfig: {
             [instance.config.docker.networkMode]: {
-              "Aliases": instance.config.docker.networkAliases
+              Aliases: instance.config.docker.networkAliases
             }
           }
         }

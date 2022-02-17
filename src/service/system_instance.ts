@@ -78,10 +78,8 @@ class InstanceSubsystem extends EventEmitter {
       // 所有实例全部进行功能调度器
       instance
         .forceExec(new FuntionDispatcher())
-        .then((v) => {
-        })
-        .catch((v) => {
-        });
+        .then((v) => {})
+        .catch((v) => {});
       this.addInstance(instance);
     });
     // 处理自动启动
@@ -161,8 +159,7 @@ class InstanceSubsystem extends EventEmitter {
       // 删除计划任务
       InstanceControl.deleteInstanceAllTask(instanceUuid);
       // 异步删除文件
-      if (deleteFile) fs.remove(instance.config.cwd, (err) => {
-      });
+      if (deleteFile) fs.remove(instance.config.cwd, (err) => {});
       return true;
     }
     throw new Error("Instance does not exist");
@@ -171,15 +168,13 @@ class InstanceSubsystem extends EventEmitter {
   forward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.requestForward(socket, targetInstanceUuid);
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   stopForward(targetInstanceUuid: string, socket: Socket) {
     try {
       this.instanceStream.cannelForward(socket, targetInstanceUuid);
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   forEachForward(instanceUuid: string, callback: (socket: Socket) => void) {
@@ -206,10 +201,12 @@ class InstanceSubsystem extends EventEmitter {
       const instance = iterator[1];
       if (instance.status() != Instance.STATUS_STOP) {
         logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) is running or busy, and is being forced to end.`);
-        promises.push(instance.execCommand(new KillCommand()).then(() => {
-          StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
-          logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) saved successfully.`);
-        }));
+        promises.push(
+          instance.execCommand(new KillCommand()).then(() => {
+            StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
+            logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) saved successfully.`);
+          })
+        );
       }
     }
     await Promise.all(promises);
