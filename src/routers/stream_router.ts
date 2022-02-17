@@ -97,7 +97,7 @@ routerApp.on("stream/detail", async (ctx) => {
 });
 
 // 执行命令，适用于普通进程的行式交互输入输出流
-routerApp.on("stream/command", async (ctx, data) => {
+routerApp.on("stream/input", async (ctx, data) => {
   try {
     const command = data.command;
     const instanceUuid = ctx.session.stream.instanceUuid;
@@ -109,7 +109,7 @@ routerApp.on("stream/command", async (ctx, data) => {
 });
 
 // 处理终端输入，适用于伪终端的直连输入输出流。
-routerApp.on("stream/input", async (ctx, data) => {
+routerApp.on("stream/write", async (ctx, data) => {
   try {
     const input = data.input;
     const instanceUuid = ctx.session.stream.instanceUuid;
