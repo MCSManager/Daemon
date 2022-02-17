@@ -142,25 +142,23 @@ export default class DockerStartCommand extends InstanceCommand {
       // 解析额外路径挂载
       const extraVolumes = instance.config.docker.extraVolumes;
       const extraBinds = [];
-      if (extraVolumes) {
-        for (let it of extraVolumes) {
-          if (!it) continue;
-          const element = it.split(":");
-          if (element.length != 2) continue;
-          let [hostPath, containerPath] = element;
+      for (const it of extraVolumes) {
+        if (!it) continue;
+        const element = it.split(":");
+        if (element.length != 2) continue;
+        let [hostPath, containerPath] = element;
 
-          if (path.isAbsolute(containerPath)) {
-            containerPath = path.normalize(containerPath);
-          } else {
-            containerPath = path.normalize(path.join("/workspace/", containerPath));
-          }
-          if (path.isAbsolute(hostPath)) {
-            hostPath = path.normalize(hostPath);
-          } else {
-            hostPath = path.normalize(path.join(process.cwd(), hostPath));
-          }
-          extraBinds.push(`${hostPath}:${containerPath}`);
+        if (path.isAbsolute(containerPath)) {
+          containerPath = path.normalize(containerPath);
+        } else {
+          containerPath = path.normalize(path.join("/workspace/", containerPath));
         }
+        if (path.isAbsolute(hostPath)) {
+          hostPath = path.normalize(hostPath);
+        } else {
+          hostPath = path.normalize(path.join(process.cwd(), hostPath));
+        }
+        extraBinds.push(`${hostPath}:${containerPath}`);
       }
 
       // 内存限制
