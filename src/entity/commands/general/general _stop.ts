@@ -39,7 +39,10 @@ export default class GeneralStopCommand extends InstanceCommand {
     } else {
       await instance.exec(new SendCommand(stopCommand));
     }
+
+    instance.println("INFO", `已执行预设的关闭命令：${stopCommand}\n如果无法关闭实例请前往实例设置更改关闭实例的正确命令，比如 ^C，stop，end 等`);
     const cacheStartCount = instance.startCount;
+
     // 若 10 分钟后实例还处于停止中状态，则恢复状态
     setTimeout(() => {
       if (instance.status() === Instance.STATUS_STOPPING && instance.startCount === cacheStartCount) {
