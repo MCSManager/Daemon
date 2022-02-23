@@ -104,6 +104,9 @@ export default class GeneralStartCommand extends InstanceCommand {
       const commandList = commandStringToArray(instance.config.startCommand);
       const commandExeFile = commandList[0];
       const commnadParameters = commandList.slice(1);
+      if (commandList.length === 0) {
+        return instance.failure(new StartupError("无法启动实例，启动命令为空"));
+      }
 
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例.`);
@@ -122,10 +125,23 @@ export default class GeneralStartCommand extends InstanceCommand {
 
       // 子进程创建结果检查
       if (!process || !process.pid) {
-        throw new StartupError(`检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
+        instance.println(
+          "ERROR",
+          `检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
 1. 实例启动命令编写错误，请前往实例设置界面检查启动命令与参数。
-2. 系统主机环境不正确或缺少环境，列如 Java 环境等。
-请将此信息报告给管理员或自行排查故障。`);
+2. 系统主机环境不正确或缺少环境，如 Java 环境等。
+
+原生启动命令：
+${instance.config.startCommand}
+
+启动命令解析体:
+程序：${commandExeFile}
+参数：${JSON.stringify(commnadParameters)}
+
+请将此信息报告给管理员，技术人员或自行排查故障。
+`
+        );
+        throw new StartupError("实例启动失败，请检查启动命令，主机环境和配置文件等");
       }
 
       // 创建进程适配器
