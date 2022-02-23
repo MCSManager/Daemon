@@ -35,12 +35,7 @@ export default class DockerResizeCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, size?: IResizeOptions): Promise<any> {
-    if (!instance.process) {
-      instance.failure(new Error("命令执行失败，因为实例实际进程不存在."));
-    }
-    if (!(instance.config.processType === "docker")) {
-      instance.failure(new Error("重设TTY大小失败，因为实例不是Docker容器."));
-    }
+    if (!instance.process || !(instance.config.processType === "docker")) return;
     const dockerProcess = <DockerProcessAdapter>instance.process;
     await dockerProcess.container.resize({
       h: size.h,
