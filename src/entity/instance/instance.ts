@@ -227,6 +227,13 @@ export default class Instance extends EventEmitter {
       }
       this.config.eventTask.ignore = false;
     }
+
+    // 启动后瞬间关闭警告，一般是启动命令编写错误
+    const currentTimestamp = new Date().getTime();
+    const startThreshold = 3 * 1000;
+    if (currentTimestamp - this.startTimestamp < startThreshold) {
+      this.println("ERROR", `检测到实例启动后在极短的时间内退出，原因可能是您的启动命令错误或本地系统环境错误。`);
+    }
   }
 
   println(level: string, text: string) {

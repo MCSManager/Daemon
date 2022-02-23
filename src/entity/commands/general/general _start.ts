@@ -122,7 +122,10 @@ export default class GeneralStartCommand extends InstanceCommand {
 
       // 子进程创建结果检查
       if (!process || !process.pid) {
-        throw new StartupError(`进程启动失败，进程PID为空，请检查启动命令和相关参数.`);
+        throw new StartupError(`检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
+1. 实例启动命令编写错误，请前往实例设置界面检查启动命令与参数。
+2. 系统主机环境不正确或缺少环境，列如 Java 环境等。
+请将此信息报告给管理员或自行排查故障。`);
       }
 
       // 创建进程适配器
