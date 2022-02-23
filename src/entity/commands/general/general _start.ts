@@ -62,8 +62,8 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
     }
     if (os.platform() === "linux") {
       return exec(`kill -s 9 ${this.pid}`, (err, stdout, stderr) => {
-        logger.info(`实例进程 ${this.pid} 正在使用指令强制结束.`);
-        logger.info(`实例进程 ${this.pid} 强制结束结果:\n Error: ${err}\n Stdout: ${stdout}`);
+        logger.info(`实例进程 ${this.pid} 已使用系统指令强制终止进程.`);
+        // logger.info(`实例进程 ${this.pid} 强制结束结果:\n Error: ${err}\n Stdout: ${stdout}`);
       });
     }
     if (s) this.process.kill(s);
