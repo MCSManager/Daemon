@@ -68,6 +68,7 @@ export default class RefreshPlayer implements ILifeCycleTask {
     instance.info.maxPlayers = -1;
     instance.info.currentPlayers = -1;
     instance.info.version = "";
+    instance.info.playersChart = [];
     clearInterval(this.task);
   }
 }
