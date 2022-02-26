@@ -27,6 +27,7 @@ export default class RefreshPlayer implements ILifeCycleTask {
   public status: number = 0;
 
   private task: any = null;
+  private playersChartTask: any = null;
   private playersChart: Array<{ value: string }> = [];
 
   async start(instance: Instance) {
@@ -62,13 +63,28 @@ export default class RefreshPlayer implements ILifeCycleTask {
         }
       } catch (error) { }
     }, 3000);
+
+    this.playersChartTask = setInterval(async () => {
+      try {
+        const result = await instance.execPreset("getPlayer");
+        if (!result) return;
+        this.playersChart.push({
+          value: result.current_players ? result.current_players : 0
+        });
+        if (this.playersChart.length > 60) {
+          this.playersChart = this.playersChart.slice(1, this.playersChart.length);
+        }
+        instance.info.playersChart = this.playersChart;
+      } catch (error) { }
+    }, 600000);
   }
 
   async stop(instance: Instance) {
+    clearInterval(this.task);
+    clearInterval(this.playersChartTask);
     instance.info.maxPlayers = -1;
     instance.info.currentPlayers = -1;
     instance.info.version = "";
     instance.info.playersChart = [];
-    clearInterval(this.task);
   }
 }
