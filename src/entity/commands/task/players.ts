@@ -90,5 +90,6 @@ export default class RefreshPlayer implements ILifeCycleTask {
     instance.info.playersChart = [];
     this.playersChart = [];
     this.playersChartTask = null;
+    this.task = null;
   }
 }
