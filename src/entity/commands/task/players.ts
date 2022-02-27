@@ -43,41 +43,42 @@ export default class RefreshPlayer implements ILifeCycleTask {
       //   latency: 1
       // }
       try {
+        // 获取玩家人数版本等信息
         const result = await instance.execPreset("getPlayer");
         if (!result) return;
         instance.info.maxPlayers = result.max_players ? result.max_players : -1;
         instance.info.currentPlayers = result.current_players ? result.current_players : -1;
         instance.info.version = result.version ? result.version : "";
-      } catch (error) { }
+
+        // 当第一次正确获取用户人数时，初始化玩家人数图表
+        if (this.playersChart.length === 0) {
+          this.initPlayersChart(instance);
+        }
+      } catch (error) {}
     }, 3000);
 
-    // 提前填充在线人数报表数据
+    // 开启查询在线人数报表数据定时器
+    this.playersChartTask = setInterval(() => {
+      this.getPlayersChartData(instance);
+    }, 600000);
+  }
+
+  initPlayersChart(instance: Instance) {
     while (this.playersChart.length < 60) {
       this.playersChart.push({ value: "0" });
     }
     instance.info.playersChart = this.playersChart;
-
-    // 启动的时候先执行一次
-    this.getPlayersChartData(instance).then(() => { });
-
-    // 开启查询在线人数报表数据定时器
-    this.playersChartTask = setInterval(() => {
-      this.getPlayersChartData(instance).then(() => { });
-    }, 600000);
+    this.getPlayersChartData(instance);
   }
 
-  async getPlayersChartData(instance: Instance) {
+  getPlayersChartData(instance: Instance) {
     try {
-      const result = await instance.execPreset("getPlayer");
-      if (!result) return;
+      this.playersChart.shift();
       this.playersChart.push({
-        value: result.current_players ? result.current_players : 0
+        value: String(instance.info.currentPlayers) ?? "0"
       });
-      if (this.playersChart.length > 60) {
-        this.playersChart = this.playersChart.slice(1, this.playersChart.length);
-      }
       instance.info.playersChart = this.playersChart;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   async stop(instance: Instance) {
@@ -87,5 +88,7 @@ export default class RefreshPlayer implements ILifeCycleTask {
     instance.info.currentPlayers = -1;
     instance.info.version = "";
     instance.info.playersChart = [];
+    this.playersChart = [];
+    this.playersChartTask = null;
   }
 }
