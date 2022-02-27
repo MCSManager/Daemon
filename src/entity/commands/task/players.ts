@@ -27,6 +27,8 @@ export default class RefreshPlayer implements ILifeCycleTask {
   public status: number = 0;
 
   private task: any = null;
+  private playersChartTask: any = null;
+  private playersChart: Array<{ value: string }> = [];
 
   async start(instance: Instance) {
     this.task = setInterval(async () => {
@@ -46,14 +48,44 @@ export default class RefreshPlayer implements ILifeCycleTask {
         instance.info.maxPlayers = result.max_players ? result.max_players : -1;
         instance.info.currentPlayers = result.current_players ? result.current_players : -1;
         instance.info.version = result.version ? result.version : "";
-      } catch (error) {}
+      } catch (error) { }
     }, 3000);
+
+    // 提前填充在线人数报表数据
+    while (this.playersChart.length < 60) {
+      this.playersChart.push({ value: "0" });
+    }
+    instance.info.playersChart = this.playersChart;
+
+    // 启动的时候先执行一次
+    this.getPlayersChartData(instance).then(() => { });
+
+    // 开启查询在线人数报表数据定时器
+    this.playersChartTask = setInterval(() => {
+      this.getPlayersChartData(instance).then(() => { });
+    }, 600000);
+  }
+
+  async getPlayersChartData(instance: Instance) {
+    try {
+      const result = await instance.execPreset("getPlayer");
+      if (!result) return;
+      this.playersChart.push({
+        value: result.current_players ? result.current_players : 0
+      });
+      if (this.playersChart.length > 60) {
+        this.playersChart = this.playersChart.slice(1, this.playersChart.length);
+      }
+      instance.info.playersChart = this.playersChart;
+    } catch (error) { }
   }
 
   async stop(instance: Instance) {
+    clearInterval(this.task);
+    clearInterval(this.playersChartTask);
     instance.info.maxPlayers = -1;
     instance.info.currentPlayers = -1;
     instance.info.version = "";
-    clearInterval(this.task);
+    instance.info.playersChart = [];
   }
 }
