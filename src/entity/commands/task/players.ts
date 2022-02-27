@@ -51,23 +51,33 @@ export default class RefreshPlayer implements ILifeCycleTask {
       } catch (error) { }
     }, 3000);
 
+    // 提前填充在线人数报表数据
     while (this.playersChart.length < 60) {
       this.playersChart.push({ value: "0" });
     }
+    instance.info.playersChart = this.playersChart;
 
-    this.playersChartTask = setInterval(async () => {
-      try {
-        const result = await instance.execPreset("getPlayer");
-        if (!result) return;
-        this.playersChart.push({
-          value: result.current_players ? result.current_players : 0
-        });
-        if (this.playersChart.length > 60) {
-          this.playersChart = this.playersChart.slice(1, this.playersChart.length);
-        }
-        instance.info.playersChart = this.playersChart;
-      } catch (error) { }
+    // 启动的时候先执行一次
+    this.getPlayersChartData(instance).then(() => { });
+
+    // 开启查询在线人数报表数据定时器
+    this.playersChartTask = setInterval(() => {
+      this.getPlayersChartData(instance).then(() => { });
     }, 600000);
+  }
+
+  async getPlayersChartData(instance: Instance) {
+    try {
+      const result = await instance.execPreset("getPlayer");
+      if (!result) return;
+      this.playersChart.push({
+        value: result.current_players ? result.current_players : 0
+      });
+      if (this.playersChart.length > 60) {
+        this.playersChart = this.playersChart.slice(1, this.playersChart.length);
+      }
+      instance.info.playersChart = this.playersChart;
+    } catch (error) { }
   }
 
   async stop(instance: Instance) {
