@@ -64,6 +64,10 @@ export default class RefreshPlayer implements ILifeCycleTask {
       } catch (error) { }
     }, 3000);
 
+    while (this.playersChart.length < 60) {
+      this.playersChart.push({ value: "0" });
+    }
+
     this.playersChartTask = setInterval(async () => {
       try {
         const result = await instance.execPreset("getPlayer");
