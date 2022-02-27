@@ -35,7 +35,7 @@ __  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
 _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
 
- + Released under the GPL-3.0 License
+ + Released under the AGPL-3.0 License
  + Copyright 2022 Suwings
  + Version ${VERSION}
 `);
@@ -106,7 +106,7 @@ io.on("connection", (socket: Socket) => {
 });
 
 // Error report monitoring
-process.on("uncaughtException", function(err) {
+process.on("uncaughtException", function (err) {
   logger.error(`错误报告 (uncaughtException):`, err);
 });
 
@@ -127,8 +127,8 @@ console.log("");
 // 装载 终端界面UI
 import "./service/ui";
 
-["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function(sig) {
-  process.on(sig, async function() {
+["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
+  process.on(sig, async function () {
     try {
       console.log("\n\n\n\n");
       logger.warn(`${sig} close process signal detected.`);
