@@ -19,19 +19,65 @@
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
 
+import { ChildProcess, exec, spawn } from "child_process";
 import logger from "../../../service/log";
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
-
+import { commandStringToArray } from "../base/command_parser";
+import iconv from "iconv-lite";
 export default class GeneralUpdateCommand extends InstanceCommand {
   constructor() {
     super("GeneralUpdateCommand");
   }
 
   async exec(instance: Instance) {
-    const updateCommand = instance.config.updateCommand;
-    logger.info(`实例 ${instance.instanceUuid} 正在准备进行更新操作...`);
-    logger.info(`实例 ${instance.instanceUuid} 执行更新命令如下:`);
-    logger.info(updateCommand);
+    if (instance.status() !== Instance.STATUS_STOP) return instance.failure(new Error("实例状态不正确，无法执行更新任务，必须停止实例"));
+    try {
+      instance.setLock(true);
+      const updateCommand = instance.config.updateCommand;
+      logger.info(`实例 ${instance.instanceUuid} 正在准备进行更新操作...`);
+      logger.info(`实例 ${instance.instanceUuid} 执行更新命令如下:`);
+      logger.info(updateCommand);
+
+      // 命令解析
+      const commandList = commandStringToArray(updateCommand);
+      const commandExeFile = commandList[0];
+      const commnadParameters = commandList.slice(1);
+      if (commandList.length === 0) {
+        return instance.failure(new Error("更新命令格式错误，请联系管理员"));
+      }
+
+      // 启动更新命令
+      const process = spawn(commandExeFile, commnadParameters, {
+        cwd: instance.config.cwd,
+        stdio: "pipe",
+        windowsHide: true
+      });
+      if (!process || !process.pid) {
+        instance.setLock(false);
+        return instance.println("错误", "更新失败，更新命令启动失败，请联系管理员");
+      }
+
+      instance.status(Instance.STATUS_BUSY);
+
+      process.stdout.on("data", (text) => {
+        instance.println("更新", iconv.decode(text, instance.config.oe));
+      });
+      process.stderr.on("data", (text) => {
+        instance.println("异常", iconv.decode(text, instance.config.oe));
+      });
+      process.on("exit", (code) => {
+        instance.setLock(false);
+        instance.status(Instance.STATUS_STOP);
+        if (code === 0) {
+          instance.println("更新", "更新成功！");
+        } else {
+          instance.println("更新", "更新程序结束，但结果不正确，可能文件更新损坏或网络不畅通");
+        }
+      });
+    } catch {
+      instance.setLock(false);
+      instance.status(Instance.STATUS_STOP);
+    }
   }
 }
