@@ -39,7 +39,7 @@ interface IInstanceInfo {
   maxPlayers: number;
   version: string;
   fileLock: number;
-  playersChart: Array<{ value: string }>
+  playersChart: Array<{ value: string }>;
 }
 
 // 实例类
@@ -126,6 +126,7 @@ export default class Instance extends EventEmitter {
     configureEntityParams(this.config, cfg, "oe", String);
     configureEntityParams(this.config, cfg, "endTime", String);
     configureEntityParams(this.config, cfg, "fileCode", String);
+    configureEntityParams(this.config, cfg, "updateCommand", String);
     if (cfg.docker) {
       configureEntityParams(this.config.docker, cfg.docker, "containerName", String);
       configureEntityParams(this.config.docker, cfg.docker, "image", String);

@@ -280,6 +280,18 @@ routerApp.on("instance/delete", (ctx, data) => {
   protocol.msg(ctx, "instance/delete", instanceUuids);
 });
 
+// 执行复杂异步任务
+routerApp.on("instance/asynchronous", (ctx, data) => {
+  const instanceUuid = data.instanceUuid;
+  const taskName = data.taskName;
+  const parameter = data.parameter;
+  if (taskName === "update") {
+    const instance = InstanceSubsystem.getInstance(instanceUuid);
+    instance.execPreset("update", parameter).then(() => {});
+  }
+  protocol.msg(ctx, "instance/asynchronous", true);
+});
+
 // 向应用实例发送数据流
 routerApp.on("instance/stdin", (ctx, data) => {
   // 本路由采用兼容性低且直接原始的方式来进行写数据
