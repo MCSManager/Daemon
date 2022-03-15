@@ -35,6 +35,7 @@ import DockerResizeCommand from "./docker/docker _resize";
 import GeneralInputCommand from "./general/general _input";
 import TimeCheck from "./task/time";
 import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock";
+import GeneralUpdateCommand from "./general/general_update";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
@@ -51,37 +52,31 @@ export default class FuntionDispatcher extends InstanceCommand {
     // 实例必须装载的组件
     instance.lifeCycleTaskManager.registerLifeCycleTask(new TimeCheck());
 
+    // 实例通用预设能力
+    instance.setPreset("command", new GeneralSendCommand());
+    instance.setPreset("input", new GeneralInputCommand());
+    instance.setPreset("stop", new GeneralStopCommand());
+    instance.setPreset("kill", new GeneralKillCommand());
+    instance.setPreset("restart", new GeneralRestartCommand());
+    instance.setPreset("update", new GeneralUpdateCommand());
+
     // 根据实例启动类型来进行基本操作方式的预设
     if (!instance.config.processType || instance.config.processType === "general") {
       instance.setPreset("start", new GeneralStartCommand());
-      instance.setPreset("command", new GeneralSendCommand());
-      instance.setPreset("input", new GeneralInputCommand());
-      instance.setPreset("stop", new GeneralStopCommand());
-      instance.setPreset("kill", new GeneralKillCommand());
-      instance.setPreset("restart", new GeneralRestartCommand());
     }
     if (instance.config.processType === "docker") {
       instance.setPreset("start", new DockerStartCommand());
-      instance.setPreset("command", new GeneralSendCommand());
-      instance.setPreset("input", new GeneralInputCommand());
-      instance.setPreset("stop", new GeneralStopCommand());
-      instance.setPreset("kill", new GeneralKillCommand());
-      instance.setPreset("restart", new GeneralRestartCommand());
-      instance.setPreset("resize", new DockerResizeCommand())
     }
 
     // 根据不同类型设置不同预设功能与作用
     if (instance.config.type.includes(Instance.TYPE_UNIVERSAL)) {
-      instance.setPreset("update", new NullCommand());
       instance.setPreset("getPlayer", new NullCommand());
     }
     if (instance.config.type.includes(Instance.TYPE_MINECRAFT_JAVA)) {
-      instance.setPreset("update", new MinecraftUpdateCommand());
       instance.setPreset("getPlayer", new MinecraftGetPlayersCommand());
       instance.lifeCycleTaskManager.registerLifeCycleTask(new RefreshPlayer());
     }
     if (instance.config.type.includes(Instance.TYPE_MINECRAFT_BEDROCK)) {
-      instance.setPreset("update", new NullCommand());
       instance.setPreset("getPlayer", new MinecraftBedrockGetPlayersCommand());
       instance.lifeCycleTaskManager.registerLifeCycleTask(new RefreshPlayer());
     }
