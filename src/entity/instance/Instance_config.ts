@@ -22,6 +22,11 @@
 import Instance from "./instance";
 import { IDockerConfig } from "./interface";
 
+interface IActionCommand {
+  name: string;
+  command: string;
+}
+
 // @Entity
 export default class InstanceConfig {
   public nickname = "Undefined";
@@ -37,6 +42,10 @@ export default class InstanceConfig {
   public endTime: string = "";
   public fileCode: string = "utf-8";
   public processType: string = "general";
+  public updateCommand: string = "";
+
+  // 自定义命令列表
+  public actionCommandList: IActionCommand[] = [];
 
   // terminal option
   public terminalOption = {
