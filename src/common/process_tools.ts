@@ -18,6 +18,20 @@
   根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
-import { ChildProcess } from "child_process";
+import { ChildProcess, exec } from "child_process";
+import os from "os";
 
-export function killProcess(pid: number, process: ChildProcess) {}
+export function killProcess(pid: number, process: ChildProcess, signal: any) {
+  if (os.platform() === "win32") {
+    return exec(`taskkill /PID ${pid} /T /F`, (err, stdout, stderr) => {
+      console.log(`进程 ${pid} 已使用系统指令强制终止进程`);
+    });
+  }
+  if (os.platform() === "linux") {
+    return exec(`kill -s 9 ${pid}`, (err, stdout, stderr) => {
+      console.log(`进程 ${pid} 已使用系统指令强制终止进程`);
+    });
+  }
+  if (signal) process.kill(signal);
+  else process.kill("SIGKILL");
+}
