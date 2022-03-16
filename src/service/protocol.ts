@@ -53,7 +53,9 @@ export function responseError(ctx: RouterContext, err: Error | string) {
   if (err) errinfo = err.toString();
   else errinfo = err;
   const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
-  logger.error(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${ctx.event} 响应数据时异常:\n`, err);
+  // 忽略因为重启守护进程没有刷新网页的权限不足错误
+  if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
+  logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${ctx.event} 响应数据时异常:\n`, err);
   ctx.socket.emit(ctx.event, packet);
 }
 
@@ -64,7 +66,9 @@ export function msg(ctx: RouterContext, event: string, data: any) {
 
 export function error(ctx: RouterContext, event: string, err: any) {
   const packet = new Packet(ctx.uuid, STATUS_ERR, event, err);
-  logger.error(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${event} 响应数据时异常:\n`, err);
+  // 忽略因为重启守护进程没有刷新网页的权限不足错误
+  if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
+  logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${event} 响应数据时异常:\n`, err);
   ctx.socket.emit(event, packet);
 }
 

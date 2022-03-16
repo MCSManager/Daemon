@@ -293,6 +293,7 @@ export default class Instance extends EventEmitter {
     return 0;
   }
 
+  // 执行预设命令动作
   async execPreset(action: string, p?: any) {
     if (this.presetCommandManager) {
       return await this.presetCommandManager.execPreset(action, p);

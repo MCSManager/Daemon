@@ -36,7 +36,7 @@ routerApp.use(async (event, ctx, data, next) => {
     if (ctx.session.stream && ctx.session.stream.check === true && ctx.session.type === "STREAM") {
       return await next();
     }
-    return protocol.error(ctx, "error", "权限不足，非法访问");
+    return protocol.error(ctx, "error", "[Unauthorized Access] 权限不足，非法访问");
   }
   return await next();
 });
