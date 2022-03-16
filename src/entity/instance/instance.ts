@@ -22,7 +22,7 @@
 import { EventEmitter } from "events";
 import iconv from "iconv-lite";
 import path from "path";
-
+import { IExecutable } from "./preset";
 import InstanceCommand from "../commands/base/command";
 import InstanceConfig from "./Instance_config";
 import StorageSubsystem from "../../common/system_storage";
@@ -64,6 +64,8 @@ export default class Instance extends EventEmitter {
   public lock: boolean;
   public startCount: number;
   public startTimestamp: number = 0;
+  // 正在进行的异步任务
+  public asynchronousTask: IExecutable = null;
 
   // 生命周期任务，定时任务管理器
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);

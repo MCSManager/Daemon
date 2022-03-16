@@ -19,8 +19,9 @@
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
 
-interface IExecutable {
+export interface IExecutable {
   exec: (a: any, b?: any) => Promise<any>;
+  stop?: (a: any) => Promise<void>;
 }
 
 export class PresetCommandManager {

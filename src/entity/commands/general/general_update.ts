@@ -26,12 +26,21 @@ import InstanceCommand from "../base/command";
 import { commandStringToArray } from "../base/command_parser";
 import iconv from "iconv-lite";
 export default class GeneralUpdateCommand extends InstanceCommand {
+  private pid: number = null;
+
   constructor() {
     super("GeneralUpdateCommand");
   }
 
+  private stoped(instance: Instance) {
+    instance.asynchronousTask = null;
+    instance.setLock(false);
+    instance.status(Instance.STATUS_STOP);
+  }
+
   async exec(instance: Instance) {
     if (instance.status() !== Instance.STATUS_STOP) return instance.failure(new Error("实例状态不正确，无法执行更新任务，必须停止实例"));
+    if (instance.asynchronousTask !== null) return instance.failure(new Error("实例状态不正确，有其他任务正在运行中"));
     try {
       instance.setLock(true);
       const updateCommand = instance.config.updateCommand;
@@ -54,10 +63,15 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         windowsHide: true
       });
       if (!process || !process.pid) {
-        instance.setLock(false);
+        this.stoped(instance);
         return instance.println("错误", "更新失败，更新命令启动失败，请联系管理员");
       }
 
+      //pid 保存
+      this.pid = process.pid;
+
+      // 设置实例正在运行的异步任务
+      instance.asynchronousTask = this;
       instance.status(Instance.STATUS_BUSY);
 
       process.stdout.on("data", (text) => {
@@ -67,8 +81,7 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         instance.println("异常", iconv.decode(text, instance.config.oe));
       });
       process.on("exit", (code) => {
-        instance.setLock(false);
-        instance.status(Instance.STATUS_STOP);
+        this.stoped(instance);
         if (code === 0) {
           instance.println("更新", "更新成功！");
         } else {
@@ -76,8 +89,11 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         }
       });
     } catch {
-      instance.setLock(false);
-      instance.status(Instance.STATUS_STOP);
+      this.stoped(instance);
     }
+  }
+
+  async stop(instance: Instance): Promise<void> {
+    logger.info(`用户请求终止实例 ${instance.instanceUuid} 的 update 异步任务`);
   }
 }

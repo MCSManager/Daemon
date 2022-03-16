@@ -285,11 +285,33 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const taskName = data.taskName;
   const parameter = data.parameter;
+  const instance = InstanceSubsystem.getInstance(instanceUuid);
+  logger.info(`会话 ${ctx.socket.id} 要求实例 ${instance.instanceUuid} 执行异步 ${taskName} 异步任务`);
   if (taskName === "update") {
-    const instance = InstanceSubsystem.getInstance(instanceUuid);
-    instance.execPreset("update", parameter).then(() => {});
+    instance
+      .execPreset("update", parameter)
+      .then(() => {})
+      .catch((err) => {
+        logger.error(`实例 ${instance.instanceUuid} ${taskName} 异步任务执行异常: ${err}`);
+      });
   }
   protocol.msg(ctx, "instance/asynchronous", true);
+});
+
+// 终止执行复杂异步任务
+routerApp.on("instance/stop_asynchronous", (ctx, data) => {
+  const instanceUuid = data.instanceUuid;
+  const instance = InstanceSubsystem.getInstance(instanceUuid);
+  const task = instance.asynchronousTask;
+  if (task && task.stop) {
+    task
+      .stop(instance)
+      .then(() => {})
+      .catch((err) => {});
+  } else {
+    return protocol.error(ctx, "instance/stop_asynchronous", "无任务异步任务正在运行");
+  }
+  protocol.msg(ctx, "instance/stop_asynchronous", true);
 });
 
 // 向应用实例发送数据流
