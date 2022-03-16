@@ -241,9 +241,15 @@ export default class Instance extends EventEmitter {
     }
   }
 
+  // 自定义输出方法，格式化
   println(level: string, text: string) {
     const str = `\n[MCSMANAGER] [${level}] ${text}\n`;
     this.emit("data", str);
+  }
+
+  // 自定义输出方法
+  print(data: any) {
+    this.emit("data", data);
   }
 
   // 释放资源（主要释放进程相关的资源）

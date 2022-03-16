@@ -29,6 +29,7 @@ import EventEmitter from "events";
 import { IInstanceProcess } from "../../../entity/instance/interface";
 import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
+import { killProcess } from "../../../common/process_tools";
 
 // 启动时错误异常
 class StartupError extends Error {
@@ -54,20 +55,7 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   }
 
   public kill(s?: any) {
-    if (os.platform() === "win32") {
-      return exec(`taskkill /PID ${this.pid} /T /F`, (err, stdout, stderr) => {
-        logger.info(`实例进程 ${this.pid} 已使用系统指令强制终止进程`);
-        // logger.info(`实例进程 ${this.pid} 强制结束结果:\n Error: ${err}\n Stdout: ${stdout}`);
-      });
-    }
-    if (os.platform() === "linux") {
-      return exec(`kill -s 9 ${this.pid}`, (err, stdout, stderr) => {
-        logger.info(`实例进程 ${this.pid} 已使用系统指令强制终止进程`);
-        // logger.info(`实例进程 ${this.pid} 强制结束结果:\n Error: ${err}\n Stdout: ${stdout}`);
-      });
-    }
-    if (s) this.process.kill(s);
-    else this.process.kill("SIGKILL");
+    return killProcess(this.pid, this.process, s);
   }
 
   public async destroy() {

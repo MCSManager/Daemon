@@ -18,7 +18,7 @@
   根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
-
+import { killProcess } from "../../../common/process_tools";
 import { ChildProcess, exec, spawn } from "child_process";
 import logger from "../../../service/log";
 import Instance from "../../instance/instance";
@@ -27,6 +27,7 @@ import { commandStringToArray } from "../base/command_parser";
 import iconv from "iconv-lite";
 export default class GeneralUpdateCommand extends InstanceCommand {
   private pid: number = null;
+  private process: ChildProcess = null;
 
   constructor() {
     super("GeneralUpdateCommand");
@@ -67,18 +68,19 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         return instance.println("错误", "更新失败，更新命令启动失败，请联系管理员");
       }
 
-      //pid 保存
+      // process & pid 保存
       this.pid = process.pid;
+      this.process = process;
 
       // 设置实例正在运行的异步任务
       instance.asynchronousTask = this;
       instance.status(Instance.STATUS_BUSY);
 
       process.stdout.on("data", (text) => {
-        instance.println("更新", iconv.decode(text, instance.config.oe));
+        instance.print(iconv.decode(text, instance.config.oe));
       });
       process.stderr.on("data", (text) => {
-        instance.println("异常", iconv.decode(text, instance.config.oe));
+        instance.print(iconv.decode(text, instance.config.oe));
       });
       process.on("exit", (code) => {
         this.stoped(instance);
@@ -95,5 +97,8 @@ export default class GeneralUpdateCommand extends InstanceCommand {
 
   async stop(instance: Instance): Promise<void> {
     logger.info(`用户请求终止实例 ${instance.instanceUuid} 的 update 异步任务`);
+    instance.println("更新", `用户请求终止实例 ${instance.instanceUuid} 的 update 异步任务`);
+    instance.println("更新", `正在强制杀死任务进程...`);
+    killProcess(this.pid, this.process);
   }
 }

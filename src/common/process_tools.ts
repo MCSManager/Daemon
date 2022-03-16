@@ -18,20 +18,23 @@
   根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
-import { ChildProcess, exec } from "child_process";
+import { ChildProcess, exec, execSync } from "child_process";
 import os from "os";
 
-export function killProcess(pid: number, process: ChildProcess, signal: any) {
-  if (os.platform() === "win32") {
-    return exec(`taskkill /PID ${pid} /T /F`, (err, stdout, stderr) => {
+export function killProcess(pid: string | number, process: ChildProcess, signal?: any) {
+  try {
+    if (os.platform() === "win32") {
+      execSync(`taskkill /PID ${pid} /T /F`);
       console.log(`进程 ${pid} 已使用系统指令强制终止进程`);
-    });
-  }
-  if (os.platform() === "linux") {
-    return exec(`kill -s 9 ${pid}`, (err, stdout, stderr) => {
+      return true;
+    }
+    if (os.platform() === "linux") {
+      execSync(`kill -s 9 ${pid}`);
       console.log(`进程 ${pid} 已使用系统指令强制终止进程`);
-    });
+      return true;
+    }
+  } catch (err) {
+    return signal ? process.kill(signal) : process.kill("SIGKILL");
   }
-  if (signal) process.kill(signal);
-  else process.kill("SIGKILL");
+  return signal ? process.kill(signal) : process.kill("SIGKILL");
 }
