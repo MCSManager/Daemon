@@ -44,7 +44,8 @@ export default class GeneralUpdateCommand extends InstanceCommand {
     if (instance.asynchronousTask !== null) return instance.failure(new Error("实例状态不正确，有其他任务正在运行中"));
     try {
       instance.setLock(true);
-      const updateCommand = instance.config.updateCommand;
+      let updateCommand = instance.config.updateCommand;
+      updateCommand = updateCommand.replace(/\$\{mcsm_workspace\}/gm, instance.config.cwd);
       logger.info(`实例 ${instance.instanceUuid} 正在准备进行更新操作...`);
       logger.info(`实例 ${instance.instanceUuid} 执行更新命令如下:`);
       logger.info(updateCommand);
@@ -90,8 +91,9 @@ export default class GeneralUpdateCommand extends InstanceCommand {
           instance.println("更新", "更新程序结束，但结果不正确，可能文件更新损坏或网络不畅通");
         }
       });
-    } catch {
+    } catch (err) {
       this.stoped(instance);
+      instance.println("更新", `更新错误: ${err}`);
     }
   }
 
