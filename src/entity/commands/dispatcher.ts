@@ -39,9 +39,9 @@ import GeneralUpdateCommand from "./general/general_update";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
-export default class FuntionDispatcher extends InstanceCommand {
+export default class FunctionDispatcher extends InstanceCommand {
   constructor() {
-    super("FuntionDispatcher");
+    super("FunctionDispatcher");
   }
 
   async exec(instance: Instance) {
