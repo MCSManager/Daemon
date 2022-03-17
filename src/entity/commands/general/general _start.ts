@@ -91,7 +91,7 @@ export default class GeneralStartCommand extends InstanceCommand {
       // 命令解析
       const commandList = commandStringToArray(instance.config.startCommand);
       const commandExeFile = commandList[0];
-      const commnadParameters = commandList.slice(1);
+      const commandParameters = commandList.slice(1);
       if (commandList.length === 0) {
         return instance.failure(new StartupError("无法启动实例，启动命令为空"));
       }
@@ -105,7 +105,7 @@ export default class GeneralStartCommand extends InstanceCommand {
 
       // 创建子进程
       // 参数1直接传进程名或路径（含空格），无需双引号
-      const process = spawn(commandExeFile, commnadParameters, {
+      const process = spawn(commandExeFile, commandParameters, {
         cwd: instance.config.cwd,
         stdio: "pipe",
         windowsHide: true
@@ -124,7 +124,7 @@ ${instance.config.startCommand}
 
 启动命令解析体:
 程序：${commandExeFile}
-参数：${JSON.stringify(commnadParameters)}
+参数：${JSON.stringify(commandParameters)}
 
 请将此信息报告给管理员，技术人员或自行排查故障。
 `
