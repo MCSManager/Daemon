@@ -25,7 +25,7 @@ import fs from "fs-extra";
 
 import InstanceCommand from "./base/command";
 import * as childProcess from "child_process";
-import FuntionDispatcher from "./dispatcher";
+import FunctionDispatcher from "./dispatcher";
 
 class StartupError extends Error {
   constructor(msg: string) {
