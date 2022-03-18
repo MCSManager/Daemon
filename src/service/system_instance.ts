@@ -34,7 +34,7 @@ import StorageSubsystem from "../common/system_storage";
 import InstanceConfig from "../entity/instance/Instance_config";
 import InstanceStreamListener from "../common/instance_stream";
 import { QueryMapWrapper } from "../common/query_wrapper";
-import FuntionDispatcher from "../entity/commands/dispatcher";
+import FunctionDispatcher from "../entity/commands/dispatcher";
 import InstanceControl from "./system_instance_control";
 import StartCommand from "../entity/commands/start";
 
@@ -77,7 +77,7 @@ class InstanceSubsystem extends EventEmitter {
       const instance = new Instance(uuid, instanceConfig);
       // 所有实例全部进行功能调度器
       instance
-        .forceExec(new FuntionDispatcher())
+        .forceExec(new FunctionDispatcher())
         .then((v) => {})
         .catch((v) => {});
       this.addInstance(instance);
@@ -102,7 +102,7 @@ class InstanceSubsystem extends EventEmitter {
     }
     // 根据参数构建并初始化类型
     instance.parameters(cfg);
-    instance.forceExec(new FuntionDispatcher());
+    instance.forceExec(new FunctionDispatcher());
     this.addInstance(instance);
     return instance;
   }

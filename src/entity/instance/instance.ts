@@ -28,7 +28,7 @@ import InstanceConfig from "./Instance_config";
 import StorageSubsystem from "../../common/system_storage";
 import { LifeCycleTaskManager } from "./life_cycle";
 import { PresetCommandManager } from "./preset";
-import FuntionDispatcher from "../commands/dispatcher";
+import FunctionDispatcher from "../commands/dispatcher";
 import { IInstanceProcess } from "./interface";
 import StartCommand from "../commands/start";
 import { configureEntityParams } from "../../common/typecheck";
@@ -112,13 +112,13 @@ export default class Instance extends EventEmitter {
     if (cfg.type && cfg.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
       configureEntityParams(this.config, cfg, "type", String);
-      this.forceExec(new FuntionDispatcher());
+      this.forceExec(new FunctionDispatcher());
     }
     // 若进程类型改变，则必须重置预设命令与生命周期事件
     if (cfg.processType && cfg.processType !== this.config.processType) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例进程类型");
       configureEntityParams(this.config, cfg, "processType", String);
-      this.forceExec(new FuntionDispatcher());
+      this.forceExec(new FunctionDispatcher());
     }
     configureEntityParams(this.config, cfg, "nickname", String);
     configureEntityParams(this.config, cfg, "startCommand", String);
