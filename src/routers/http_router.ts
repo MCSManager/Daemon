@@ -37,12 +37,14 @@ router.all("/", async (ctx) => {
 // 文件下载路由
 router.get("/download/:key/:fileName", async (ctx) => {
   const key = ctx.params.key;
+  const paramsFileName = ctx.params.fileName;
   try {
     // 从任务中心取任务
     const mission = missionPassport.getMission(key, "download");
     if (!mission) throw new Error((ctx.body = "No task, Access denied | 无下载任务，非法访问"));
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
     if (!instance) throw new Error("实例不存在");
+    if (!FileManager.checkFileName(paramsFileName)) throw new Error("用户文件下载名不符合规范");
 
     const cwd = instance.config.cwd;
     const fileRelativePath = mission.parameter.fileName;
@@ -52,6 +54,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
     if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied | 参数不正确"));
 
     // 开始给用户下载文件
+    ctx.response.set("Content-Disposition", `attachment; filename="${paramsFileName}"`);
     ctx.type = ext;
     ctx.body = fs.createReadStream(fileManager.toAbsolutePath(fileRelativePath));
     // 任务已执行，销毁护照
