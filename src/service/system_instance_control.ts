@@ -94,7 +94,12 @@ class InstanceControlSubsystem {
     if (!this.checkTask(key, task.name)) throw new Error("已存在重复的任务");
     let job: IScheduleJob;
     if (needStore) logger.info(`创建计划任务 ${task.name}:\n${JSON.stringify(task)}`);
+
+    // 最小间隔时间检查
     if (task.type === 1) {
+      let internalTime = Number(task.time);
+      if (isNaN(internalTime) || internalTime < 1) internalTime = 1;
+
       // task.type=1: 时间间隔型计划任务，采用内置定时器实现
       job = new IntervalJob(() => {
         this.action(task);
@@ -106,9 +111,17 @@ class InstanceControlSubsystem {
           task.count--;
           this.updateTaskConfig(key, task.name, task);
         }
-      }, Number(task.time));
+      }, internalTime);
     } else {
-      // task.type=1: 指定时间型计划任务，采用 node-schedule 库实现
+      // 表达式合法性检查: 8 19 14 * * 1,2,3,4
+      const timeArray = task.time.split(" ");
+      const checkIndex = [0, 1, 2];
+      checkIndex.forEach((item) => {
+        if (isNaN(Number(timeArray[item])) && Number(timeArray[item]) >= 0) {
+          throw new Error(`计划任务创建错误，不正确的时间表达式: \n${task.name}: ${timeArray}\n请尝试删除 data/TaskConfig/${task.name}.json 文件解决此问题`);
+        }
+      });
+      // task.type=2: 指定时间型计划任务，采用 node-schedule 库实现
       job = schedule.scheduleJob(task.time, () => {
         this.action(task);
         if (task.count === -1) return;
