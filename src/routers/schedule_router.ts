@@ -25,8 +25,12 @@ import InstanceControlSubsystem from "../service/system_instance_control";
 
 // 创建计划任务
 routerApp.on("schedule/register", (ctx, data) => {
-  InstanceControlSubsystem.registerScheduleJob(data);
-  protocol.response(ctx, true);
+  try {
+    InstanceControlSubsystem.registerScheduleJob(data);
+    protocol.response(ctx, true);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
 });
 
 // 获取任务列表

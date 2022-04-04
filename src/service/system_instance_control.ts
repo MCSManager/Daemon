@@ -91,9 +91,11 @@ class InstanceControlSubsystem {
     if (!this.taskMap.has(key)) {
       this.taskMap.set(key, []);
     }
+    if (this.taskMap.get(key)?.length > 8) throw new Error("无法继续创建计划任务，以达到上限");
     if (!this.checkTask(key, task.name)) throw new Error("已存在重复的任务");
-    let job: IScheduleJob;
     if (needStore) logger.info(`创建计划任务 ${task.name}:\n${JSON.stringify(task)}`);
+
+    let job: IScheduleJob;
 
     // 最小间隔时间检查
     if (task.type === 1) {
@@ -230,6 +232,11 @@ class InstanceControlSubsystem {
         list[index].config = data;
         break;
       }
+    }
+  }
+
+  private checkScheduledTaskLimit(instanceUuid: string) {
+    for (const iterator of this.taskMap) {
     }
   }
 }
