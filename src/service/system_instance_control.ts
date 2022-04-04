@@ -165,26 +165,26 @@ class InstanceControlSubsystem {
       // logger.info(`执行计划任务: ${task.name} ${task.action} ${task.time} ${task.count} `);
       if (task.action === "start") {
         if (instanceStatus === 0) {
-          instance.exec(new StartCommand("ScheduleJob"));
+          return await instance.exec(new StartCommand("ScheduleJob"));
         }
       }
       if (task.action === "stop") {
         if (instanceStatus === 3) {
-          instance.exec(new StopCommand());
+          return await instance.exec(new StopCommand());
         }
       }
       if (task.action === "restart") {
         if (instanceStatus === 3) {
-          instance.exec(new RestartCommand());
+          return await instance.exec(new RestartCommand());
         }
       }
       if (task.action === "command") {
         if (instanceStatus === 3) {
-          instance.exec(new SendCommand(payload));
+          return await instance.exec(new SendCommand(payload));
         }
       }
       if (task.action === "kill") {
-        instance.exec(new KillCommand());
+        return await instance.exec(new KillCommand());
       }
     } catch (error) {
       logger.error(`实例 ${task.instanceUuid} 计划任务 ${task.name} 执行错误: \n ${error} `);
