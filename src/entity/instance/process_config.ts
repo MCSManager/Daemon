@@ -67,6 +67,9 @@ export class ProcessConfig {
     if (this.iProcessConfig.type === "properties") {
       text = properties.stringify(object);
       text = text.replace(/ = /gim, "=");
+      if (this.iProcessConfig.fileName == "server.properties") {
+        text = text.replace(/\\\\u/gim, "\\u");
+      }
     }
     if (this.iProcessConfig.type === "json") {
       text = JSON.stringify(object);
