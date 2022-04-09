@@ -60,6 +60,13 @@ const config = globalConfiguration.config;
 
 // 初始化 HTTP 服务
 const koaApp = koa.initKoa();
+
+// 监听 Koa 错误
+koaApp.on("error", (error) => {
+  // 屏蔽所有 Koa 框架级别事件
+  // 当 Koa 遭遇短连接洪水攻击时，很容易错误信息刷屏，有可能会间接影响某些应用程序运作
+});
+
 const httpServer = http.createServer(koaApp.callback());
 httpServer.listen(config.port, config.ip);
 

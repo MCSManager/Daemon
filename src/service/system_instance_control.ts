@@ -82,7 +82,12 @@ class InstanceControlSubsystem {
     // 初始化所有持久化数据并逐一装载到内存
     StorageSubsystem.list("TaskConfig").forEach((uuid) => {
       const config = StorageSubsystem.load("TaskConfig", TaskConfig, uuid) as TaskConfig;
-      this.registerScheduleJob(config, false);
+      try {
+        this.registerScheduleJob(config, false);
+      } catch (error) {
+        // 可能会遗留掉某些计划任务，但是上限不会变
+        // 忽略启动时的计划任务注册
+      }
     });
   }
 
