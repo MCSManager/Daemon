@@ -111,6 +111,7 @@ router.post("/upload/:key", async (ctx) => {
       return (ctx.body = "OK");
     }
     ctx.body = "未知原因: 上传失败";
+    ctx.status = 500;
   } catch (error) {
     ctx.body = error.message;
     ctx.status = 500;
