@@ -28,6 +28,7 @@ import StopCommand from "../entity/commands/stop";
 import SendCommand from "../entity/commands/cmd";
 import RestartCommand from "../entity/commands/restart";
 import KillCommand from "../entity/commands/kill";
+import FileManager from "./system_file";
 
 // 计划任务配置项接口
 interface IScheduleTask {
@@ -98,6 +99,7 @@ class InstanceControlSubsystem {
     }
     if (this.taskMap.get(key)?.length >= 8) throw new Error("无法继续创建计划任务，以达到上限");
     if (!this.checkTask(key, task.name)) throw new Error("已存在重复的任务");
+    if (!FileManager.checkFileName(task.name)) throw new Error("非法的计划名，仅支持下划线，数字，字母和部分本地语言");
     if (needStore) logger.info(`创建计划任务 ${task.name}:\n${JSON.stringify(task)}`);
 
     let job: IScheduleJob;
@@ -144,7 +146,7 @@ class InstanceControlSubsystem {
     const newTask = new Task(task, job);
     this.taskMap.get(key).push(newTask);
     if (needStore) {
-      StorageSubsystem.store("TaskConfig", newTask.config.name, newTask.config);
+      StorageSubsystem.store("TaskConfig", `${key}_${newTask.config.name}`, newTask.config);
     }
     if (needStore) logger.info(`创建计划任务 ${task.name} 完毕`);
   }
@@ -218,7 +220,7 @@ class InstanceControlSubsystem {
         arr.splice(index, 1);
       }
     });
-    StorageSubsystem.delete("TaskConfig", name);
+    StorageSubsystem.delete("TaskConfig", `${key}_${name}`);
   }
 
   private checkTask(key: string, name: string) {
