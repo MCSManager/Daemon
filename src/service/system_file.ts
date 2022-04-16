@@ -182,7 +182,7 @@ export default class FileManager {
   }
 
   public static checkFileName(fileName: string) {
-    const blackKeys = ["/", "\\", "|", "?", "*", ">", "<", ";", '"', "'"];
+    const blackKeys = ["/", "\\", "|", "?", "*", ">", "<", ";", '"'];
     for (const ch of blackKeys) {
       if (fileName.includes(ch)) return false;
     }
