@@ -54,7 +54,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
     if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied | 参数不正确"));
 
     // 开始给用户下载文件
-    ctx.response.set("Content-Disposition", `attachment; filename="${paramsFileName}"`);
+    ctx.response.set("Content-Disposition", `attachment; filename="${encodeURIComponent(paramsFileName)}"`);
     ctx.type = ext;
     ctx.body = fs.createReadStream(fileManager.toAbsolutePath(fileRelativePath));
     // 任务已执行，销毁护照
