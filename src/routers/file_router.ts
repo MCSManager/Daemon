@@ -43,8 +43,8 @@ routerApp.on("file/list", (ctx, data) => {
   try {
     const fileManager = getFileManager(data.instanceUuid);
     const { page, pageSize, target } = data;
-    const overview = fileManager.list(page, pageSize);
     fileManager.cd(target);
+    const overview = fileManager.list(page, pageSize);
     protocol.response(ctx, overview);
   } catch (error) {
     protocol.responseError(ctx, error);
