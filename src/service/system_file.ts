@@ -79,21 +79,25 @@ export default class FileManager {
     const files: IFile[] = [];
     const dirs: IFile[] = [];
     fileNames.forEach((name) => {
-      const info = fs.statSync(this.toAbsolutePath(name));
-      if (info.isFile()) {
-        files.push({
-          name: name,
-          type: 1,
-          size: info.size,
-          time: info.atime.toString()
-        });
-      } else {
-        dirs.push({
-          name: name,
-          type: 0,
-          size: info.size,
-          time: info.atime.toString()
-        });
+      try {
+        const info = fs.statSync(this.toAbsolutePath(name));
+        if (info.isFile()) {
+          files.push({
+            name: name,
+            type: 1,
+            size: info.size,
+            time: info.atime.toString()
+          });
+        } else {
+          dirs.push({
+            name: name,
+            type: 0,
+            size: info.size,
+            time: info.atime.toString()
+          });
+        }
+      } catch (error) {
+        // 忽略一个文件信息获取错误，以防止导致整体错误
       }
     });
     files.sort((a, b) => (a.name > b.name ? 1 : -1));
