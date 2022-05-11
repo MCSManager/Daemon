@@ -129,8 +129,8 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 // zip -r a.zip css css_v1 js
 async function linuxZip(sourceZip: string, files: string[]) {
   return new Promise((resolve, reject) => {
-    const p = ["-r", sourceZip];
-    p.concat(files);
+    let p = ["-r", sourceZip];
+    p = p.concat(files);
     console.log("linuxZip:", p);
     const process = child_process.spawn("zip", p, {
       cwd: path.normalize(path.dirname(sourceZip))
