@@ -64,6 +64,7 @@ export async function compress(sourceZip: string, files: string[], fileCode?: st
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
   if (system === "linux") {
     if (haveLinuxUnzip()) {
+      console.log("xxxxxxxxxxxxxxxxxx");
       return await linuxUnzip(zipPath, dest);
     }
   }
