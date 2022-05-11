@@ -95,13 +95,21 @@ async function _7zipDecompress(sourceZip: string, destDir: string) {
 }
 
 function haveLinuxUnzip() {
-  const result = child_process.execSync("unzip -hh");
-  return result?.toString("utf-8").toLowerCase().includes("extended help for unzip");
+  try {
+    const result = child_process.execSync("unzip -hh");
+    return result?.toString("utf-8").toLowerCase().includes("extended help for unzip");
+  } catch (error) {
+    return false;
+  }
 }
 
 function haveLinuxZip() {
-  const result = child_process.execSync("zip -h2");
-  return result?.toString("utf-8").toLowerCase().includes("extended help for zip");
+  try {
+    const result = child_process.execSync("zip -h2");
+    return result?.toString("utf-8").toLowerCase().includes("extended help for zip");
+  } catch (error) {
+    return false;
+  }
 }
 
 async function linuxUnzip(sourceZip: string, destDir: string) {
