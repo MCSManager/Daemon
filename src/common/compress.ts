@@ -53,7 +53,6 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
 
 export async function compress(sourceZip: string, files: string[], fileCode?: string) {
   if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
-
   return await nodeCompress(sourceZip, files, fileCode);
 }
 
