@@ -52,12 +52,9 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
 }
 
 export async function compress(sourceZip: string, files: string[], fileCode?: string) {
-  // TODO 与系统集成的解压缩功能
-  // if (system === "win32") {
-  //   await _7zipCompress(sourceZip, files);
-  // } else {
-
-  // }
+  if (system === "linux") {
+    return await linuxZip(sourceZip, files);
+  }
   return await nodeCompress(sourceZip, files, fileCode);
 }
 
@@ -110,6 +107,22 @@ function haveLinuxUnzip() {
 async function linuxUnzip(sourceZip: string, destDir: string) {
   return new Promise((resolve, reject) => {
     const process = child_process.spawn("unzip", [sourceZip, "-d", destDir], {
+      cwd: path.normalize(path.dirname(sourceZip))
+    });
+    if (!process || !process.pid) return reject(false);
+    process.on("exit", (code) => {
+      if (code) return reject(false);
+      return resolve(true);
+    });
+  });
+}
+
+// zip -r a.zip css css_v1 js
+async function linuxZip(sourceZip: string, files: string[]) {
+  return new Promise((resolve, reject) => {
+    const p = ["-r", sourceZip];
+    p.concat(files);
+    const process = child_process.spawn("zip", p, {
       cwd: path.normalize(path.dirname(sourceZip))
     });
     if (!process || !process.pid) return reject(false);
