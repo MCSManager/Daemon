@@ -132,12 +132,8 @@ async function linuxZip(sourceZip: string, files: string[]) {
   if (!files || files.length == 0) return false;
   return new Promise((resolve, reject) => {
     files = files.map((v) => path.normalize(path.basename(v)));
-    console.log("linuxZip:", ["-r", sourceZip, ...files]);
     const process = child_process.spawn("zip", ["-r", sourceZip, ...files], {
       cwd: path.normalize(path.dirname(sourceZip))
-    });
-    process.stdout.on("data", (data) => {
-      console.log(data.toString("utf-8"));
     });
     if (!process || !process.pid) return reject(false);
     process.on("exit", (code) => {
