@@ -20,11 +20,21 @@
 */
 
 import fs from "fs-extra";
-
+import path from "path";
 import * as compressing from "compressing";
 import child_process from "child_process";
+import os from "os";
 
 // 跨平台的高效率/低效率结合的解压缩方案
+const system = os.platform();
+
+function checkFileName(fileName: string) {
+  const disableList = ['"', "/", "\\", "?", "|"];
+  for (const iterator of disableList) {
+    if (fileName.includes(iterator)) return false;
+  }
+  return true;
+}
 
 async function nodeCompress(zipPath: string, files: string[], fileCode: string = "utf-8") {
   const stream = new compressing.zip.Stream();
@@ -52,11 +62,11 @@ export async function compress(sourceZip: string, files: string[], fileCode?: st
 }
 
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
-  // if (system === "win32") {
-  //   await _7zipDecompress(zipPath, dest);
-  // } else {
-
-  // }
+  if (system === "linux") {
+    if (haveLinuxUnzip()) {
+      return await linuxUnzip(zipPath, dest);
+    }
+  }
   return await nodeDecompress(zipPath, dest, fileCode);
 }
 
@@ -92,4 +102,20 @@ async function _7zipDecompress(sourceZip: string, destDir: string) {
   });
 }
 
-async function linuxUnzip(sourceZip: string, destDir: string) {}
+function haveLinuxUnzip() {
+  const result = child_process.execSync("unzip -hh");
+  return result?.toString("utf-8").toLowerCase().includes("extended help for unzip");
+}
+
+async function linuxUnzip(sourceZip: string, destDir: string) {
+  return new Promise((resolve, reject) => {
+    const process = child_process.spawn("unzip", [sourceZip, "-d", destDir], {
+      cwd: path.normalize(path.dirname(sourceZip))
+    });
+    if (!process || !process.pid) return reject(false);
+    process.on("exit", (code) => {
+      if (code) return reject(false);
+      return resolve(true);
+    });
+  });
+}
