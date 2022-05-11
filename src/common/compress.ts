@@ -127,13 +127,14 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 }
 
 // zip -r a.zip css css_v1 js
+// 此功能压缩的ZIP文件和文件所在目录必须在同一个目录下
 async function linuxZip(sourceZip: string, files: string[]) {
+  if (!files || files.length == 0) return false;
   return new Promise((resolve, reject) => {
-    let p = ["-r", sourceZip];
-    p = p.concat(files);
-    console.log("linuxZip:", p);
-    const process = child_process.spawn("zip", p, {
-      cwd: path.normalize(path.dirname(sourceZip))
+    files = files.map((v) => path.normalize(path.basename(v)));
+    console.log("linuxZip:", ["-r", sourceZip, ...files]);
+    const process = child_process.spawn("zip", ["-r", sourceZip, ...files], {
+      cwd: path.normalize(path.dirname(files[0]))
     });
     process.stdout.on("data", (data) => {
       console.log(data.toString("utf-8"));
