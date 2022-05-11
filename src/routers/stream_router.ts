@@ -127,6 +127,6 @@ routerApp.on("stream/resize", async (ctx, data) => {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     if (instance.config.processType === "docker") await instance.execPreset("resize", data);
   } catch (error) {
-    protocol.responseError(ctx, error);
+    // protocol.responseError(ctx, error);
   }
 });

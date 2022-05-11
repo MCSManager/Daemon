@@ -65,6 +65,7 @@ export default class FunctionDispatcher extends InstanceCommand {
       instance.setPreset("start", new GeneralStartCommand());
     }
     if (instance.config.processType === "docker") {
+      instance.setPreset("resize", new DockerResizeCommand());
       instance.setPreset("start", new DockerStartCommand());
     }
 

@@ -37,7 +37,7 @@ export default class DockerResizeCommand extends InstanceCommand {
   async exec(instance: Instance, size?: IResizeOptions): Promise<any> {
     if (!instance.process || !(instance.config.processType === "docker")) return;
     const dockerProcess = <DockerProcessAdapter>instance.process;
-    await dockerProcess.container.resize({
+    await dockerProcess?.container?.resize({
       h: size.h,
       w: size.w
     });
