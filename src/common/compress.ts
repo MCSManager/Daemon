@@ -52,18 +52,13 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
 }
 
 export async function compress(sourceZip: string, files: string[], fileCode?: string) {
-  if (system === "linux") {
-    return await linuxZip(sourceZip, files);
-  }
+  if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
+
   return await nodeCompress(sourceZip, files, fileCode);
 }
 
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
-  if (system === "linux") {
-    if (haveLinuxUnzip()) {
-      return await linuxUnzip(zipPath, dest);
-    }
-  }
+  if (system === "linux" && haveLinuxUnzip()) return await linuxUnzip(zipPath, dest);
   return await nodeDecompress(zipPath, dest, fileCode);
 }
 
@@ -104,6 +99,11 @@ function haveLinuxUnzip() {
   return result?.toString("utf-8").toLowerCase().includes("extended help for unzip");
 }
 
+function haveLinuxZip() {
+  const result = child_process.execSync("zip -h2");
+  return result?.toString("utf-8").toLowerCase().includes("extended help for zip");
+}
+
 async function linuxUnzip(sourceZip: string, destDir: string) {
   return new Promise((resolve, reject) => {
     const process = child_process.spawn("unzip", [sourceZip, "-d", destDir], {
@@ -119,6 +119,7 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 
 // zip -r a.zip css css_v1 js
 async function linuxZip(sourceZip: string, files: string[]) {
+  console.log("DO:", files);
   return new Promise((resolve, reject) => {
     const p = ["-r", sourceZip];
     p.concat(files);
