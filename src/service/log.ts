@@ -18,9 +18,17 @@
   根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
-
+import fs from "fs-extra";
 import * as log4js from "log4js";
+
 const LOG_FILE_PATH = "logs/current.log";
+
+// 每次启动时将日志文件单独保存
+if (fs.existsSync(LOG_FILE_PATH)) {
+  const time = new Date();
+  const timeString = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()}_${time.getHours()}-${time.getMinutes()}-${time.getSeconds()}`;
+  fs.renameSync(LOG_FILE_PATH, `logs/${timeString}.log`);
+}
 
 log4js.configure({
   appenders: {
