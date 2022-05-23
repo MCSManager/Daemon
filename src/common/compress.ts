@@ -113,7 +113,6 @@ function haveLinuxZip() {
 
 async function linuxUnzip(sourceZip: string, destDir: string) {
   return new Promise((resolve, reject) => {
-    console.log("linuxUnzip:", [sourceZip, "-d", destDir]);
     const process = child_process.spawn("unzip", [sourceZip, "-d", destDir], {
       cwd: path.normalize(path.dirname(sourceZip))
     });
