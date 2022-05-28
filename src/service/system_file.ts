@@ -71,11 +71,10 @@ export default class FileManager {
 
   list(page: 0, pageSize = 40) {
     if (pageSize > 100 || pageSize <= 0 || page < 0) throw new Error("Beyond the value limit");
-    let fileNames = fs.readdirSync(this.toAbsolutePath());
+    const fileNames = fs.readdirSync(this.toAbsolutePath());
     const total = fileNames.length;
     const sliceStart = page * pageSize;
     const sliceEnd = sliceStart + pageSize;
-    fileNames = fileNames.slice(sliceStart, sliceEnd);
     const files: IFile[] = [];
     const dirs: IFile[] = [];
     fileNames.forEach((name) => {
@@ -102,7 +101,8 @@ export default class FileManager {
     });
     files.sort((a, b) => (a.name > b.name ? 1 : -1));
     dirs.sort((a, b) => (a.name > b.name ? 1 : -1));
-    const resultList = dirs.concat(files);
+    let resultList = dirs.concat(files);
+    resultList = resultList.slice(sliceStart, sliceEnd);
     return {
       items: resultList,
       page,
