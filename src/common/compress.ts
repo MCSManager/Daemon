@@ -113,14 +113,22 @@ function haveLinuxZip() {
 
 async function linuxUnzip(sourceZip: string, destDir: string) {
   return new Promise((resolve, reject) => {
-    const process = child_process.spawn("unzip", [sourceZip, "-d", destDir], {
+    let end = false;
+    const process = child_process.spawn("unzip", ["-o", sourceZip, "-d", destDir], {
       cwd: path.normalize(path.dirname(sourceZip))
     });
     if (!process || !process.pid) return reject(false);
     process.on("exit", (code) => {
+      end = true;
       if (code) return reject(false);
       return resolve(true);
     });
+    // 超时，终止任务
+    setTimeout(() => {
+      if (end) return;
+      process.kill("SIGKILL");
+      reject(false);
+    }, 1000 * 60 * 60);
   });
 }
 
@@ -129,14 +137,22 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 async function linuxZip(sourceZip: string, files: string[]) {
   if (!files || files.length == 0) return false;
   return new Promise((resolve, reject) => {
+    let end = false;
     files = files.map((v) => path.normalize(path.basename(v)));
     const process = child_process.spawn("zip", ["-r", sourceZip, ...files], {
       cwd: path.normalize(path.dirname(sourceZip))
     });
     if (!process || !process.pid) return reject(false);
     process.on("exit", (code) => {
+      end = true;
       if (code) return reject(false);
       return resolve(true);
     });
+    // 超时，终止任务
+    setTimeout(() => {
+      if (end) return;
+      process.kill("SIGKILL");
+      reject(false);
+    }, 1000 * 60 * 60);
   });
 }
