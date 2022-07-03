@@ -24,6 +24,7 @@ import path from "path";
 import * as compressing from "compressing";
 import child_process from "child_process";
 import os from "os";
+import archiver from "archiver";
 
 // 跨平台的高效率/低效率结合的解压缩方案
 const system = os.platform();
@@ -52,8 +53,9 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
 }
 
 export async function compress(sourceZip: string, files: string[], fileCode?: string) {
-  if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
-  return await nodeCompress(sourceZip, files, fileCode);
+  // if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
+  // return await nodeCompress(sourceZip, files, fileCode);
+  return await archiveZip(sourceZip, files, fileCode);
 }
 
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
@@ -154,5 +156,40 @@ async function linuxZip(sourceZip: string, files: string[]) {
       process.kill("SIGKILL");
       reject(false);
     }, 1000 * 60 * 60);
+  });
+}
+
+function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8") {
+  return new Promise((resolve, reject) => {
+    // create a file to stream archive data to.
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver("zip", {
+      zlib: { level: 9 }
+    });
+    files.forEach((v) => {
+      const basename = path.normalize(path.basename(v));
+      if (!fs.existsSync(v)) return;
+      if (fs.statSync(v)?.isDirectory()) {
+        archive.directory(v, basename);
+      } else {
+        archive.file(v, { name: basename });
+      }
+    });
+    output.on("close", function () {
+      resolve(true);
+    });
+    output.on("end", function () {
+      console.log("Data has been drained");
+    });
+    archive.on("warning", function (err) {
+      if (err.code !== "ENOENT") {
+        reject(err);
+      }
+    });
+    archive.on("error", function (err) {
+      reject(err);
+    });
+    archive.pipe(output);
+    archive.finalize();
   });
 }
