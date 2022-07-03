@@ -55,5 +55,12 @@ class GlobalConfiguration {
     StorageSubsystem.store("Config", GlobalConfiguration.ID, this.config);
   }
 }
+
+class GlobalEnv {
+  public fileTaskCount = 0;
+}
+
 const globalConfiguration = new GlobalConfiguration();
-export { globalConfiguration, Config };
+const globalEnv = new GlobalEnv();
+
+export { globalConfiguration, Config, globalEnv };
