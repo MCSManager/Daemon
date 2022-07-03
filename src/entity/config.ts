@@ -35,6 +35,7 @@ class Config {
   public ip = "";
   public port = 24444;
   public key = builderPassword();
+  public maxFileTask = 3;
 }
 
 // 守护进程配置类

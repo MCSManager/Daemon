@@ -23,7 +23,7 @@ import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
 import { getFileManager } from "../service/file_router_service";
-import { globalEnv } from "../entity/config";
+import { globalConfiguration, globalEnv } from "../entity/config";
 
 // 部分路由器操作路由器验证中间件
 routerApp.use((event, ctx, data, next) => {
@@ -47,6 +47,19 @@ routerApp.on("file/list", (ctx, data) => {
     fileManager.cd(target);
     const overview = fileManager.list(page, pageSize);
     protocol.response(ctx, overview);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// 查询文件管理系统状态
+routerApp.on("file/status", (ctx, data) => {
+  try {
+    const instance = InstanceSubsystem.getInstance(data.instanceUuid);
+    protocol.response(ctx, {
+      instanceFileTask: instance.info.fileLock ?? 0,
+      globalFileTask: globalEnv.fileTaskCount ?? 0
+    });
   } catch (error) {
     protocol.responseError(ctx, error);
   }
@@ -124,6 +137,7 @@ routerApp.on("file/edit", async (ctx, data) => {
 
 // 压缩/解压文件
 routerApp.on("file/compress", async (ctx, data) => {
+  const maxFileTask = globalConfiguration.config.maxFileTask;
   try {
     const source = data.source;
     const targets = data.targets;
@@ -131,10 +145,9 @@ routerApp.on("file/compress", async (ctx, data) => {
     const code = data.code;
     const fileManager = getFileManager(data.instanceUuid);
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
-    // if (instance.info.fileLock !== 0) {
-    //   throw new Error("超出最大同时解压缩任务量，请等待其他解压缩任务完成后再执行。");
-    // }
-
+    if (instance.info.fileLock >= maxFileTask) {
+      throw new Error(`超出最大同时解压缩任务量，最大准许${maxFileTask}个，目前有${instance.info.fileLock}个任务正在进行，请耐心等待`);
+    }
     // 单个实例文件任务量与整个守护进程文件任务量数统计
     function fileTaskStart() {
       instance.info.fileLock++;
