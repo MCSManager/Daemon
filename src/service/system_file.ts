@@ -158,19 +158,21 @@ export default class FileManager {
     await fs.move(targetPath, destPath);
   }
 
-  async unzip(sourceZip: string, destDir: string) {
+  async unzip(sourceZip: string, destDir: string, code?: string) {
+    if (!code) code = this.fileCode;
     if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
-    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), this.fileCode);
+    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
   }
 
-  async zip(sourceZip: string, files: string[]) {
+  async zip(sourceZip: string, files: string[], code?: string) {
+    if (!code) code = this.fileCode;
     if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);
     const sourceZipPath = this.toAbsolutePath(sourceZip);
     const filesPath = [];
     for (const iterator of files) {
       if (this.check(iterator)) filesPath.push(this.toAbsolutePath(iterator));
     }
-    return await compress(sourceZipPath, filesPath, this.fileCode);
+    return await compress(sourceZipPath, filesPath, code);
   }
 
   async edit(target: string, data?: string) {

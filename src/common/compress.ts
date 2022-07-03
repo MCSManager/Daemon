@@ -25,6 +25,8 @@ import * as compressing from "compressing";
 import child_process from "child_process";
 import os from "os";
 import archiver from "archiver";
+import StreamZip, { async } from "node-stream-zip";
+// const StreamZip = require('node-stream-zip');
 
 // 跨平台的高效率/低效率结合的解压缩方案
 const system = os.platform();
@@ -37,18 +39,52 @@ function checkFileName(fileName: string) {
   return true;
 }
 
-async function nodeCompress(zipPath: string, files: string[], fileCode: string = "utf-8") {
-  const stream = new compressing.zip.Stream();
-  files.forEach((v) => {
-    stream.addEntry(v, {});
+function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8") {
+  return new Promise((resolve, reject) => {
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver("zip", {
+      zlib: { level: 9 }
+    });
+    files.forEach((v) => {
+      const basename = path.normalize(path.basename(v));
+      if (!fs.existsSync(v)) return;
+      if (fs.statSync(v)?.isDirectory()) {
+        archive.directory(v, basename);
+      } else {
+        archive.file(v, { name: basename });
+      }
+    });
+    output.on("close", function () {
+      resolve(true);
+    });
+    archive.on("warning", function (err) {
+      if (err.code !== "ENOENT") {
+        reject(err);
+      }
+    });
+    archive.on("error", function (err) {
+      reject(err);
+    });
+    archive.pipe(output);
+    archive.finalize();
   });
-  const destStream = fs.createWriteStream(zipPath);
-  stream.pipe(destStream);
 }
 
-async function nodeDecompress(sourceZip: string, destDir: string, fileCode: string = "utf-8") {
-  return await compressing.zip.uncompress(sourceZip, destDir, {
-    zipFileNameEncoding: fileCode
+function archiveUnZip(sourceZip: string, destDir: string, fileCode: string = "utf-8") {
+  return new Promise(async (resolve, reject) => {
+    const zip = new StreamZip.async({ file: sourceZip, nameEncoding: fileCode });
+    if (!fs.existsSync(destDir)) fs.mkdirsSync(destDir);
+    try {
+      const count = await zip.extract(null, destDir);
+      console.log(`Extracted ${count} entries`);
+      return resolve(true);
+    } catch (error) {
+      reject(error);
+    }
+    zip
+      .close()
+      .then(() => {})
+      .catch(() => {});
   });
 }
 
@@ -59,8 +95,9 @@ export async function compress(sourceZip: string, files: string[], fileCode?: st
 }
 
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
-  if (system === "linux" && haveLinuxUnzip()) return await linuxUnzip(zipPath, dest);
-  return await nodeDecompress(zipPath, dest, fileCode);
+  // if (system === "linux" && haveLinuxUnzip()) return await linuxUnzip(zipPath, dest);
+  // return await nodeDecompress(zipPath, dest, fileCode);
+  return await archiveUnZip(zipPath, dest, fileCode);
 }
 
 async function _7zipCompress(zipPath: string, files: string[]) {
@@ -159,37 +196,17 @@ async function linuxZip(sourceZip: string, files: string[]) {
   });
 }
 
-function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8") {
-  return new Promise((resolve, reject) => {
-    // create a file to stream archive data to.
-    const output = fs.createWriteStream(zipPath);
-    const archive = archiver("zip", {
-      zlib: { level: 9 }
-    });
-    files.forEach((v) => {
-      const basename = path.normalize(path.basename(v));
-      if (!fs.existsSync(v)) return;
-      if (fs.statSync(v)?.isDirectory()) {
-        archive.directory(v, basename);
-      } else {
-        archive.file(v, { name: basename });
-      }
-    });
-    output.on("close", function () {
-      resolve(true);
-    });
-    output.on("end", function () {
-      console.log("Data has been drained");
-    });
-    archive.on("warning", function (err) {
-      if (err.code !== "ENOENT") {
-        reject(err);
-      }
-    });
-    archive.on("error", function (err) {
-      reject(err);
-    });
-    archive.pipe(output);
-    archive.finalize();
+async function nodeCompress(zipPath: string, files: string[], fileCode: string = "utf-8") {
+  const stream = new compressing.zip.Stream();
+  files.forEach((v) => {
+    stream.addEntry(v, {});
+  });
+  const destStream = fs.createWriteStream(zipPath);
+  stream.pipe(destStream);
+}
+
+async function nodeDecompress(sourceZip: string, destDir: string, fileCode: string = "utf-8") {
+  return await compressing.zip.uncompress(sourceZip, destDir, {
+    zipFileNameEncoding: fileCode
   });
 }

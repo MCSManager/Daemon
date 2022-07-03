@@ -127,6 +127,7 @@ routerApp.on("file/compress", async (ctx, data) => {
     const source = data.source;
     const targets = data.targets;
     const type = data.type;
+    const code = data.code;
     const fileManager = getFileManager(data.instanceUuid);
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
     if (instance.info.fileLock !== 0) {
@@ -136,7 +137,7 @@ routerApp.on("file/compress", async (ctx, data) => {
     if (type === 1) {
       // 异步执行
       fileManager
-        .zip(source, targets)
+        .zip(source, targets, code)
         .then(() => {
           instance.info.fileLock = 0;
         })
@@ -147,7 +148,7 @@ routerApp.on("file/compress", async (ctx, data) => {
     } else {
       // 异步执行
       fileManager
-        .unzip(source, targets)
+        .unzip(source, targets, code)
         .then(() => {
           instance.info.fileLock = 0;
         })
