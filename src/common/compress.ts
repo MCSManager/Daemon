@@ -44,6 +44,7 @@ function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8"
     const output = fs.createWriteStream(zipPath);
     const archive = archiver("zip", {
       zlib: { level: 9 }
+      // encoding: fileCode
     });
     files.forEach((v) => {
       const basename = path.normalize(path.basename(v));
@@ -58,9 +59,7 @@ function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8"
       resolve(true);
     });
     archive.on("warning", function (err) {
-      if (err.code !== "ENOENT") {
-        reject(err);
-      }
+      reject(err);
     });
     archive.on("error", function (err) {
       reject(err);
@@ -75,8 +74,7 @@ function archiveUnZip(sourceZip: string, destDir: string, fileCode: string = "ut
     const zip = new StreamZip.async({ file: sourceZip, nameEncoding: fileCode });
     if (!fs.existsSync(destDir)) fs.mkdirsSync(destDir);
     try {
-      const count = await zip.extract(null, destDir);
-      console.log(`Extracted ${count} entries`);
+      await zip.extract(null, destDir);
       return resolve(true);
     } catch (error) {
       reject(error);

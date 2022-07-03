@@ -31,11 +31,11 @@ function builderPassword() {
 
 // @Entity
 class Config {
-  public version = 1;
+  public version = 2;
   public ip = "";
   public port = 24444;
   public key = builderPassword();
-  public maxFileTask = 3;
+  public maxFileTask = 2;
 }
 
 // 守护进程配置类
