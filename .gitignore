@@ -9,7 +9,7 @@ testServer/
 docker_temp/
 toprettier.bat
 upload/
-
+lib/
 tmp/
 dist/
 
