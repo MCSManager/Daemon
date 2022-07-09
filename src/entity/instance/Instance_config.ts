@@ -43,6 +43,9 @@ export default class InstanceConfig {
   public fileCode: string = "utf-8";
   public processType: string = "general";
   public updateCommand: string = "";
+  public pty: boolean = true;
+  public ptyWindowCol: 80;
+  public ptyWindowRow: 40;
 
   // 自定义命令列表
   public actionCommandList: IActionCommand[] = [];

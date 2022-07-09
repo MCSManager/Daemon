@@ -129,6 +129,9 @@ export default class Instance extends EventEmitter {
     configureEntityParams(this.config, cfg, "endTime", String);
     configureEntityParams(this.config, cfg, "fileCode", String);
     configureEntityParams(this.config, cfg, "updateCommand", String);
+    configureEntityParams(this.config, cfg, "pty", Boolean);
+    configureEntityParams(this.config, cfg, "ptyWindowCol", Number);
+    configureEntityParams(this.config, cfg, "ptyWindowRow", Number);
     if (cfg.docker) {
       configureEntityParams(this.config.docker, cfg.docker, "containerName", String);
       configureEntityParams(this.config.docker, cfg.docker, "image", String);
