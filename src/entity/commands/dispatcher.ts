@@ -35,7 +35,7 @@ import DockerResizeCommand from "./docker/docker _resize";
 import TimeCheck from "./task/time";
 import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock";
 import GeneralUpdateCommand from "./general/general_update";
-import PtyStartCommand from "./pty/general _start";
+import PtyStartCommand from "./pty/pty_start";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
