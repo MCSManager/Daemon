@@ -21,7 +21,7 @@
 
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
-import { DockerProcessAdapter } from "./docker _start";
+import { DockerProcessAdapter } from "./docker_start";
 
 export interface IResizeOptions {
   h: number;
