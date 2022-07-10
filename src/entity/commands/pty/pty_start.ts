@@ -116,7 +116,7 @@ export default class PtyStartCommand extends InstanceCommand {
       // 创建子进程
       // 参数1直接传进程名或路径（含空格），无需双引号
       console.log(path.dirname(ptyAppPath));
-      const subProcess = spawn(ptyAppName, ptyParameter, {
+      const subProcess = spawn(ptyAppPath, ptyParameter, {
         cwd: path.dirname(ptyAppPath),
         stdio: "pipe",
         windowsHide: true
