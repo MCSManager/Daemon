@@ -31,6 +31,7 @@ import { IInstanceProcess } from "../../instance/interface";
 import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";
+import GeneralStartCommand from "../general/general_start";
 
 // 启动时错误异常
 class StartupError extends Error {
@@ -99,6 +100,14 @@ export default class PtyStartCommand extends InstanceCommand {
       const ptyAppPath = path.normalize(path.join(process.cwd(), "lib", ptyAppName));
       const ptyParameter = ["-dir", instance.config.cwd, "-cmd", commandList.join(" "), "-size", `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`];
 
+      if (!fs.existsSync(ptyAppPath)) {
+        // return instance.failure(new StartupError("PTY 转发程序不存在，请勿使用 PTY 模式，请在终端设置中更改"));
+        logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
+        logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
+        instance.forceExec(new GeneralStartCommand());
+        return;
+      }
+
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例.`);
       logger.info(`实例标识符: [${instance.instanceUuid}]`);
@@ -108,14 +117,9 @@ export default class PtyStartCommand extends InstanceCommand {
       logger.info(`工作目录: ${instance.config.cwd}`);
       logger.info("----------------");
 
-      if (!fs.existsSync(ptyAppPath)) {
-        console.log(ptyAppPath);
-        return instance.failure(new StartupError("PTY 转发程序不存在，请勿使用 PTY 模式，请在终端设置中更改"));
-      }
-
       // 创建子进程
       // 参数1直接传进程名或路径（含空格），无需双引号
-      console.log(path.dirname(ptyAppPath));
+      // console.log(path.dirname(ptyAppPath));
       const subProcess = spawn(ptyAppPath, ptyParameter, {
         cwd: path.dirname(ptyAppPath),
         stdio: "pipe",
