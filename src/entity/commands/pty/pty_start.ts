@@ -97,7 +97,7 @@ export default class PtyStartCommand extends InstanceCommand {
         // 关闭 PTY 类型，重新配置实例功能组，重新启动实例
         instance.config.terminalOption.pty = false;
         await instance.forceExec(new FunctionDispatcher());
-        await instance.forceExec(new StartCommand());
+        await instance.execPreset("start", source); // 直接执行预设命令
         return;
       }
 
