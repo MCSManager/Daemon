@@ -120,6 +120,12 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config, cfg, "processType", String);
       this.forceExec(new FunctionDispatcher());
     }
+    // 若终端类型改变，则必须重置预设命令
+    if (cfg.terminalOption.pty != null && cfg.terminalOption.pty !== this.config.terminalOption.pty) {
+      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改PTY模式");
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
+      this.forceExec(new FunctionDispatcher());
+    }
     configureEntityParams(this.config, cfg, "nickname", String);
     configureEntityParams(this.config, cfg, "startCommand", String);
     configureEntityParams(this.config, cfg, "stopCommand", String);
@@ -158,7 +164,7 @@ export default class Instance extends EventEmitter {
     }
     if (cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);
-      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
+
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowCol", Number);
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
     }
