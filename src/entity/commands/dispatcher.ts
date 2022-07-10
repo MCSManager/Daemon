@@ -36,6 +36,7 @@ import TimeCheck from "./task/time";
 import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock";
 import GeneralUpdateCommand from "./general/general_update";
 import PtyStartCommand from "./pty/pty_start";
+import PtyStopCommand from "./pty/pty_stop";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
@@ -68,10 +69,12 @@ export default class FunctionDispatcher extends InstanceCommand {
     if (instance.config.terminalOption.pty && instance.config.terminalOption.ptyWindowCol && instance.config.terminalOption.ptyWindowRow) {
       if (!fs.existsSync(ptyProgramPath)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
       instance.setPreset("start", new PtyStartCommand());
+      instance.setPreset("stop", new PtyStopCommand());
+      instance.setPreset("resize", new NullCommand());
     }
     // 是否启用 Docker PTY 模式
     if (instance.config.processType === "docker") {
-      instance.setPreset("resize", new DockerResizeCommand());
+      instance.setPreset("resize", new NullCommand());
       instance.setPreset("start", new DockerStartCommand());
     }
 
