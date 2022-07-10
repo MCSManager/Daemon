@@ -109,19 +109,19 @@ export default class Instance extends EventEmitter {
   // 传入实例配置，松散型动态的给实例参数设置配置项
   parameters(cfg: any) {
     // 若实例类型改变，则必须重置预设命令与生命周期事件
-    if (cfg.type && cfg.type != this.config.type) {
+    if (cfg?.type && cfg?.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
       configureEntityParams(this.config, cfg, "type", String);
       this.forceExec(new FunctionDispatcher());
     }
     // 若进程类型改变，则必须重置预设命令与生命周期事件
-    if (cfg.processType && cfg.processType !== this.config.processType) {
+    if (cfg?.processType && cfg?.processType !== this.config.processType) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例进程类型");
       configureEntityParams(this.config, cfg, "processType", String);
       this.forceExec(new FunctionDispatcher());
     }
     // 若终端类型改变，则必须重置预设命令
-    if (cfg.terminalOption.pty != null && cfg.terminalOption.pty !== this.config.terminalOption.pty) {
+    if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改PTY模式");
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
@@ -135,9 +135,6 @@ export default class Instance extends EventEmitter {
     configureEntityParams(this.config, cfg, "endTime", String);
     configureEntityParams(this.config, cfg, "fileCode", String);
     configureEntityParams(this.config, cfg, "updateCommand", String);
-    configureEntityParams(this.config, cfg, "pty", Boolean);
-    configureEntityParams(this.config, cfg, "ptyWindowCol", Number);
-    configureEntityParams(this.config, cfg, "ptyWindowRow", Number);
     if (cfg.docker) {
       configureEntityParams(this.config.docker, cfg.docker, "containerName", String);
       configureEntityParams(this.config.docker, cfg.docker, "image", String);
