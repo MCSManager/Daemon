@@ -104,6 +104,7 @@ export default class PtyStartCommand extends InstanceCommand {
         // return instance.failure(new StartupError("PTY 转发程序不存在，请勿使用 PTY 模式，请在终端设置中更改"));
         logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
         logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
+        instance.println("WARN", "PTY 终端转发程序不存在，自动降级到普通启动模式");
         instance.forceExec(new GeneralStartCommand());
         return;
       }
