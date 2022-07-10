@@ -93,7 +93,7 @@ export default class PtyStartCommand extends InstanceCommand {
       if (!fs.existsSync(ptyAppPath)) {
         logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
         logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
-        instance.println("ERROR", "PTY 终端转发程序不存在，自动降级到普通启动模式");
+        instance.println("ERROR", "面板 PTY 终端依赖程序不存在，已自动降级到普通启动模式，您将无法使用 Ctrl，Tab 等快捷功能键。");
         // 关闭 PTY 类型，重新配置实例功能组，重新启动实例
         instance.config.terminalOption.pty = false;
         await instance.forceExec(new FunctionDispatcher());
@@ -145,6 +145,7 @@ ${instance.config.startCommand}
 参数：${JSON.stringify(ptyParameter)}
 
 请将此信息报告给管理员，技术人员或自行排查故障。
+如果您认为是面板伪终端导致的问题，请在左侧终端设置中关闭“伪终端”选项，我们将会采用原始输入输出流的方式监听程序。
 `
         );
         throw new StartupError("实例启动失败，请检查启动命令，主机环境和配置文件等");
@@ -156,6 +157,7 @@ ${instance.config.startCommand}
       // 产生开启事件
       instance.started(processAdapter);
       logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
+      instance.println("INFO", "面板终端 PTY 模式已生效，您可以直接在终端内输入文字并使用 Ctrl，Tab 等功能键。");
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
