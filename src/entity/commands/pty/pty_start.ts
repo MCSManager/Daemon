@@ -32,6 +32,8 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";
 import GeneralStartCommand from "../general/general_start";
+import FunctionDispatcher from "../dispatcher";
+import StartCommand from "../start";
 
 // 启动时错误异常
 class StartupError extends Error {
@@ -101,11 +103,13 @@ export default class PtyStartCommand extends InstanceCommand {
       const ptyParameter = ["-dir", instance.config.cwd, "-cmd", commandList.join(" "), "-size", `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`];
 
       if (!fs.existsSync(ptyAppPath)) {
-        // return instance.failure(new StartupError("PTY 转发程序不存在，请勿使用 PTY 模式，请在终端设置中更改"));
         logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
         logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
-        instance.println("WARN", "PTY 终端转发程序不存在，自动降级到普通启动模式");
-        instance.forceExec(new GeneralStartCommand());
+        instance.println("ERROR", "PTY 终端转发程序不存在，自动降级到普通启动模式");
+        // 关闭 PTY 类型，重新配置实例功能组，重新启动实例
+        instance.config.terminalOption.pty = false;
+        await instance.forceExec(new FunctionDispatcher());
+        await instance.exec(new StartCommand());
         return;
       }
 
