@@ -158,6 +158,9 @@ export default class Instance extends EventEmitter {
     }
     if (cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowCol", Number);
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
     }
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }

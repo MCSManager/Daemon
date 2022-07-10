@@ -65,7 +65,7 @@ export default class FunctionDispatcher extends InstanceCommand {
     }
     // 是否启用 PTY 模式
     const ptyProgramPath = path.normalize(path.join(process.cwd(), "lib"));
-    if (instance.config.pty && instance.config.ptyWindowCol && instance.config.ptyWindowRow) {
+    if (instance.config.terminalOption.pty && instance.config.terminalOption.ptyWindowCol && instance.config.terminalOption.ptyWindowRow) {
       if (!fs.existsSync(ptyProgramPath)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
       instance.setPreset("start", new PtyStartCommand());
     }

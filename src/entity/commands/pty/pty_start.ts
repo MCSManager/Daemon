@@ -97,7 +97,7 @@ export default class PtyStartCommand extends InstanceCommand {
       let ptyAppName = "pty.exe";
       if (os.platform() !== "win32") ptyAppName = "pty";
       const ptyAppPath = path.normalize(path.join(process.cwd(), "lib", ptyAppName));
-      const ptyParameter = ["-dir", instance.config.cwd, "-cmd", commandList.join(" "), "-size", `${instance.config.ptyWindowCol},${instance.config.ptyWindowRow}`];
+      const ptyParameter = ["-dir", instance.config.cwd, "-cmd", commandList.join(" "), "-size", `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`];
 
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例.`);
