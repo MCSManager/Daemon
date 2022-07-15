@@ -109,7 +109,7 @@ export default class PtyStartCommand extends InstanceCommand {
       // 命令解析
       const commandList = commandStringToArray(instance.config.startCommand);
       if (commandList.length === 0) return instance.failure(new StartupError("无法启动实例，启动命令为空"));
-      const ptyParameter = ["-dir", instance.config.cwd, "-cmd", commandList.join(" "), "-size", `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`];
+      const ptyParameter = ["-dir", instance.config.cwd, "-cmd", JSON.stringify(commandList), "-size", `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`, "-color"];
 
       logger.info("----------------");
       logger.info(`会话 ${source}: 请求开启实例.`);
