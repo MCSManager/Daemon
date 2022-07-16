@@ -37,6 +37,7 @@ import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock
 import GeneralUpdateCommand from "./general/general_update";
 import PtyStartCommand from "./pty/pty_start";
 import PtyStopCommand from "./pty/pty_stop";
+import { PTY_PATH } from "../../const";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
@@ -64,15 +65,15 @@ export default class FunctionDispatcher extends InstanceCommand {
     if (!instance.config.processType || instance.config.processType === "general") {
       instance.setPreset("start", new GeneralStartCommand());
     }
-    // 是否启用 PTY 模式
-    const ptyProgramPath = path.normalize(path.join(process.cwd(), "lib"));
+
+    // 启用仿真终端模式
     if (
       instance.config.terminalOption.pty &&
       instance.config.terminalOption.ptyWindowCol &&
       instance.config.terminalOption.ptyWindowRow &&
       instance.config.processType === "general"
     ) {
-      if (!fs.existsSync(ptyProgramPath)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
+      if (!fs.existsSync(PTY_PATH)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
       instance.setPreset("start", new PtyStartCommand());
       instance.setPreset("stop", new PtyStopCommand());
       instance.setPreset("resize", new NullCommand());

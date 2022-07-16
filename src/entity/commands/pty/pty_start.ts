@@ -34,6 +34,7 @@ import { killProcess } from "../../../common/process_tools";
 import GeneralStartCommand from "../general/general_start";
 import FunctionDispatcher from "../dispatcher";
 import StartCommand from "../start";
+import { PTY_PATH } from "../../../const";
 
 // 启动时错误异常
 class StartupError extends Error {
@@ -88,10 +89,8 @@ export default class PtyStartCommand extends InstanceCommand {
 
     try {
       // PTY 模式正确性检查
-      let ptyAppName = "pty.exe";
-      if (os.platform() !== "win32") ptyAppName = "pty";
-      const ptyAppPath = path.normalize(path.join(process.cwd(), "lib", ptyAppName));
-      if (!fs.existsSync(ptyAppPath)) {
+
+      if (!fs.existsSync(PTY_PATH)) {
         logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
         logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
         instance.println("ERROR", "仿真终端模式失败，可能是依赖程序不存在，正在自动降级到普通终端模式...");
@@ -124,7 +123,7 @@ export default class PtyStartCommand extends InstanceCommand {
       logger.info(`会话 ${source}: 请求开启实例.`);
       logger.info(`实例标识符: [${instance.instanceUuid}]`);
       logger.info(`启动命令: ${commandList.join(" ")}`);
-      logger.info(`PTY 路径: ${[ptyAppPath]}`);
+      logger.info(`PTY 路径: ${[PTY_PATH]}`);
       logger.info(`PTY 参数: ${ptyParameter.join(" ")}`);
       logger.info(`工作目录: ${instance.config.cwd}`);
       logger.info("----------------");
@@ -132,8 +131,8 @@ export default class PtyStartCommand extends InstanceCommand {
       // 创建子进程
       // 参数1直接传进程名或路径（含空格），无需双引号
       // console.log(path.dirname(ptyAppPath));
-      const subProcess = spawn(ptyAppPath, ptyParameter, {
-        cwd: path.dirname(ptyAppPath),
+      const subProcess = spawn(PTY_PATH, ptyParameter, {
+        cwd: path.dirname(PTY_PATH),
         stdio: "pipe",
         windowsHide: true
       });
@@ -149,8 +148,8 @@ export default class PtyStartCommand extends InstanceCommand {
 原生启动命令：
 ${instance.config.startCommand}
 
-启动命令解析体:
-程序：${ptyAppName}
+仿真终端中转命令:
+程序：${PTY_PATH}
 参数：${JSON.stringify(ptyParameter)}
 
 请将此信息报告给管理员，技术人员或自行排查故障。
@@ -166,7 +165,7 @@ ${instance.config.startCommand}
       // 产生开启事件
       instance.started(processAdapter);
       logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
-      instance.println("INFO", "面板终端 PTY 模式已生效，您可以直接在终端内输入文字并使用 Ctrl，Tab 等功能键。");
+      instance.println("INFO", "全仿真终端模式已生效，您可以直接在终端内直接输入内容并使用 Ctrl，Tab 等功能键。");
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
