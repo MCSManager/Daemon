@@ -166,14 +166,16 @@ export default class FileManager {
       throw new Error(`文件解压缩只支持最大 ${MAX_ZIP_GB}GB 文件的解压缩，如需改变上限请前往 data/Config/global.json 文件`);
   }
 
-  async unzip(sourceZip: string, destDir: string, code?: string) {
+  unzip(sourceZip: string, destDir: string, code?: string) {
     if (!code) code = this.fileCode;
     if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
     this.zipFileCheck(this.toAbsolutePath(sourceZip));
-    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
+    decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code)
+      .then(() => {})
+      .catch(() => {});
   }
 
-  async zip(sourceZip: string, files: string[], code?: string) {
+  zip(sourceZip: string, files: string[], code?: string) {
     if (!code) code = this.fileCode;
     if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);
     const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
@@ -191,7 +193,9 @@ export default class FileManager {
     }
     if (totalSize > MAX_TOTAL_FIELS_SIZE)
       throw new Error(`文件解压缩只支持所有文件大小和 ${MAX_ZIP_GB}GB 的压缩，如需改变上限请前往 data/Config/global.json 文件`);
-    return await compress(sourceZipPath, filesPath, code);
+    compress(sourceZipPath, filesPath, code)
+      .then(() => {})
+      .catch(() => {});
   }
 
   async edit(target: string, data?: string) {

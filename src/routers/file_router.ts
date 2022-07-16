@@ -160,21 +160,20 @@ routerApp.on("file/compress", async (ctx, data) => {
 
     // 开始解压或压缩文件
     fileTaskStart();
-    if (type === 1) {
-      fileManager
-        .zip(source, targets, code)
-        .then(() => {})
-        .catch((error) => protocol.responseError(ctx, error))
-        .finally(fileTaskEnd);
-    } else {
-      fileManager
-        .unzip(source, targets, code)
-        .then(() => {})
-        .catch((error) => protocol.responseError(ctx, error))
-        .finally(fileTaskEnd);
+    try {
+      if (type === 1) {
+        fileManager.zip(source, targets, code);
+      } else {
+        fileManager.unzip(source, targets, code);
+      }
+      protocol.response(ctx, true);
+    } catch (error) {
+      throw error;
+    } finally {
+      fileTaskEnd();
     }
-    protocol.response(ctx, true);
   } catch (error) {
     protocol.responseError(ctx, error);
+  } finally {
   }
 });
