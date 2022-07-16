@@ -126,6 +126,12 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
     }
+    // 只准许服务器停止时修改某些配置项目
+    if (this.status() === Instance.STATUS_STOP && cfg.terminalOption) {
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowCol", Number);
+      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
+    }
+
     configureEntityParams(this.config, cfg, "nickname", String);
     configureEntityParams(this.config, cfg, "startCommand", String);
     configureEntityParams(this.config, cfg, "stopCommand", String);
@@ -161,9 +167,6 @@ export default class Instance extends EventEmitter {
     }
     if (cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);
-
-      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowCol", Number);
-      configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
     }
     StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
