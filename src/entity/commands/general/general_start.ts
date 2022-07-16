@@ -78,7 +78,8 @@ export default class GeneralStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+      return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
 
     try {
@@ -138,6 +139,7 @@ ${instance.config.startCommand}
       // 产生开启事件
       instance.started(processAdapter);
       logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
+      instance.println("INFO", "应用实例已运行，终端为普通终端模式，您可以在底部的命令输入框发送命令，不支持 Ctrl，Tab 等功能键");
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
