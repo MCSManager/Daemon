@@ -73,7 +73,6 @@ export default class FunctionDispatcher extends InstanceCommand {
       instance.config.terminalOption.ptyWindowRow &&
       instance.config.processType === "general"
     ) {
-      if (!fs.existsSync(PTY_PATH)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
       instance.setPreset("start", new PtyStartCommand());
       instance.setPreset("stop", new PtyStopCommand());
       instance.setPreset("resize", new NullCommand());

@@ -19,9 +19,10 @@
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
 
-import { EventEmitter } from "events";
 import iconv from "iconv-lite";
 import path from "path";
+import fs from "fs-extra";
+import { EventEmitter } from "events";
 import { IExecutable } from "./preset";
 import InstanceCommand from "../commands/base/command";
 import InstanceConfig from "./Instance_config";
@@ -32,7 +33,7 @@ import FunctionDispatcher from "../commands/dispatcher";
 import { IInstanceProcess } from "./interface";
 import StartCommand from "../commands/start";
 import { configureEntityParams } from "../../common/typecheck";
-
+import { PTY_PATH } from "../../const";
 // 实例无需持久化储存的额外信息
 interface IInstanceInfo {
   currentPlayers: number;
@@ -123,6 +124,8 @@ export default class Instance extends EventEmitter {
     // 若终端类型改变，则必须重置预设命令
     if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改PTY模式");
+      if (!fs.existsSync(PTY_PATH))
+        throw new Error(`无法启用仿真终端，因为 ${PTY_PATH} 附属程序不存在，您可以联系管理员重启 Daemon 程序得以重新安装（仅 Linux）`);
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
     }
