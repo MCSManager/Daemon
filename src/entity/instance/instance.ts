@@ -124,7 +124,7 @@ export default class Instance extends EventEmitter {
     // 若终端类型改变，则必须重置预设命令
     if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
       if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改PTY模式");
-      if (!fs.existsSync(PTY_PATH))
+      if (!fs.existsSync(PTY_PATH) && cfg?.terminalOption?.pty === true)
         throw new Error(`无法启用仿真终端，因为 ${PTY_PATH} 附属程序不存在，您可以联系管理员重启 Daemon 程序得以重新安装（仅 Linux）`);
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
