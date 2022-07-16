@@ -36,6 +36,7 @@ class Config {
   public port = 24444;
   public key = builderPassword();
   public maxFileTask = 2;
+  public maxZipFileSize = 60;
 }
 
 // 守护进程配置类

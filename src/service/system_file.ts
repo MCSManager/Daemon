@@ -24,6 +24,7 @@ import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
 import os from "os";
 import iconv from "iconv-lite";
+import { globalConfiguration } from "../entity/config";
 
 const ERROR_MSG_01 = "非法访问路径";
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
@@ -158,20 +159,38 @@ export default class FileManager {
     await fs.move(targetPath, destPath);
   }
 
+  private zipFileCheck(path: string) {
+    const fileInfo = fs.statSync(path);
+    const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
+    if (fileInfo.size > 1024 * 1024 * 1024 * MAX_ZIP_GB)
+      throw new Error(`文件解压缩只支持最大 ${MAX_ZIP_GB}GB 文件的解压缩，如需改变上限请前往 data/Config/global.json 文件`);
+  }
+
   async unzip(sourceZip: string, destDir: string, code?: string) {
     if (!code) code = this.fileCode;
     if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
+    this.zipFileCheck(this.toAbsolutePath(sourceZip));
     return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
   }
 
   async zip(sourceZip: string, files: string[], code?: string) {
     if (!code) code = this.fileCode;
     if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);
+    const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
+    const MAX_TOTAL_FIELS_SIZE = 1024 * 1024 * 1024 * MAX_ZIP_GB;
     const sourceZipPath = this.toAbsolutePath(sourceZip);
     const filesPath = [];
+    let totalSize = 0;
     for (const iterator of files) {
-      if (this.check(iterator)) filesPath.push(this.toAbsolutePath(iterator));
+      if (this.check(iterator)) {
+        filesPath.push(this.toAbsolutePath(iterator));
+        try {
+          totalSize += fs.statSync(this.toAbsolutePath(iterator))?.size;
+        } catch (error) {}
+      }
     }
+    if (totalSize > MAX_TOTAL_FIELS_SIZE)
+      throw new Error(`文件解压缩只支持所有文件大小和 ${MAX_ZIP_GB}GB 的压缩，如需改变上限请前往 data/Config/global.json 文件`);
     return await compress(sourceZipPath, filesPath, code);
   }
 
