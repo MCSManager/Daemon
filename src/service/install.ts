@@ -70,6 +70,9 @@ export function initDependent() {
       .then(() => {
         logger.info("可选依赖程序已自动安装，仿真终端和部分高级功能已自动启用");
         logger.info("依赖程序参考：https://github.com/mcsmanager/pty");
+        fs.chmod(PTY_PATH, 0o777, () => {
+          logger.warn(`修改文件 ${PTY_PATH} 权限失败，请手动设置其为 chmod 755 以上`);
+        });
       })
       .catch((err) => {
         fs.remove(PTY_PATH, () => {});
