@@ -40,7 +40,7 @@ class StartupDockerProcessError extends Error {
   }
 }
 
-// Docker 进程适配器
+// 进程适配器
 export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -98,7 +98,8 @@ export default class DockerStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe) return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
+    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
 
     try {
@@ -205,6 +206,9 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`类型: Docker 容器`);
       logger.info("----------------");
 
+      // 是否使用 TTY 模式
+      const isTty = instance.config.terminalOption.pty;
+
       // 开始 Docker 容器创建并运行
       const docker = new Docker();
       const container = await docker.createContainer({
@@ -213,7 +217,7 @@ export default class DockerStartCommand extends InstanceCommand {
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true,
-        Tty: true,
+        Tty: isTty,
         User: `${processUserUid()}:${processGroupGid()}`,
         WorkingDir: "/workspace/",
         Cmd: commandList,
@@ -239,6 +243,14 @@ export default class DockerStartCommand extends InstanceCommand {
         }
       });
 
+      // 根据 PTY 参数设置窗口大小
+      if (isTty) {
+        const w = instance.config.terminalOption.ptyWindowCol;
+        const h = instance.config.terminalOption.ptyWindowCol;
+        container.resize({ h, w });
+      }
+
+      // Docker 对接到进程适配器
       const processAdapter = new DockerProcessAdapter(container);
       await processAdapter.start();
 
