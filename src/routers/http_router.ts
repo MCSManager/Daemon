@@ -71,6 +71,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
 router.post("/upload/:key", async (ctx) => {
   const key = ctx.params.key;
   const unzip = ctx.query.unzip;
+  const zipCode = String(ctx.query.code);
   try {
     // 领取任务 & 检查任务 & 检查实例是否存在
     const mission = missionPassport.getMission(key, "upload");
@@ -105,7 +106,7 @@ router.post("/upload/:key", async (ctx) => {
         if (unzip) {
           // 如果需要解压则进行解压任务
           const filemanager = new FileManager(instance.config.cwd);
-          filemanager.unzip(fullFileName, "");
+          filemanager.unzip(fullFileName, "", zipCode);
         }
       });
       return (ctx.body = "OK");
