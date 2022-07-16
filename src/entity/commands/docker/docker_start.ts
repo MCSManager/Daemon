@@ -40,6 +40,12 @@ class StartupDockerProcessError extends Error {
   }
 }
 
+interface IDockerProcessAdapterStartParam {
+  isTty: boolean;
+  h: number;
+  w: number;
+}
+
 // 进程适配器
 export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
@@ -50,23 +56,30 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
     super();
   }
 
-  public async start() {
-    await this.container.start();
-    //防止部分程序爆炸 (除0)
-    await this.container.resize({
-      h: 40,
-      w: 80
-    });
-    this.pid = this.container.id;
-    const stream = (this.stream = await this.container.attach({
-      stream: true,
-      stdout: true,
-      stderr: true,
-      stdin: true
-    }));
-    stream.on("data", (data) => this.emit("data", data));
-    stream.on("error", (data) => this.emit("data", data));
-    this.wait();
+  // 一旦真实启动程序之后，任何错误都不可阻断接下来的启动流程
+  public async start(param?: IDockerProcessAdapterStartParam) {
+    try {
+      await this.container.start();
+
+      const { isTty, h, w } = param;
+      if (isTty) {
+        this.container.resize({ h, w });
+      }
+
+      this.pid = this.container.id;
+      const stream = (this.stream = await this.container.attach({
+        stream: true,
+        stdout: true,
+        stderr: true,
+        stdin: true
+      }));
+      stream.on("data", (data) => this.emit("data", data));
+      stream.on("error", (data) => this.emit("data", data));
+      this.wait();
+    } catch (error) {
+      this.kill();
+      throw error;
+    }
   }
 
   public write(data?: string) {
@@ -243,16 +256,13 @@ export default class DockerStartCommand extends InstanceCommand {
         }
       });
 
-      // 根据 PTY 参数设置窗口大小
-      if (isTty) {
-        const w = instance.config.terminalOption.ptyWindowCol;
-        const h = instance.config.terminalOption.ptyWindowCol;
-        container.resize({ h, w });
-      }
-
       // Docker 对接到进程适配器
       const processAdapter = new DockerProcessAdapter(container);
-      await processAdapter.start();
+      await processAdapter.start({
+        isTty,
+        w: instance.config.terminalOption.ptyWindowCol,
+        h: instance.config.terminalOption.ptyWindowCol
+      });
 
       instance.started(processAdapter);
       logger.info(`实例 ${instance.instanceUuid} 成功启动.`);
