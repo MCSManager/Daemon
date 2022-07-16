@@ -26,7 +26,7 @@ import fs from "fs-extra";
 
 import InstanceCommand from "../base/command";
 import EventEmitter from "events";
-import { IInstanceProcess } from "../../../entity/instance/interface";
+import { IInstanceProcess } from "../../instance/interface";
 import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";

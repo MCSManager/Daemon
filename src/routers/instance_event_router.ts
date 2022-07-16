@@ -60,18 +60,24 @@ setInterval(function () {
 // 实例输出流事件
 // 默认加入到数据缓存中以控制发送速率确保其稳定性
 InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
-  if (outputStreamCache[instanceUuid]) {
-    if (outputStreamCache[instanceUuid].length > 1000 * MAX_CHAR_SIZE)
-      return (outputStreamCache[instanceUuid] +=
-        "\n[warning] the output data is too fast, more content has been blocked at this moment in order to ensure stability.\n[警告] 输出流数据过快，为保证稳定性，已屏蔽此刻更多内容....\n");
-    outputStreamCache[instanceUuid] += text;
-  } else {
-    outputStreamCache[instanceUuid] = text;
-  }
-  // 输出内容追加到log文件
-  outputLog(instanceUuid, text)
-    .then(() => {})
-    .catch(() => {});
+  InstanceSubsystem.forEachForward(instanceUuid, (socket) => {
+    protocol.msg(new RouterContext(null, socket), "instance/stdout", {
+      instanceUuid: instanceUuid,
+      text: text
+    });
+  });
+  // if (outputStreamCache[instanceUuid]) {
+  //   if (outputStreamCache[instanceUuid].length > 1000 * MAX_CHAR_SIZE)
+  //     return (outputStreamCache[instanceUuid] +=
+  //       "\n[warning] the output data is too fast, more content has been blocked at this moment in order to ensure stability.\n[警告] 输出流数据过快，为保证稳定性，已屏蔽此刻更多内容....\n");
+  //   outputStreamCache[instanceUuid] += text;
+  // } else {
+  //   outputStreamCache[instanceUuid] = text;
+  // }
+  // // 输出内容追加到log文件
+  // outputLog(instanceUuid, text)
+  //   .then(() => {})
+  //   .catch(() => {});
 });
 
 // 实例退出事件

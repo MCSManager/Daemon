@@ -1,16 +1,16 @@
 /*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+  Copyright (C) 2022 RimuruChan <RealSprite233@outlook.com>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
+
+  According to the AGPL, it is forbidden to delete all copyright notices,
   and if you modify the source code, you must open source the
   modified source code.
 
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
+  版权所有 (C) 2022 RimuruChan <RealSprite233@outlook.com>
 
   该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
   由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
@@ -20,21 +20,26 @@
 */
 
 import Instance from "../../instance/instance";
-import { encode } from "iconv-lite";
 import InstanceCommand from "../base/command";
+import { DockerProcessAdapter } from "./docker_start";
 
-export default class GeneralSendCommand extends InstanceCommand {
+export interface IResizeOptions {
+  h: number;
+  w: number;
+}
+
+// 适用于 Docker 终端高宽定义命令，来自 @RimuruChan
+export default class DockerResizeCommand extends InstanceCommand {
   constructor() {
-    super("SendCommand");
+    super("ResizeTTY");
   }
 
-  async exec(instance: Instance, text?: string): Promise<any> {
-    // 关服命令需要发送命令，但关服命令执行前会设置状态为关闭中状态。
-    // 所以这里只能通过进程是否存在来执行命令
-    if (!instance.process) {
-      instance.failure(new Error("命令执行失败，因为实例实际进程不存在."));
-    }
-    instance.process.write(encode(text, instance.config.ie));
-    instance.process.write("\n");
+  async exec(instance: Instance, size?: IResizeOptions): Promise<any> {
+    if (!instance.process || !(instance.config.processType === "docker")) return;
+    const dockerProcess = <DockerProcessAdapter>instance.process;
+    await dockerProcess?.container?.resize({
+      h: size.h,
+      w: size.w
+    });
   }
 }

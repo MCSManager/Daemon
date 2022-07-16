@@ -104,19 +104,22 @@ routerApp.on("stream/input", async (ctx, data) => {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     await instance.exec(new SendCommand(command));
   } catch (error) {
-    protocol.responseError(ctx, error);
+    // 忽略此处潜在的高频异常
+    // protocol.responseError(ctx, error);
   }
 });
 
 // 处理终端输入，适用于伪终端的直连输入输出流。
 routerApp.on("stream/write", async (ctx, data) => {
   try {
-    const input = data.input;
+    const buf = data.input;
     const instanceUuid = ctx.session.stream.instanceUuid;
     const instance = InstanceSubsystem.getInstance(instanceUuid);
-    await instance.exec(new SendInput(input));
+    // 不采用命令执行方式运行
+    if (instance.process) instance.process.write(buf);
   } catch (error) {
-    protocol.responseError(ctx, error);
+    // 忽略此处潜在的高频异常
+    // protocol.responseError(ctx, error);
   }
 });
 

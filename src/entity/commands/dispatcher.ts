@@ -18,24 +18,25 @@
   根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
-
+import path from "path";
+import fs from "fs-extra";
 import Instance from "../instance/instance";
 import InstanceCommand from "./base/command";
 import RefreshPlayer from "./task/players";
-import MinecraftUpdateCommand from "../minecraft/mc_update";
 import MinecraftGetPlayersCommand from "../minecraft/mc_getplayer";
 import NullCommand from "./nullfunc";
-import GeneralStartCommand from "./general/general _start";
-import GeneralStopCommand from "./general/general _stop";
-import GeneralKillCommand from "./general/general _kill";
-import GeneralSendCommand from "./general/general _command";
-import GeneralRestartCommand from "./general/general _restart";
-import DockerStartCommand from "./docker/docker _start";
-import DockerResizeCommand from "./docker/docker _resize";
-import GeneralInputCommand from "./general/general _input";
+import GeneralStartCommand from "./general/general_start";
+import GeneralStopCommand from "./general/general_stop";
+import GeneralKillCommand from "./general/general_kill";
+import GeneralSendCommand from "./general/general_command";
+import GeneralRestartCommand from "./general/general_restart";
+import DockerStartCommand from "./docker/docker_start";
+import DockerResizeCommand from "./docker/docker_resize";
 import TimeCheck from "./task/time";
 import MinecraftBedrockGetPlayersCommand from "../minecraft/mc_getplayer_bedrock";
 import GeneralUpdateCommand from "./general/general_update";
+import PtyStartCommand from "./pty/pty_start";
+import PtyStopCommand from "./pty/pty_stop";
 
 // 实例功能调度器
 // 根据不同的类型调度分配不同的功能
@@ -54,7 +55,6 @@ export default class FunctionDispatcher extends InstanceCommand {
 
     // 实例通用预设能力
     instance.setPreset("command", new GeneralSendCommand());
-    instance.setPreset("input", new GeneralInputCommand());
     instance.setPreset("stop", new GeneralStopCommand());
     instance.setPreset("kill", new GeneralKillCommand());
     instance.setPreset("restart", new GeneralRestartCommand());
@@ -64,8 +64,22 @@ export default class FunctionDispatcher extends InstanceCommand {
     if (!instance.config.processType || instance.config.processType === "general") {
       instance.setPreset("start", new GeneralStartCommand());
     }
+    // 是否启用 PTY 模式
+    const ptyProgramPath = path.normalize(path.join(process.cwd(), "lib"));
+    if (
+      instance.config.terminalOption.pty &&
+      instance.config.terminalOption.ptyWindowCol &&
+      instance.config.terminalOption.ptyWindowRow &&
+      instance.config.processType === "general"
+    ) {
+      if (!fs.existsSync(ptyProgramPath)) throw new Error("无法启用 PTY 模式，因为 ./lib/pty 附属程序不存在");
+      instance.setPreset("start", new PtyStartCommand());
+      instance.setPreset("stop", new PtyStopCommand());
+      instance.setPreset("resize", new NullCommand());
+    }
+    // 是否启用 Docker PTY 模式
     if (instance.config.processType === "docker") {
-      instance.setPreset("resize", new DockerResizeCommand());
+      instance.setPreset("resize", new NullCommand());
       instance.setPreset("start", new DockerStartCommand());
     }
 

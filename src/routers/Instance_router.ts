@@ -81,6 +81,11 @@ routerApp.on("instance/select", (ctx, data) => {
       info: instance.info
     });
   });
+
+  overview.sort((a, b) => {
+    return a.config.nickname >= b.config.nickname ? 1 : -1;
+  });
+
   protocol.response(ctx, {
     page: pageResult.page,
     pageSize: pageResult.pageSize,

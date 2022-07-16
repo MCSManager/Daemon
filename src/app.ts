@@ -53,6 +53,10 @@ import * as router from "./service/router";
 import * as koa from "./service/http";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
+import { initDependent } from "./service/install";
+
+// 异步初始化可选依赖库
+initDependent();
 
 // 初始化全局配置服务
 globalConfiguration.load();

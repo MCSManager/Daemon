@@ -30,7 +30,7 @@ const router = new Router();
 
 // 定义 HTTP 首页展示路由
 router.all("/", async (ctx) => {
-  ctx.body = "MCSManager Deamon: Status: OK. | reference: https://mcsmanager.com/";
+  ctx.body = "[MCSManager Daemon] Status: online | reference: https://docs.mcsmanager.com/";
   ctx.status = 200;
 });
 
