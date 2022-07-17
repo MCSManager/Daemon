@@ -34,7 +34,7 @@ export default class GeneralSendCommand extends InstanceCommand {
     if (!instance.process) instance.failure(new Error("命令执行失败，因为实例实际进程不存在."));
     // instance.process.write(buf);
     instance.process.write(encode(buf, instance.config.oe));
-    if (instance.config.crlf === 1) instance.process.write("\n");
-    if (instance.config.crlf === 2) instance.process.write("\r\n");
+    if (instance.config.crlf === 2) return instance.process.write("\r\n");
+    return instance.process.write("\n");
   }
 }
