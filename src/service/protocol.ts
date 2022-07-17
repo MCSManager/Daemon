@@ -36,6 +36,10 @@ export interface IPacket {
   data: any;
 }
 
+export interface IResponseErrorConfig {
+  notPrintErr: boolean;
+}
+
 // 全局 Socket 储存
 const globalSocket = new Map<String, Socket>();
 
@@ -48,14 +52,14 @@ export function response(ctx: RouterContext, data: any) {
   ctx.socket.emit(ctx.event, packet);
 }
 
-export function responseError(ctx: RouterContext, err: Error | string) {
+export function responseError(ctx: RouterContext, err: Error | string, config?: IResponseErrorConfig) {
   let errinfo: any = "";
   if (err) errinfo = err.toString();
   else errinfo = err;
   const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
   // 忽略因为重启守护进程没有刷新网页的权限不足错误
   if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
-  logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${ctx.event} 响应数据时异常:\n`, err);
+  if (!config?.notPrintErr) logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${ctx.event} 响应数据时异常:\n`, err);
   ctx.socket.emit(ctx.event, packet);
 }
 

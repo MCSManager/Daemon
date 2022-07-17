@@ -73,7 +73,9 @@ routerApp.on("stream/auth", (ctx, data) => {
     });
     protocol.response(ctx, true);
   } catch (error) {
-    protocol.responseError(ctx, error);
+    protocol.responseError(ctx, error, {
+      notPrintErr: true
+    });
   }
 });
 

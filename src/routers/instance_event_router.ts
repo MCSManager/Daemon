@@ -31,21 +31,24 @@ const MAX_LOG_SIZE = 512;
 const buffer = new Map<string, string>();
 setInterval(() => {
   buffer.forEach((buf, instanceUuid) => {
+    if (!buf || !instanceUuid) return;
     const logFilePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
     if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR);
     try {
       const fileInfo = fs.statSync(logFilePath);
       if (fileInfo && fileInfo.size > 1024 * MAX_LOG_SIZE) fs.removeSync(logFilePath);
     } catch (err) {}
-    fs.writeFile(logFilePath, buf, { encoding: "utf-8", flag: "a" }, () => {});
+    fs.writeFile(logFilePath, buf, { encoding: "utf-8", flag: "a" }, () => {
+      buffer.set(instanceUuid, "");
+    });
   });
-}, 1000);
+}, 500);
 
 // 输出流记录到缓存区
 async function outputLog(instanceUuid: string, text: string) {
-  const buf = buffer.get(instanceUuid) + text;
+  const buf = (buffer.get(instanceUuid) ?? "") + text;
   if (buf.length > 1024 * 1024) buffer.set(instanceUuid, "");
-  buffer.set(instanceUuid, buf);
+  buffer.set(instanceUuid, buf ?? null);
 }
 
 // 实例输出流事件

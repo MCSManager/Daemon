@@ -391,7 +391,9 @@ routerApp.on("instance/outputlog", async (ctx, data) => {
       const text = await fs.readFile(filePath, { encoding: "utf-8" });
       return protocol.response(ctx, text);
     }
-    protocol.responseError(ctx, new Error("终端日志文件不存在"));
+    protocol.responseError(ctx, new Error("终端日志文件不存在"), {
+      notPrintErr: true
+    });
   } catch (err) {
     protocol.responseError(ctx, err);
   }
