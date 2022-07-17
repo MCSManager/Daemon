@@ -25,37 +25,28 @@ import RouterContext from "../entity/ctx";
 import * as protocol from "../service/protocol";
 import InstanceSubsystem from "../service/system_instance";
 import fs from "fs-extra";
-const TIME_SPEED = 100;
-const MAX_CHAR_SIZE = 40;
-const MAX_LOG_SIZE = 256;
+const MAX_LOG_SIZE = 1024;
 
-// 输出流记录到文本
-// 此函数执行频率极快，可能有待优化效率
+// 缓存区
+const buffer = new Map<string, string>();
+setInterval(() => {
+  buffer.forEach((buf, instanceUuid) => {
+    const logFilePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
+    if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR);
+    try {
+      const fileInfo = fs.statSync(logFilePath);
+      if (fileInfo && fileInfo.size > 1024 * MAX_LOG_SIZE) fs.removeSync(logFilePath);
+    } catch (err) {}
+    fs.writeFile(logFilePath, buf, { encoding: "utf-8", flag: "a" }, () => {});
+  });
+}, 1000);
+
+// 输出流记录到缓存区
 async function outputLog(instanceUuid: string, text: string) {
-  const logFilePath = path.join(InstanceSubsystem.LOG_DIR, `${instanceUuid}.log`);
-  if (!fs.existsSync(InstanceSubsystem.LOG_DIR)) fs.mkdirsSync(InstanceSubsystem.LOG_DIR);
-  try {
-    const fileInfo = fs.statSync(logFilePath);
-    if (fileInfo && fileInfo.size > 1024 * MAX_LOG_SIZE) fs.removeSync(logFilePath);
-  } catch (err) {}
-  await fs.writeFile(logFilePath, text, { encoding: "utf-8", flag: "a" });
+  const buf = buffer.get(instanceUuid) + text;
+  if (buf.length > 1024 * 1024) buffer.set(instanceUuid, "");
+  buffer.set(instanceUuid, buf);
 }
-
-// 定时发送程序输出流日志广播
-// 此设计可以一次性打包多次内容，一并发送
-const outputStreamCache: any = {};
-setInterval(function () {
-  for (const instanceUuid in outputStreamCache) {
-    const text = outputStreamCache[instanceUuid];
-    InstanceSubsystem.forEachForward(instanceUuid, (socket) => {
-      protocol.msg(new RouterContext(null, socket), "instance/stdout", {
-        instanceUuid: instanceUuid,
-        text: text
-      });
-    });
-    delete outputStreamCache[instanceUuid];
-  }
-}, TIME_SPEED);
 
 // 实例输出流事件
 // 默认加入到数据缓存中以控制发送速率确保其稳定性
@@ -66,18 +57,10 @@ InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
       text: text
     });
   });
-  // if (outputStreamCache[instanceUuid]) {
-  //   if (outputStreamCache[instanceUuid].length > 1000 * MAX_CHAR_SIZE)
-  //     return (outputStreamCache[instanceUuid] +=
-  //       "\n[warning] the output data is too fast, more content has been blocked at this moment in order to ensure stability.\n[警告] 输出流数据过快，为保证稳定性，已屏蔽此刻更多内容....\n");
-  //   outputStreamCache[instanceUuid] += text;
-  // } else {
-  //   outputStreamCache[instanceUuid] = text;
-  // }
-  // // 输出内容追加到log文件
-  // outputLog(instanceUuid, text)
-  //   .then(() => {})
-  //   .catch(() => {});
+  // 输出内容追加到log文件
+  outputLog(instanceUuid, text)
+    .then(() => {})
+    .catch(() => {});
 });
 
 // 实例退出事件

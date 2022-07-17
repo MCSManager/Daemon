@@ -99,12 +99,8 @@ class InstanceSubsystem extends EventEmitter {
       cfg.cwd = path.normalize(`${INSTANCE_DATA_DIR}/${instance.instanceUuid}`);
       if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     }
-    // 针对中文操作系统编码自动选择
-    if (os.platform() === "win32") {
-      cfg.ie = cfg.oe = cfg.fileCode = "gbk";
-    } else {
-      cfg.ie = cfg.oe = cfg.fileCode = "utf-8";
-    }
+    // 设置默认输入输出编码
+    cfg.ie = cfg.oe = cfg.fileCode = "utf8";
     // 根据参数构建并初始化类型
     instance.parameters(cfg);
     instance.forceExec(new FunctionDispatcher());
