@@ -141,6 +141,7 @@ export default class Instance extends EventEmitter {
     configureEntityParams(this.config, cfg, "cwd", String);
     configureEntityParams(this.config, cfg, "ie", String);
     configureEntityParams(this.config, cfg, "oe", String);
+    configureEntityParams(this.config, cfg, "crlf", Number);
     configureEntityParams(this.config, cfg, "endTime", String);
     configureEntityParams(this.config, cfg, "fileCode", String);
     configureEntityParams(this.config, cfg, "updateCommand", String);

@@ -43,6 +43,7 @@ export default class InstanceConfig {
   public fileCode: string = "utf-8";
   public processType: string = "general";
   public updateCommand: string = "";
+  public crlf = 1; // 1: \n 2: \r\n
 
   // 自定义命令列表
   public actionCommandList: IActionCommand[] = [];
