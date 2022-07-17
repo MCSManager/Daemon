@@ -109,7 +109,7 @@ routerApp.on("stream/input", async (ctx, data) => {
   }
 });
 
-// 处理终端输入，适用于伪终端的直连输入输出流。
+// 处理终端输入，适用于仿真终端的直连输入输出流。
 routerApp.on("stream/write", async (ctx, data) => {
   try {
     const buf = data.input;

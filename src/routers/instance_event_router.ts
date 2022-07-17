@@ -25,7 +25,7 @@ import RouterContext from "../entity/ctx";
 import * as protocol from "../service/protocol";
 import InstanceSubsystem from "../service/system_instance";
 import fs from "fs-extra";
-const MAX_LOG_SIZE = 1024;
+const MAX_LOG_SIZE = 512;
 
 // 缓存区
 const buffer = new Map<string, string>();
