@@ -24,14 +24,15 @@ import fs from "fs-extra";
 import https from "https";
 import path from "path";
 import logger from "./log";
-import { Logger } from "log4js";
-
 const PTY_PATH = path.normalize(path.join(process.cwd(), "lib", "pty"));
 const PTY_DIR_PATH = path.join(process.cwd(), "lib");
 
 function installPtyForLinux(url: string) {
   return new Promise<number>((resolve, reject) => {
-    // if (os.platform() !== "linux") resolve(-1);
+    if (os.platform() !== "linux" || os.arch() !== "x64") {
+      if (!fs.existsSync(PTY_PATH)) logger.info("仿真终端只能支持 Windows/Linux x86_64 架构，已自动降级为普通终端");
+      resolve(-1);
+    }
 
     if (!fs.existsSync(PTY_DIR_PATH)) fs.mkdirsSync(PTY_DIR_PATH);
     if (fs.existsSync(PTY_PATH) && fs.statSync(PTY_PATH)?.size > 1024) {
@@ -61,8 +62,8 @@ function installPtyForLinux(url: string) {
   });
 }
 
-// 自动安装依赖库
-// 依赖程序基于 Go 语言开发，开源地址：https://github.com/MCSManager/pty
+// 仿真终端依赖程序，基于 Go/C++ 实现的 PTY 程序
+// 参考：https://github.com/MCSManager/pty
 export function initDependent() {
   const ptyUrls = ["https://mcsmanager.com/download/pty_linux", "https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/pty_linux"];
   function setup(index = 0) {
