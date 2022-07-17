@@ -12,7 +12,7 @@ upload/
 lib/
 tmp/
 dist/
-
+production/
 config.json
 *.bat
 test_file/
