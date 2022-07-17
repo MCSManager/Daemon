@@ -27,7 +27,10 @@ import InstanceCommand from "../commands/base/command";
 // Get Minecraft Bedrock server MOTD information
 // Author: https://github.com/Mcayear
 async function request(ip: string, port: number) {
-  const message = Buffer.from("01 00 00 00 00 00 06 18 20 00 FF FF 00 FE FE FE FE FD FD FD FD 12 34 56 78 A3 61 1C F8 BA 8F D5 60".replace(/ /g, ""), "hex");
+  const message = Buffer.from(
+    "01 00 00 00 00 00 06 18 20 00 FF FF 00 FE FE FE FE FD FD FD FD 12 34 56 78 A3 61 1C F8 BA 8F D5 60".replace(/ /g, ""),
+    "hex"
+  );
   const client = dgram.createSocket("udp4");
   var Config = {
     ip,
@@ -36,6 +39,7 @@ async function request(ip: string, port: number) {
   return new Promise((r, j) => {
     client.on("error", (err: any) => {
       j(err);
+      client.close();
     });
     client.on("message", (data: any) => {
       const result = data.toString().split(";");
@@ -43,9 +47,15 @@ async function request(ip: string, port: number) {
       client.close();
     });
     client.send(message, Config.port, Config.ip, (err: any) => {
-      if (err) j(err);
+      if (err) {
+        j(err);
+        client.close();
+      }
     });
-    setTimeout(() => j("request timeout"), 5000);
+    setTimeout(() => {
+      j("request timeout");
+      client.close();
+    }, 5000);
   });
 }
 
