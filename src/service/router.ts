@@ -89,7 +89,6 @@ export function navigation(socket: Socket) {
   routerApp.emitRouter("connection", ctx, null);
 }
 
-logger.info("正在读取业务路由与相关中间件...");
 // 身份验证路由顺序必须是第一位装载，这些路由顺序均不可擅自改变
 import "../routers/auth_router";
 import "../routers/passport_router";
@@ -101,4 +100,4 @@ import "../routers/stream_router";
 import "../routers/environment_router";
 import "../routers/schedule_router";
 
-logger.info(`装载完毕, 共路由 ${routerApp.eventNames().length} 个, 中间件 ${routerApp.middlewares.length} 个`);
+logger.info(`所有功能模块与权限防火墙已初始化完毕`);

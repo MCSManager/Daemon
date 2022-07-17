@@ -129,8 +129,9 @@ process.on("unhandledRejection", (reason, p) => {
 // Started up
 logger.info(`守护进程现已成功启动`);
 logger.info("================================");
-logger.info(`访问地址 ${config.ip ? config.ip : "localhost"}:${config.port}`);
-logger.info(`访问密钥 ${config.key}`);
+logger.info("参考文档：https://docs.mcsmanager.com/");
+logger.info(`访问地址：http://${config.ip ? config.ip : "localhost"}:${config.port}`);
+logger.info(`访问密钥：${config.key}`);
 logger.info("密钥作为守护进程唯一认证手段");
 logger.info("================================");
 console.log("");

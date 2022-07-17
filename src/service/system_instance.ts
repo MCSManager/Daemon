@@ -73,14 +73,19 @@ class InstanceSubsystem extends EventEmitter {
   loadInstances() {
     const instanceConfigs = StorageSubsystem.list("InstanceConfig");
     instanceConfigs.forEach((uuid) => {
-      const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
-      const instance = new Instance(uuid, instanceConfig);
-      // 所有实例全部进行功能调度器
-      instance
-        .forceExec(new FunctionDispatcher())
-        .then((v) => {})
-        .catch((v) => {});
-      this.addInstance(instance);
+      try {
+        const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
+        const instance = new Instance(uuid, instanceConfig);
+        // 所有实例全部进行功能调度器
+        instance
+          .forceExec(new FunctionDispatcher())
+          .then((v) => {})
+          .catch((v) => {});
+        this.addInstance(instance);
+      } catch (error) {
+        logger.error(`读取 ${uuid} 应用实例失败: ${error.message}`);
+        logger.error(`请检查或删除文件：data/InstanceConfig/${uuid}.json`);
+      }
     });
     // 处理自动启动
     this.autoStart();
