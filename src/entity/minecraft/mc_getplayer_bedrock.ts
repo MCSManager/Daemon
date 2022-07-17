@@ -38,8 +38,10 @@ async function request(ip: string, port: number) {
   };
   return new Promise((r, j) => {
     client.on("error", (err: any) => {
+      try {
+        client.close();
+      } catch (error) {}
       j(err);
-      client.close();
     });
     client.on("message", (data: any) => {
       const result = data.toString().split(";");
@@ -54,7 +56,9 @@ async function request(ip: string, port: number) {
     });
     setTimeout(() => {
       j("request timeout");
-      client.close();
+      try {
+        client.close();
+      } catch (error) {}
     }, 5000);
   });
 }
