@@ -89,11 +89,20 @@ export default class PtyStartCommand extends InstanceCommand {
 
     try {
       // PTY 模式正确性检查
+      logger.info(`会话 ${source}: 请求开启实例，模式为仿真终端`);
+      let checkPtyEnv = true;
 
       if (!fs.existsSync(PTY_PATH)) {
-        logger.info(`会话 ${source}: 请求开启实例，模式为 PTY 终端`);
-        logger.warn("PTY 终端转发程序不存在，自动降级到普通启动模式");
-        instance.println("ERROR", "仿真终端模式失败，可能是依赖程序不存在，正在自动降级到普通终端模式...");
+        instance.println("ERROR", "仿真终端模式失败，可能是依赖程序不存在，已自动降级到普通终端模式...");
+        checkPtyEnv = false;
+      }
+
+      if ((os.platform() !== "linux" && os.platform() !== "win32") || os.arch() !== "x64") {
+        instance.println("ERROR", "仿真终端模式失败，无法支持的架构或系统，已自动降级到普通终端模式...");
+        checkPtyEnv = false;
+      }
+
+      if (checkPtyEnv === false) {
         // 关闭 PTY 类型，重新配置实例功能组，重新启动实例
         instance.config.terminalOption.pty = false;
         await instance.forceExec(new FunctionDispatcher());
