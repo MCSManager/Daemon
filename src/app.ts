@@ -19,6 +19,7 @@
   可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
 */
 
+import { $t } from "./i18n";
 import { getVersion, initVersionManager } from "./service/version";
 
 initVersionManager();
@@ -46,7 +47,7 @@ import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
 
-logger.info(`欢迎使用 MCSManager 守护进程`);
+logger.info($t("app.welcome"));
 
 import { globalConfiguration } from "./entity/config";
 import * as router from "./service/router";
@@ -89,11 +90,10 @@ const io = new Server(httpServer, {
 
 // 初始化应用实例系统 & 装载应用实例
 try {
-  logger.info("正在读取本地应用实例中");
   InstanceSubsystem.loadInstances();
-  logger.info(`所有应用实例已加载，总计 ${InstanceSubsystem.instances.size} 个`);
+  logger.info($t("app.instanceLoad", { n: InstanceSubsystem.instances.size }));
 } catch (err) {
-  logger.error("读取本地实例文件失败:", err);
+  logger.error($t("app.instanceLoadError"), err);
   process.exit(-1);
 }
 
@@ -138,7 +138,6 @@ console.log("");
 
 // 装载 终端界面UI
 import "./service/ui";
-
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
   process.on(sig, async function () {
     try {
