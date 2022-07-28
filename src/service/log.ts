@@ -1,6 +1,5 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
+
 import fs from "fs-extra";
 import * as log4js from "log4js";
 

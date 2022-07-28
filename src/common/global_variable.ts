@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
 export default class GlobalVariable {
   public static readonly map = new Map<string, any>();

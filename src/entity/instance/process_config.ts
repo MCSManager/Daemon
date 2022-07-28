@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
 import yaml from "yaml";
 import properties from "properties";

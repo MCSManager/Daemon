@@ -1,6 +1,5 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
+
 import { EventEmitter } from "events";
 
 // interface of docker config

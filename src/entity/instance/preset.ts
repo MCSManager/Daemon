@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
 export interface IExecutable {
   exec: (a: any, b?: any) => Promise<any>;

@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
 import Instance from "./instance";
 import { IDockerConfig } from "./interface";

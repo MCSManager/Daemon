@@ -1,6 +1,5 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
+
 import { ChildProcess, exec, execSync } from "child_process";
 import os from "os";
 

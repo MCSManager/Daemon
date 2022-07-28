@@ -1,6 +1,5 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
+
 import { killProcess } from "../../../common/process_tools";
 import { ChildProcess, exec, spawn } from "child_process";
 import logger from "../../../service/log";

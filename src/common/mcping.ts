@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-*/
+// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
 // Using SLT (Server List Ping) provided by Minecraft.
 // Since it is part of the protocol it is always enabled contrary to Query
