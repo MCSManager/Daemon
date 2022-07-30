@@ -10,11 +10,11 @@ import fs from "fs-extra";
 import { commandStringToArray } from "../base/command_parser";
 import path from "path";
 
-// 用户身份函数
+// user identity function
 const processUserUid = process.getuid ? process.getuid : () => 0;
 const processGroupGid = process.getgid ? process.getgid : () => 0;
 
-// 启动时错误异常
+// Error exception at startup
 class StartupDockerProcessError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -27,7 +27,7 @@ interface IDockerProcessAdapterStartParam {
   w: number;
 }
 
-// 进程适配器
+// process adapter
 export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -37,7 +37,7 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
     super();
   }
 
-  // 一旦真实启动程序之后，任何错误都不可阻断接下来的启动流程
+  // Once the program is actually started, no errors can block the next startup process
   public async start(param?: IDockerProcessAdapterStartParam) {
     try {
       await this.container.start();
@@ -97,26 +97,26 @@ export default class DockerStartCommand extends InstanceCommand {
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 
     try {
-      // 锁死实例
+      // lock the instance
       instance.setLock(true);
-      // 设置启动状态
+      // set startup state
       instance.status(Instance.STATUS_STARTING);
-      // 启动次数增加
+      // increase the number of starts
       instance.startCount++;
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const cwd = instance.absoluteCwdPath();
 
-      // 解析端口开放
+      // parsing port open
       // {
-      //   "PortBindings": {
-      //     "22/tcp": [
-      //       {
-      //         "HostPort": "11022"
-      //       }
-      //     ]
-      //   }
+      // "PortBindings": {
+      // "22/tcp": [
+      // {
+      // "HostPort": "11022"
+      // }
+      // ]
+      // }
       // }
       // 25565:25565/tcp 8080:8080/tcp
       const portMap = instance.config.docker.ports;
@@ -127,14 +127,14 @@ export default class DockerStartCommand extends InstanceCommand {
         if (elemt.length != 2) continue;
         const ports = elemt[0];
         const protocol = elemt[1];
-        //主机(宿主)端口:容器端口
+        //Host (host) port: container port
         const publicAndPrivatePort = ports.split(":");
         if (publicAndPrivatePort.length != 2) continue;
         publicPortArray[`${publicAndPrivatePort[1]}/${protocol}`] = [{ HostPort: publicAndPrivatePort[0] }];
         exposedPorts[`${publicAndPrivatePort[1]}/${protocol}`] = {};
       }
 
-      // 解析额外路径挂载
+      // resolve extra path mounts
       const extraVolumes = instance.config.docker.extraVolumes;
       const extraBinds = [];
       for (const it of extraVolumes) {
@@ -156,11 +156,11 @@ export default class DockerStartCommand extends InstanceCommand {
         extraBinds.push(`${hostPath}:${containerPath}`);
       }
 
-      // 内存限制
+      // memory limit
       let maxMemory = undefined;
       if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
 
-      // CPU使用率计算
+      // CPU usage calculation
       let cpuQuota = undefined;
       let cpuPeriod = undefined;
       if (instance.config.docker.cpuUsage) {
@@ -168,7 +168,7 @@ export default class DockerStartCommand extends InstanceCommand {
         cpuPeriod = 1000 * 1000;
       }
 
-      // CPU 核心数校验
+      // Check the number of CPU cores
       let cpusetCpus = undefined;
       if (instance.config.docker.cpusetCpus) {
         const arr = instance.config.docker.cpusetCpus.split(",");
@@ -176,16 +176,16 @@ export default class DockerStartCommand extends InstanceCommand {
           if (isNaN(Number(v))) throw new Error($t("instance.invalidCpu", { v }));
         });
         cpusetCpus = instance.config.docker.cpusetCpus;
-        // Note: 检验
+        // Note: check
       }
 
-      // 容器名校验
+      // container name check
       let containerName = instance.config.docker.containerName;
       if (containerName && (containerName.length > 64 || containerName.length < 2)) {
         throw new Error($t("instance.invalidContainerName", { v: containerName }));
       }
 
-      // 输出启动日志
+      // output startup log
       logger.info("----------------");
       logger.info(`Session ${source}: Request to start an instance`);
       logger.info(`UUID: [${instance.instanceUuid}] [${instance.config.nickname}]`);
@@ -200,10 +200,10 @@ export default class DockerStartCommand extends InstanceCommand {
       logger.info(`TYPE: Docker Container`);
       logger.info("----------------");
 
-      // 是否使用 TTY 模式
+      // Whether to use TTY mode
       const isTty = instance.config.terminalOption.pty;
 
-      // 开始 Docker 容器创建并运行
+      // Start Docker container creation and running
       const docker = new Docker();
       const container = await docker.createContainer({
         name: containerName,
@@ -237,7 +237,7 @@ export default class DockerStartCommand extends InstanceCommand {
         }
       });
 
-      // Docker 对接到进程适配器
+      // Docker docks to the process adapter
       const processAdapter = new DockerProcessAdapter(container);
       await processAdapter.start({
         isTty,
