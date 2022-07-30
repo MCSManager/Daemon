@@ -22,6 +22,12 @@ export default class StartCommand extends InstanceCommand {
     this.source = source;
   }
 
+  private async sleep() {
+    return new Promise((ok) => {
+      setTimeout(ok, 1000 * 3);
+    });
+  }
+
   async exec(instance: Instance) {
     // 状态检查
     const instanceStatus = instance.status();
@@ -36,15 +42,11 @@ export default class StartCommand extends InstanceCommand {
       }
     }
 
-    // 无限启动检查
     const currentTimestamp = new Date().getTime();
-    const intervals = 10 * 1000;
-    if (instance.startTimestamp && currentTimestamp - instance.startTimestamp < intervals) {
-      const unbanss = Number((intervals - (currentTimestamp - instance.startTimestamp)) / 1000).toFixed(0);
-      return instance.failure(new Error(`两次启动间隔太短，本次请求被拒绝，请 ${unbanss} 秒后再试`));
-    }
-    // 更新上次启动时间戳
     instance.startTimestamp = currentTimestamp;
+
+    instance.println("INFO", "正在启动实例...");
+    await this.sleep();
 
     return await instance.execPreset("start", this.source);
   }

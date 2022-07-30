@@ -17,8 +17,7 @@ __  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
 _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
 
- + Released under the AGPL-3.0 License
- + Copyright 2022 Suwings
+ + Copyright 2022 https://github.com/mcsmanager
  + Version ${VERSION}
 `);
 
@@ -119,6 +118,7 @@ console.log("");
 
 // 装载 终端界面UI
 import "./service/ui";
+
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
   process.on(sig, async function () {
     try {
