@@ -17,7 +17,12 @@ export default {
     passwordTip: "密钥作为守护进程唯一认证手段"
   },
   // src\app\middleware\permission.ts
-  permission: {}
+  permission: {},
+
+  command: {
+    quotes: "错误的命令双引号，无法找到成对双引号，如需使用单个双引号请使用 {quotes} 符号",
+    errLen: "错误的命令长度，请确保命令格式正确"
+  }
 };
 // import { $t } from "../../i18n";
 // $t("permission.forbiddenInstance");]

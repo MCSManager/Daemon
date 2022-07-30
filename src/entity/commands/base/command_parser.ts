@@ -1,5 +1,7 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../../i18n";
+
 export function commandStringToArray(cmd: string) {
   const QUOTES_KEY = "{quotes}";
   let start = 0;
@@ -40,13 +42,13 @@ export function commandStringToArray(cmd: string) {
       const ch = cmd[index];
       if (ch === '"') return index;
     }
-    throw new Error("错误的命令双引号，无法找到成对双引号，如需使用单个双引号请使用 {quotes} 符号");
+    throw new Error($t("command.quotes"));
   }
 
   _analyze();
 
   if (cmdArray.length == 0) {
-    throw new Error("错误的命令长度，请确保命令格式正确");
+    throw new Error($t("command.errLen"));
   }
 
   for (const index in cmdArray) {
