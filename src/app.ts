@@ -17,7 +17,7 @@ __  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
 _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
 
- + Copyright 2022 https://github.com/mcsmanager
+ + Copyright 2022 MCSManager Dev <mcsmanager-dev@outlook.com>
  + Version ${VERSION}
 `);
 
@@ -79,7 +79,7 @@ try {
 
 // 注册 Websocket 连接事件
 io.on("connection", (socket: Socket) => {
-  logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已连接.`);
+  logger.info($t("app.sessionConnect", { ip: socket.handshake.address, uuid: socket.id }));
 
   // Join the global Socket object
   protocol.addGlobalSocket(socket);
@@ -92,32 +92,33 @@ io.on("connection", (socket: Socket) => {
     // Remove from the global Socket object
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
-    logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已断开`);
+    logger.info($t("app.sessionDisconnect", { ip: socket.handshake.address, uuid: socket.id }));
   });
 });
 
 // Error report monitoring
 process.on("uncaughtException", function (err) {
-  logger.error(`错误报告 (uncaughtException):`, err);
+  logger.error(`Error: UncaughtException:`, err);
 });
 
 // Error report monitoring
 process.on("unhandledRejection", (reason, p) => {
-  logger.error(`错误报告 (unhandledRejection):`, reason, p);
+  logger.error(`Error: UnhandledRejection:`, reason, p);
 });
 
 // Started up
-logger.info(`守护进程现已成功启动`);
-logger.info("================================");
-logger.info("参考文档：https://docs.mcsmanager.com/");
-logger.info(`访问地址：http://${config.ip ? config.ip : "localhost"}:${config.port}`);
-logger.info(`访问密钥：${config.key}`);
-logger.info("密钥作为守护进程唯一认证手段");
-logger.info("================================");
+logger.info("---------------------------");
+logger.info($t("app.started"));
+logger.info($t("app.doc"));
+logger.info($t("app.addr", { port: config.port }));
+logger.info($t("app.configPathTip", { path: "" }));
+logger.info($t("app.password", { key: config.key }));
+logger.info($t("app.passwordTip"));
+logger.info("---------------------------");
 console.log("");
 
 // 装载 终端界面UI
-import "./service/ui";
+// import "./service/ui";
 
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
   process.on(sig, async function () {
