@@ -6,16 +6,16 @@ import { getVersion, initVersionManager } from "./service/version";
 initVersionManager();
 const VERSION = getVersion();
 
-console.log(`______  _______________________  ___                                         
-___   |/  /_  ____/_  ___/__   |/  /_____ _____________ _______ _____________
-__  /|_/ /_  /    _____ \\__  /|_/ /_  __  /_  __ \\  __  /_  __  /  _ \\_  ___/
-_  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /    
-/_/  /_/  \\____/  /____/ /_/  /_/  \\__,_/ /_/ /_/\\__,_/ _\\__, / \\___//_/     
-________                                                /____/                                          
-___  __ \\_____ ____________ ________________ 
-__  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
-_  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
-/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
+console.log(`______ _______________________ ___
+___ |/ /_ ____/_ ___/__ |/ /_____ _____________ _______ _____________
+__ /|_/ /_ / _____ \\__ /|_/ /_ __ /_ __ \\ __ /_ __ / _ \\_ ___/
+_ / / / / /___ ____/ /_ / / / / /_/ /_ / / /_/ /_ /_/ // __/ /
+/_/ /_/ \\____/ /____/ /_/ /_/ \\__,_/ /_/ /_/\\__,_/ _\\__, / \\___//_/
+________ /____/
+___ __ \\_____ ____________ ________________
+__ / / / __ / _ \\_ __ __ \\ __ \\_ __ \\
+_ /_/ // /_/ // __/ / / / / / /_/ / / / /
+/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/
 
  + Copyright 2022 MCSManager Dev <mcsmanager-dev@outlook.com>
  + Version ${VERSION}
@@ -36,26 +36,26 @@ import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 import { initDependent } from "./service/install";
 
-// 异步初始化可选依赖库
+// initialize optional dependencies asynchronously
 initDependent();
 
-// 初始化全局配置服务
+// Initialize the global configuration service
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// 初始化 HTTP 服务
+// Initialize HTTP service
 const koaApp = koa.initKoa();
 
-// 监听 Koa 错误
+// Listen for Koa errors
 koaApp.on("error", (error) => {
-  // 屏蔽所有 Koa 框架级别事件
-  // 当 Koa 遭遇短连接洪水攻击时，很容易错误信息刷屏，有可能会间接影响某些应用程序运作
+  // Block all Koa framework level events
+  // When Koa is attacked by a short connection flood, it is easy for error messages to swipe the screen, which may indirectly affect the operation of some applications
 });
 
 const httpServer = http.createServer(koaApp.callback());
 httpServer.listen(config.port, config.ip);
 
-// 初始化 Websocket 服务到 HTTP 服务
+// Initialize Websocket service to HTTP service
 const io = new Server(httpServer, {
   serveClient: false,
   pingInterval: 5000,
@@ -68,7 +68,7 @@ const io = new Server(httpServer, {
   }
 });
 
-// 初始化应用实例系统 & 装载应用实例
+// Initialize application instance system & load application instance
 try {
   InstanceSubsystem.loadInstances();
   logger.info($t("app.instanceLoad", { n: InstanceSubsystem.instances.size }));
@@ -77,7 +77,7 @@ try {
   process.exit(-1);
 }
 
-// 注册 Websocket 连接事件
+// Register for Websocket connection events
 io.on("connection", (socket: Socket) => {
   logger.info($t("app.sessionConnect", { ip: socket.handshake.address, uuid: socket.id }));
 
@@ -88,36 +88,33 @@ io.on("connection", (socket: Socket) => {
   router.navigation(socket);
 
   // Disconnect event
+  // Remove from the global Socket object
   socket.on("disconnect", () => {
-    // Remove from the global Socket object
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
     logger.info($t("app.sessionDisconnect", { ip: socket.handshake.address, uuid: socket.id }));
   });
 });
 
-// Error report monitoring
 process.on("uncaughtException", function (err) {
   logger.error(`Error: UncaughtException:`, err);
 });
 
-// Error report monitoring
 process.on("unhandledRejection", (reason, p) => {
   logger.error(`Error: UnhandledRejection:`, reason, p);
 });
 
-// Started up
-logger.info("---------------------------");
+logger.info("----------------------------");
 logger.info($t("app.started"));
 logger.info($t("app.doc"));
 logger.info($t("app.addr", { port: config.port }));
 logger.info($t("app.configPathTip", { path: "" }));
 logger.info($t("app.password", { key: config.key }));
 logger.info($t("app.passwordTip"));
-logger.info("---------------------------");
+logger.info("----------------------------");
 console.log("");
 
-// 装载 终端界面UI
+// Load the terminal interface UI
 // import "./service/ui";
 
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
