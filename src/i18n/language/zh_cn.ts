@@ -18,7 +18,13 @@ export default {
   },
   // src\app\middleware\permission.ts
   permission: {},
-
+  instance: {
+    dirEmpty: "启动命令，输入输出编码或工作目录为空值",
+    dirNoE: "工作目录并不存在",
+    invalidCpu: "非法的CPU核心指定 {{v}}",
+    invalidContainerName: "非法的容器名 {{v}}",
+    successful: "实例 {{v}} 启动成功"
+  },
   command: {
     quotes: "错误的命令双引号，无法找到成对双引号，如需使用单个双引号请使用 {quotes} 符号",
     errLen: "错误的命令长度，请确保命令格式正确"

@@ -1,5 +1,5 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-
+import { $t } from "../../../i18n";
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
 import Docker from "dockerode";
@@ -93,8 +93,8 @@ export default class DockerStartCommand extends InstanceCommand {
 
   async exec(instance: Instance, source = "Unknown") {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
+      return instance.failure(new StartupDockerProcessError($t("instance.dirEmpty")));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 
     try {
       // 锁死实例
@@ -173,7 +173,7 @@ export default class DockerStartCommand extends InstanceCommand {
       if (instance.config.docker.cpusetCpus) {
         const arr = instance.config.docker.cpusetCpus.split(",");
         arr.forEach((v) => {
-          if (isNaN(Number(v))) throw new Error(`非法的CPU核心指定: ${v}`);
+          if (isNaN(Number(v))) throw new Error($t("instance.invalidCpu", { v }));
         });
         cpusetCpus = instance.config.docker.cpusetCpus;
         // Note: 检验
@@ -182,22 +182,22 @@ export default class DockerStartCommand extends InstanceCommand {
       // 容器名校验
       let containerName = instance.config.docker.containerName;
       if (containerName && (containerName.length > 64 || containerName.length < 2)) {
-        throw new Error(`非法的容器名: ${containerName}`);
+        throw new Error($t("instance.invalidContainerName", { v: containerName }));
       }
 
       // 输出启动日志
       logger.info("----------------");
-      logger.info(`会话 ${source}: 请求开启实例`);
-      logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`容器名称: [${containerName}]`);
-      logger.info(`启动命令: ${commandList.join(" ")}`);
-      logger.info(`工作目录: ${cwd}`);
-      logger.info(`网络模式: ${instance.config.docker.networkMode}`);
-      logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
-      if (extraBinds.length > 0) logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
-      logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
-      if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
-      logger.info(`类型: Docker 容器`);
+      logger.info(`Session ${source}: Request to start an instance`);
+      logger.info(`UUID: [${instance.instanceUuid}] [${instance.config.nickname}]`);
+      logger.info(`NAME: [${containerName}]`);
+      logger.info(`COMMAND: ${commandList.join(" ")}`);
+      logger.info(`WORKSPACE: ${cwd}`);
+      logger.info(`NET_MODE: ${instance.config.docker.networkMode}`);
+      logger.info(`OPEN_PORT: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`EXT_MOUNT: ${JSON.stringify(extraBinds)}`);
+      logger.info(`NET_ALIASES: ${JSON.stringify(instance.config.docker.networkAliases)}`);
+      logger.info(`MEM_LIMIT: ${maxMemory} MB`);
+      logger.info(`TYPE: Docker Container`);
       logger.info("----------------");
 
       // 是否使用 TTY 模式
@@ -246,7 +246,7 @@ export default class DockerStartCommand extends InstanceCommand {
       });
 
       instance.started(processAdapter);
-      logger.info(`实例 ${instance.instanceUuid} 成功启动.`);
+      logger.info($t("instance.successful", { v: `${instance.config.nickname} ${instance.instanceUuid}` }));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
