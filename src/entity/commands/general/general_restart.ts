@@ -1,5 +1,5 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
-
+import { $t } from "../../../i18n";
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
 
@@ -10,7 +10,7 @@ export default class GeneralRestartCommand extends InstanceCommand {
 
   async exec(instance: Instance) {
     try {
-      instance.println("INFO", "重启实例计划开始执行...");
+      instance.println("INFO", $t("restart.start"));
       await instance.execPreset("stop");
       instance.setLock(true);
       const startCount = instance.startCount;
@@ -18,13 +18,13 @@ export default class GeneralRestartCommand extends InstanceCommand {
       const task = setInterval(async () => {
         try {
           if (startCount !== instance.startCount) {
-            throw new Error("重启实例状态错误，实例已被启动过，上次状态的重启计划取消");
+            throw new Error($t("restart.error1"));
           }
           if (instance.status() !== Instance.STATUS_STOPPING && instance.status() !== Instance.STATUS_STOP) {
-            throw new Error("重启实例状态错误，实例状态应该为停止中状态，现在变为正在运行，重启计划取消");
+            throw new Error($t("restart.error2"));
           }
           if (instance.status() === Instance.STATUS_STOP) {
-            instance.println("INFO", "检测到服务器已停止，正在重启实例...");
+            instance.println("INFO", $t("restart.restarting"));
             await instance.execPreset("start");
             instance.setLock(false);
             clearInterval(task);
