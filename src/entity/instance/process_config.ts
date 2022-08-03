@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../i18n";
 import yaml from "yaml";
 import properties from "properties";
 import path from "path";
@@ -58,7 +59,7 @@ export class ProcessConfig {
     if (this.iProcessConfig.type === "txt") {
       text = object.toString();
     }
-    if (!text) throw new Error("写入内容为空，可能是配置文件类型不支持");
+    if (!text) throw new Error($t("process_config.writEmpty"));
     fs.writeFileSync(this.iProcessConfig.path, text, { encoding: CONFIG_FILE_ENCODE });
   }
 

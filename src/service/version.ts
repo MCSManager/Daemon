@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import * as fs from "fs-extra";
 import GlobalVariable from "../common/global_variable";
 import logger from "./log";
@@ -16,7 +17,7 @@ export function initVersionManager() {
       }
     }
   } catch (error) {
-    logger.error("版本检查失败", error);
+    logger.error($t("version.versionDetectErr"), error);
   }
 }
 

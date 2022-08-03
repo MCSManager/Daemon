@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../i18n";
 import iconv from "iconv-lite";
 import path from "path";
 import fs from "fs-extra";
@@ -73,7 +74,7 @@ export default class Instance extends EventEmitter {
   constructor(instanceUuid: string, config: InstanceConfig) {
     super();
 
-    if (!instanceUuid || !config) throw new Error("初始化实例失败，唯一标识符或配置参数为空");
+    if (!instanceUuid || !config) throw new Error($t("instanceConf.initInstanceErr"));
 
     // Basic information
     this.instanceStatus = Instance.STATUS_STOP;
@@ -92,21 +93,21 @@ export default class Instance extends EventEmitter {
   parameters(cfg: any) {
     // 若实例类型改变，则必须重置预设命令与生命周期事件
     if (cfg?.type && cfg?.type != this.config.type) {
-      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例类型");
+      if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyInstanceType"));
       configureEntityParams(this.config, cfg, "type", String);
       this.forceExec(new FunctionDispatcher());
     }
     // 若进程类型改变，则必须重置预设命令与生命周期事件
     if (cfg?.processType && cfg?.processType !== this.config.processType) {
-      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改此实例进程类型");
+      if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyProcessType"));
       configureEntityParams(this.config, cfg, "processType", String);
       this.forceExec(new FunctionDispatcher());
     }
     // 若终端类型改变，则必须重置预设命令
     if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
-      if (this.status() != Instance.STATUS_STOP) throw new Error("正在运行时无法修改PTY模式");
+      if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyPtyModel"));
       if (!fs.existsSync(PTY_PATH) && cfg?.terminalOption?.pty === true)
-        throw new Error(`无法启用仿真终端，因为 ${PTY_PATH} 附属程序不存在，您可以联系管理员重启 Daemon 程序得以重新安装（仅 Linux）`);
+        throw new Error($t("instanceConf.ptyNotExist", { path: PTY_PATH }));
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
     }
@@ -162,8 +163,8 @@ export default class Instance extends EventEmitter {
 
   // 对本实例执行对应的命令
   async execCommand(command: InstanceCommand) {
-    if (this.lock) throw new Error(`此 ${command.info} 操作无法执行，因为实例处于锁定状态，请稍后再试.`);
-    if (this.status() == Instance.STATUS_BUSY) throw new Error(`当前实例正处于忙碌状态，无法执行任何操作.`);
+    if (this.lock) throw new Error($t("instanceConf.instanceLock", { info: command.info }));
+    if (this.status() == Instance.STATUS_BUSY) throw new Error($t("instanceConf.instanceBusy"));
     return await command.exec(this);
   }
 
@@ -221,10 +222,10 @@ export default class Instance extends EventEmitter {
       if (!this.config.eventTask.ignore) {
         this.forceExec(new StartCommand("Event Task: Auto Restart"))
           .then(() => {
-            this.println("信息", "检测到实例关闭，根据主动事件机制，自动重启指令已发出...");
+            this.println($t("instanceConf.info"), $t("instanceConf.autoRestart"));
           })
           .catch((err) => {
-            this.println("错误", `自动重启错误: ${err}`);
+            this.println($t("instanceConf.error"), $t("instanceConf.autoRestartErr", { err: err }));
           });
       }
       this.config.eventTask.ignore = false;
@@ -234,7 +235,7 @@ export default class Instance extends EventEmitter {
     const currentTimestamp = new Date().getTime();
     const startThreshold = 3 * 1000;
     if (currentTimestamp - this.startTimestamp < startThreshold) {
-      this.println("ERROR", `检测到实例启动后在极短的时间内退出，原因可能是您的启动命令错误或配置文件错误。`);
+      this.println("ERROR", $t("instanceConf.instantExit"));
     }
   }
 

@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import { missionPassport } from "../service/mission_passport";
@@ -17,7 +18,7 @@ routerApp.use(async (event, ctx, data, next) => {
     if (ctx.session.stream && ctx.session.stream.check === true && ctx.session.type === "STREAM") {
       return await next();
     }
-    return protocol.error(ctx, "error", "[Unauthorized Access] 权限不足，非法访问");
+    return protocol.error(ctx, "error", $t("stream_router.unauthorizedAccess"));
   }
   return await next();
 });
@@ -27,14 +28,14 @@ routerApp.on("stream/auth", (ctx, data) => {
   try {
     const password = data.password;
     const mission = missionPassport.getMission(password, "stream_channel");
-    if (!mission) throw new Error("任务不存在");
+    if (!mission) throw new Error($t("stream_router.taskNotExist"));
 
     // 实例UUID参数必须来自于任务参数，不可直接使用
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
-    if (!instance) throw new Error("实例不存在");
+    if (!instance) throw new Error($t("stream_router.instanceNotExist"));
 
     // 加入数据流认证标识
-    logger.info(`会话 ${ctx.socket.id} ${ctx.socket.handshake.address} 数据流通道身份验证成功`);
+    logger.info($t("stream_router.authSuccess", { id: ctx.socket.id, address: ctx.socket.handshake.address }));
     ctx.session.id = ctx.socket.id;
     ctx.session.login = true;
     ctx.session.type = "STREAM";
@@ -45,12 +46,16 @@ routerApp.on("stream/auth", (ctx, data) => {
 
     // 开始向此 Socket 转发输出流数据
     InstanceSubsystem.forward(instance.instanceUuid, ctx.socket);
-    logger.info(`会话 ${ctx.socket.id} ${ctx.socket.handshake.address} 已与 ${instance.instanceUuid} 建立数据通道`);
+    logger.info(
+      $t("stream_router.establishConnection", { id: ctx.socket.id, address: ctx.socket.handshake.address, uuid: instance.instanceUuid })
+    );
 
     // 注册断开时取消转发事件
     ctx.socket.on("disconnect", () => {
       InstanceSubsystem.stopForward(instance.instanceUuid, ctx.socket);
-      logger.info(`会话 ${ctx.socket.id} ${ctx.socket.handshake.address} 已与 ${instance.instanceUuid} 断开数据通道`);
+      logger.info(
+        $t("stream_router.disconnect", { id: ctx.socket.id, address: ctx.socket.handshake.address, uuid: instance.instanceUuid })
+      );
     });
     protocol.response(ctx, true);
   } catch (error) {

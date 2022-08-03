@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
@@ -7,7 +8,7 @@ import os from "os";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
 
-const ERROR_MSG_01 = "非法访问路径";
+const ERROR_MSG_01 = $t("system_file.illegalAccess");
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
 
 interface IFile {
@@ -143,8 +144,7 @@ export default class FileManager {
   private zipFileCheck(path: string) {
     const fileInfo = fs.statSync(path);
     const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
-    if (fileInfo.size > 1024 * 1024 * 1024 * MAX_ZIP_GB)
-      throw new Error(`文件解压缩只支持最大 ${MAX_ZIP_GB}GB 文件的解压缩，如需改变上限请前往 data/Config/global.json 文件`);
+    if (fileInfo.size > 1024 * 1024 * 1024 * MAX_ZIP_GB) throw new Error($t("system_file.unzipLimit", { max: MAX_ZIP_GB }));
   }
 
   unzip(sourceZip: string, destDir: string, code?: string) {
@@ -172,8 +172,7 @@ export default class FileManager {
         } catch (error) {}
       }
     }
-    if (totalSize > MAX_TOTAL_FIELS_SIZE)
-      throw new Error(`文件解压缩只支持所有文件大小和 ${MAX_ZIP_GB}GB 的压缩，如需改变上限请前往 data/Config/global.json 文件`);
+    if (totalSize > MAX_TOTAL_FIELS_SIZE) throw new Error($t("system_file.unzipLimit", { max: MAX_ZIP_GB }));
     compress(sourceZipPath, filesPath, code)
       .then(() => {})
       .catch(() => {});
@@ -185,7 +184,7 @@ export default class FileManager {
       const absPath = this.toAbsolutePath(target);
       const info = fs.statSync(absPath);
       if (info.size > MAX_EDIT_SIZE) {
-        throw new Error("超出最大文件编辑限制");
+        throw new Error($t("system_file.execLimit"));
       }
       return await this.readFile(target);
     } else {

@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../i18n";
 export interface IExecutable {
   exec: (a: any, b?: any) => Promise<any>;
   stop?: (a: any) => Promise<void>;
@@ -20,7 +21,7 @@ export class PresetCommandManager {
 
   async execPreset(action: string, p?: any) {
     const cmd = this.preset.get(action);
-    if (!cmd) throw new Error(`预设命令 ${action} 不可用`);
+    if (!cmd) throw new Error($t("preset.actionErr", { action: action }));
     return await cmd.exec(this.self, p);
   }
 

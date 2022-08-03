@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import schedule from "node-schedule";
 import InstanceSubsystem from "./system_instance";
 import StorageSubsystem from "../common/system_storage";
@@ -78,10 +79,10 @@ class InstanceControlSubsystem {
     if (!this.taskMap.has(key)) {
       this.taskMap.set(key, []);
     }
-    if (this.taskMap.get(key)?.length >= 8) throw new Error("无法继续创建计划任务，以达到上限");
-    if (!this.checkTask(key, task.name)) throw new Error("已存在重复的任务");
-    if (!FileManager.checkFileName(task.name)) throw new Error("非法的计划名，仅支持下划线，数字，字母和部分本地语言");
-    if (needStore) logger.info(`创建计划任务 ${task.name}:\n${JSON.stringify(task)}`);
+    if (this.taskMap.get(key)?.length >= 8) throw new Error($t("system_instance_control.execLimit"));
+    if (!this.checkTask(key, task.name)) throw new Error($t("system_instance_control.existRepeatTask"));
+    if (!FileManager.checkFileName(task.name)) throw new Error($t("system_instance_control.illegalName"));
+    if (needStore) logger.info($t("system_instance_control.crateTask", { name: task.name, task: JSON.stringify(task) }));
 
     let job: IScheduleJob;
 
@@ -108,9 +109,7 @@ class InstanceControlSubsystem {
       const checkIndex = [0, 1, 2];
       checkIndex.forEach((item) => {
         if (isNaN(Number(timeArray[item])) && Number(timeArray[item]) >= 0) {
-          throw new Error(
-            `计划任务创建错误，不正确的时间表达式: \n${task.name}: ${timeArray}\n请尝试删除 data/TaskConfig/${task.name}.json 文件解决此问题`
-          );
+          throw new Error($t("system_instance_control.crateTaskErr", { name: task.name, timeArray: timeArray }));
         }
       });
       // task.type=2: 指定时间型计划任务，采用 node-schedule 库实现
@@ -131,7 +130,7 @@ class InstanceControlSubsystem {
     if (needStore) {
       StorageSubsystem.store("TaskConfig", `${key}_${newTask.config.name}`, newTask.config);
     }
-    if (needStore) logger.info(`创建计划任务 ${task.name} 完毕`);
+    if (needStore) logger.info($t("system_instance_control.crateSuccess", { name: task.name }));
   }
 
   public listScheduleJob(instanceUuid: string) {
@@ -179,7 +178,7 @@ class InstanceControlSubsystem {
         return await instance.exec(new KillCommand());
       }
     } catch (error) {
-      logger.error(`实例 ${task.instanceUuid} 计划任务 ${task.name} 执行错误: \n ${error} `);
+      logger.error($t("system_instance_control.execCmdErr", { uuid: task.instanceUuid, name: task.name, error: error }));
     }
   }
 

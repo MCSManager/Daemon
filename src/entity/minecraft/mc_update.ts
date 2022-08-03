@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../i18n";
 import Instance from "../instance/instance";
 import InstanceCommand from "../commands/base/command";
 
@@ -9,6 +10,6 @@ export default class MinecraftUpdateCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    console.log("更新实例.....");
+    console.log($t("mc_update.updateInstance"));
   }
 }

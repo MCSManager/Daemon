@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
@@ -13,7 +14,7 @@ routerApp.use((event, ctx, data, next) => {
     if (!InstanceSubsystem.exists(instanceUuid)) {
       return protocol.error(ctx, event, {
         instanceUuid: instanceUuid,
-        err: `实例 ${instanceUuid} 不存在`
+        err: $t("file_router.instanceNotExist", { instanceUuid: instanceUuid })
       });
     }
   }
@@ -127,7 +128,7 @@ routerApp.on("file/compress", async (ctx, data) => {
     const fileManager = getFileManager(data.instanceUuid);
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
     if (instance.info.fileLock >= maxFileTask) {
-      throw new Error(`超出最大同时解压缩任务量，最大准许${maxFileTask}个，目前有${instance.info.fileLock}个任务正在进行，请耐心等待`);
+      throw new Error($t("file_router.unzipLimit", { maxFileTask: maxFileTask, fileLock: instance.info.fileLock }));
     }
     // 单个实例文件任务量与整个守护进程文件任务量数统计
     function fileTaskStart() {

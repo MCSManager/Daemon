@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import { routerApp } from "../service/router";
 import * as protocol from "../service/protocol";
 import { globalConfiguration } from "../entity/config";
@@ -22,8 +23,8 @@ routerApp.use(async (event, ctx, _, next) => {
   if (ctx.session.key === globalConfiguration.config.key && ctx.session.type === TOP_LEVEL && ctx.session.login && ctx.session.id) {
     return await next();
   }
-  logger.warn(`会话 ${socket.id}(${socket.handshake.address}) 试图无权限访问 ${event} 现已阻止.`);
-  return protocol.error(ctx, "error", "权限不足，非法访问");
+  logger.warn($t("auth_router.notAccess", { id: socket.id, address: socket.handshake.address, event: event }));
+  return protocol.error(ctx, "error", $t("auth_router.illegalAccess"));
 });
 
 // 日志输出中间件
@@ -43,7 +44,7 @@ routerApp.use(async (event, ctx, _, next) => {
 routerApp.on("auth", (ctx, data) => {
   if (data === globalConfiguration.config.key) {
     // 身份认证通过，注册会话为可信会话
-    logger.info(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address}) 验证身份成功`);
+    logger.info($t("auth_router.access"), { id: ctx.socket.id, address: ctx.socket.handshake.address });
     loginSuccessful(ctx, data);
     protocol.msg(ctx, "auth", true);
   } else {
@@ -57,7 +58,7 @@ routerApp.on("connection", (ctx) => {
   setTimeout(() => {
     if (!session.login) {
       ctx.socket.disconnect();
-      logger.info(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address}) 因长时间未验证身份而断开连接`);
+      logger.info($t("auth_router.disconnect", { id: ctx.socket.id, address: ctx.socket.handshake.address }));
     }
   }, AUTH_TIMEOUT);
 });

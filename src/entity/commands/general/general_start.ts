@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../../i18n";
 import os from "os";
 import Instance from "../../instance/instance";
 import logger from "../../../service/log";
@@ -60,8 +61,8 @@ export default class GeneralStartCommand extends InstanceCommand {
 
   async exec(instance: Instance, source = "Unknown") {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
+      return instance.failure(new StartupError($t("general_start.instanceConfigErr")));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("general_start.cwdPathNotExist")));
 
     try {
       instance.setLock(true);
@@ -75,14 +76,14 @@ export default class GeneralStartCommand extends InstanceCommand {
       const commandExeFile = commandList[0];
       const commandParameters = commandList.slice(1);
       if (commandList.length === 0) {
-        return instance.failure(new StartupError("无法启动实例，启动命令为空"));
+        return instance.failure(new StartupError($t("general_start.cmdEmpty")));
       }
 
       logger.info("----------------");
-      logger.info(`会话 ${source}: 请求开启实例.`);
-      logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`启动命令: ${JSON.stringify(commandList)}`);
-      logger.info(`工作目录: ${instance.config.cwd}`);
+      logger.info($t("general_start.startInstance", { source: source }));
+      logger.info($t("general_start.instanceUuid", { uuid: instance.instanceUuid }));
+      logger.info($t("general_start.startCmd", { cmdList: JSON.stringify(commandList) }));
+      logger.info($t("general_start.cwd", { cwd: instance.config.cwd }));
       logger.info("----------------");
 
       // 创建子进程
@@ -97,21 +98,13 @@ export default class GeneralStartCommand extends InstanceCommand {
       if (!process || !process.pid) {
         instance.println(
           "ERROR",
-          `检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
-1. 实例启动命令编写错误，请前往实例设置界面检查启动命令与参数。
-2. 系统主机环境不正确或缺少环境，如 Java 环境等。
-
-原生启动命令：
-${instance.config.startCommand}
-
-启动命令解析体:
-程序：${commandExeFile}
-参数：${JSON.stringify(commandParameters)}
-
-请将此信息报告给管理员，技术人员或自行排查故障。
-`
+          $t("general_start.pidErr", {
+            startCommand: instance.config.startCommand,
+            commandExeFile: commandExeFile,
+            commandParameters: JSON.stringify(commandParameters)
+          })
         );
-        throw new StartupError("实例启动失败，请检查启动命令，主机环境和配置文件等");
+        throw new StartupError($t("general_start.startErr"));
       }
 
       // 创建进程适配器
@@ -119,8 +112,8 @@ ${instance.config.startCommand}
 
       // 产生开启事件
       instance.started(processAdapter);
-      logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
-      instance.println("INFO", "应用实例已运行，终端为普通终端模式，您可以在底部的命令输入框发送命令，不支持 Ctrl，Tab 等功能键");
+      logger.info($t("general_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
+      instance.println("INFO", $t("general_start.startOrdinaryTerminal"));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();

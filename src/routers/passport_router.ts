@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import { routerApp } from "../service/router";
 import { missionPassport } from "../service/mission_passport";
 import * as protocol from "../service/protocol";
@@ -15,7 +16,7 @@ routerApp.on("passport/register", (ctx, data) => {
   const count = data.count;
   const start = new Date().getTime();
   const end = start + ONE_HOUR_TIME * TASK_MAX_TIME;
-  if (!name || !password) throw new Error("不可定义任务名或密钥为空");
+  if (!name || !password) throw new Error($t("passport_router.registerErr"));
   missionPassport.registerMission(password, {
     name,
     parameter,

@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import readline from "readline";
 
 import * as protocol from "./protocol";
@@ -16,7 +17,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log('[终端] 守护进程拥有基本的交互功能，请输入"help"查看更多信息');
+console.log($t("ui.help"));
 
 function stdin() {
   rl.question("> ", async (answer) => {

@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../../../i18n";
 import os from "os";
 import Instance from "../../instance/instance";
 import logger from "../../../service/log";
@@ -65,21 +66,21 @@ export default class PtyStartCommand extends InstanceCommand {
 
   async exec(instance: Instance, source = "Unknown") {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
+      return instance.failure(new StartupError($t("pty_start.cmdErr")));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("pty_start.cwdNotExist")));
 
     try {
       // PTY 模式正确性检查
-      logger.info(`会话 ${source}: 请求开启实例，模式为仿真终端`);
+      logger.info($t("pty_start.startPty", { source: source }));
       let checkPtyEnv = true;
 
       if (!fs.existsSync(PTY_PATH)) {
-        instance.println("ERROR", "仿真终端模式失败，可能是依赖程序不存在，已自动降级到普通终端模式...");
+        instance.println("ERROR", $t("pty_start.startErr"));
         checkPtyEnv = false;
       }
 
       if ((os.platform() !== "linux" && os.platform() !== "win32") || os.arch() !== "x64") {
-        instance.println("ERROR", "仿真终端模式失败，无法支持的架构或系统，已自动降级到普通终端模式...");
+        instance.println("ERROR", $t("pty_start.notSupportPty"));
         checkPtyEnv = false;
       }
 
@@ -98,7 +99,7 @@ export default class PtyStartCommand extends InstanceCommand {
 
       // 命令解析
       const commandList = commandStringToArray(instance.config.startCommand);
-      if (commandList.length === 0) return instance.failure(new StartupError("无法启动实例，启动命令为空"));
+      if (commandList.length === 0) return instance.failure(new StartupError($t("pty_start.cmdEmpty")));
       const ptyParameter = [
         "-dir",
         instance.config.cwd,
@@ -110,12 +111,12 @@ export default class PtyStartCommand extends InstanceCommand {
       ];
 
       logger.info("----------------");
-      logger.info(`会话 ${source}: 请求开启实例.`);
-      logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`启动命令: ${commandList.join(" ")}`);
-      logger.info(`PTY 路径: ${[PTY_PATH]}`);
-      logger.info(`PTY 参数: ${ptyParameter.join(" ")}`);
-      logger.info(`工作目录: ${instance.config.cwd}`);
+      logger.info($t("pty_start.sourceRequest", { source: source }));
+      logger.info($t("pty_start.instanceUuid", { instanceUuid: instance.instanceUuid }));
+      logger.info($t("pty_start.startCmd", { cmd: commandList.join(" ") }));
+      logger.info($t("pty_start.ptyPath", { path: PTY_PATH }));
+      logger.info($t("pty_start.ptyParams", { param: ptyParameter.join(" ") }));
+      logger.info($t("pty_start.ptyCwd", { cwd: instance.config.cwd }));
       logger.info("----------------");
 
       // 创建子进程
@@ -131,22 +132,9 @@ export default class PtyStartCommand extends InstanceCommand {
       if (!subProcess || !subProcess.pid) {
         instance.println(
           "ERROR",
-          `检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
-1. 实例启动命令编写错误，请前往实例设置界面检查启动命令与参数。
-2. 系统主机环境不正确或缺少环境，如 Java 环境等。
-
-原生启动命令：
-${instance.config.startCommand}
-
-仿真终端中转命令:
-程序：${PTY_PATH}
-参数：${JSON.stringify(ptyParameter)}
-
-请将此信息报告给管理员，技术人员或自行排查故障。
-如果您认为是面板仿真终端导致的问题，请在左侧终端设置中关闭“仿真终端”选项，我们将会采用原始输入输出流的方式监听程序。
-`
+          $t("pty_start.ptyCwd", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
         );
-        throw new StartupError("实例启动失败，请检查启动命令，主机环境和配置文件等");
+        throw new StartupError($t("pty_start.instanceStartErr"));
       }
 
       // 创建进程适配器
@@ -154,8 +142,8 @@ ${instance.config.startCommand}
 
       // 产生开启事件
       instance.started(processAdapter);
-      logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
-      instance.println("INFO", "全仿真终端模式已生效，您可以直接在终端内直接输入内容并使用 Ctrl，Tab 等功能键。");
+      logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
+      instance.println("INFO", $t("pty_start.startEmulatedTerminal"));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();

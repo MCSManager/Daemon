@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
@@ -41,10 +42,12 @@ class InstanceSubsystem extends EventEmitter {
         instance
           .exec(new StartCommand())
           .then(() => {
-            logger.info(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动指令已发出`);
+            logger.info($t("system_instance.autoStart", { name: instance.config.nickname, uuid: instance.instanceUuid }));
           })
           .catch((reason) => {
-            logger.error(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动时错误: ${reason}`);
+            logger.error(
+              $t("system_instance.autoStartErr", { name: instance.config.nickname, uuid: instance.instanceUuid, reason: reason })
+            );
           });
       }
     });
@@ -64,8 +67,8 @@ class InstanceSubsystem extends EventEmitter {
           .catch((v) => {});
         this.addInstance(instance);
       } catch (error) {
-        logger.error(`读取 ${uuid} 应用实例失败: ${error.message}`);
-        logger.error(`请检查或删除文件：data/InstanceConfig/${uuid}.json`);
+        logger.error($t("system_instance.readInstanceFailed", { uuid: uuid, error: error.message }));
+        logger.error($t("system_instance.checkConf", { uuid: uuid }));
       }
     });
     // 处理自动启动
@@ -90,7 +93,7 @@ class InstanceSubsystem extends EventEmitter {
   }
 
   addInstance(instance: Instance) {
-    if (instance.instanceUuid == null) throw new Error("无法新增某实例，因为实例UUID为空");
+    if (instance.instanceUuid == null) throw new Error($t("system_instance.uuidEmpty"));
     if (this.instances.has(instance.instanceUuid)) {
       throw new Error(`The application instance ${instance.instanceUuid} already exists.`);
     }

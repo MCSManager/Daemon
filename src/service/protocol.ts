@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import { Socket } from "socket.io";
 import RouterContext from "../entity/ctx";
 import logger from "./log";
@@ -40,7 +41,8 @@ export function responseError(ctx: RouterContext, err: Error | string, config?: 
   const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
   // 忽略因为重启守护进程没有刷新网页的权限不足错误
   if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
-  if (!config?.notPrintErr) logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${ctx.event} 响应数据时异常:\n`, err);
+  if (!config?.notPrintErr)
+    logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
   ctx.socket.emit(ctx.event, packet);
 }
 
@@ -53,7 +55,7 @@ export function error(ctx: RouterContext, event: string, err: any) {
   const packet = new Packet(ctx.uuid, STATUS_ERR, event, err);
   // 忽略因为重启守护进程没有刷新网页的权限不足错误
   if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
-  logger.warn(`会话 ${ctx.socket.id}(${ctx.socket.handshake.address})/${event} 响应数据时异常:\n`, err);
+  logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
   ctx.socket.emit(event, packet);
 }
 

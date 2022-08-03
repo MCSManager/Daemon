@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import { DockerManager } from "../service/docker_service";
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
@@ -16,7 +17,7 @@ routerApp.on("environment/images", async (ctx, data) => {
     const result = await docker.listImages();
     protocol.response(ctx, result);
   } catch (error) {
-    protocol.responseError(ctx, "无法获取镜像信息，请确保您已正确安装Docker环境");
+    protocol.responseError(ctx, $t("environment_router.dockerInfoErr"));
   }
 });
 
@@ -57,7 +58,7 @@ routerApp.on("environment/new_image", async (ctx, data) => {
     const dockerFilepath = path.normalize(path.join(dockerFileDir, "Dockerfile"));
     await fs.writeFile(dockerFilepath, dockerFileText, { encoding: "utf-8" });
 
-    logger.info(`守护进程正在创建镜像 ${name}:${tag} DockerFile 如下:\n${dockerFileText}\n`);
+    logger.info($t("environment_router.crateImage", { name: name, tag: tag }));
 
     // 预先响应
     protocol.response(ctx, true);
@@ -66,9 +67,9 @@ routerApp.on("environment/new_image", async (ctx, data) => {
     const dockerImageName = `${name}:${tag}`;
     try {
       await new DockerManager().startBuildImage(dockerFileDir, dockerImageName);
-      logger.info(`创建镜像 ${name}:${tag} 完毕`);
+      logger.info($t("environment_router.crateSuccess", { name: name, tag: tag }));
     } catch (error) {
-      logger.info(`创建镜像 ${name}:${tag} 错误:${error}`);
+      logger.info($t("environment_router.crateErr", { name: name, tag: tag, error: error }));
     }
   } catch (error) {
     protocol.responseError(ctx, error);
@@ -82,7 +83,7 @@ routerApp.on("environment/del_image", async (ctx, data) => {
     const docker = new DockerManager().getDocker();
     const image = docker.getImage(imageId);
     if (image) {
-      logger.info(`守护进程正在删除镜像 ${imageId}`);
+      logger.info($t("environment_router.delImage", { imageId: imageId }));
       await image.remove();
     } else {
       throw new Error("Image does not exist");

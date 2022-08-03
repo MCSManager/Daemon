@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import fs from "fs-extra";
 import * as protocol from "../service/protocol";
 import { routerApp } from "../service/router";
@@ -167,10 +168,10 @@ routerApp.on("instance/forward", (ctx, data) => {
   try {
     // InstanceSubsystem.getInstance(targetInstanceUuid);
     if (isforward) {
-      logger.info(`会话 ${ctx.socket.id} 请求转发实例 ${targetInstanceUuid} IO 流`);
+      logger.info($t("Instance_router.requestIO", { id: ctx.socket.id, targetInstanceUuid: targetInstanceUuid }));
       InstanceSubsystem.forward(targetInstanceUuid, ctx.socket);
     } else {
-      logger.info(`会话 ${ctx.socket.id} 请求取消转发实例 ${targetInstanceUuid} IO 流`);
+      logger.info($t("Instance_router.cancelIO", { id: ctx.socket.id, targetInstanceUuid: targetInstanceUuid }));
       InstanceSubsystem.stopForward(targetInstanceUuid, ctx.socket);
     }
     protocol.msg(ctx, "instance/forward", { instanceUuid: targetInstanceUuid });
@@ -189,7 +190,7 @@ routerApp.on("instance/open", async (ctx, data) => {
       if (!disableResponse) protocol.msg(ctx, "instance/open", { instanceUuid });
     } catch (err) {
       if (!disableResponse) {
-        logger.error(`实例${instanceUuid}启动时错误: `, err);
+        logger.error($t("Instance_router.openInstanceErr", { instanceUuid: instanceUuid }), err);
         protocol.error(ctx, "instance/open", { instanceUuid: instanceUuid, err: err.message });
       }
     }
@@ -272,13 +273,13 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   const taskName = data.taskName;
   const parameter = data.parameter;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
-  logger.info(`会话 ${ctx.socket.id} 要求实例 ${instance.instanceUuid} 执行异步 ${taskName} 异步任务`);
+  logger.info($t("Instance_router.performTasks", { id: ctx.socket.id, uuid: instanceUuid, taskName: taskName }));
   if (taskName === "update") {
     instance
       .execPreset("update", parameter)
       .then(() => {})
       .catch((err) => {
-        logger.error(`实例 ${instance.instanceUuid} ${taskName} 异步任务执行异常: ${err}`);
+        logger.error($t("Instance_router.performTasksErr", { uuid: instance.instanceUuid, taskName: taskName, err: err }));
       });
   }
   protocol.msg(ctx, "instance/asynchronous", true);
@@ -295,7 +296,7 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
       .then(() => {})
       .catch((err) => {});
   } else {
-    return protocol.error(ctx, "instance/stop_asynchronous", "无任务异步任务正在运行");
+    return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
   }
   protocol.msg(ctx, "instance/stop_asynchronous", true);
 });
@@ -341,7 +342,7 @@ routerApp.on("instance/process_config/file", (ctx, data) => {
   try {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     const fileManager = new FileManager(instance.absoluteCwdPath());
-    if (!fileManager.check(fileName)) throw new Error("文件不存在或路径错误，文件访问被拒绝");
+    if (!fileManager.check(fileName)) throw new Error($t("Instance_router.accessFileErr"));
     const filePath = path.normalize(path.join(instance.absoluteCwdPath(), fileName));
     const processConfig = new ProcessConfig({
       fileName: fileName,
@@ -372,7 +373,7 @@ routerApp.on("instance/outputlog", async (ctx, data) => {
       const text = await fs.readFile(filePath, { encoding: "utf-8" });
       return protocol.response(ctx, text);
     }
-    protocol.responseError(ctx, new Error("终端日志文件不存在"), {
+    protocol.responseError(ctx, new Error($t("Instance_router.terminalLogNotExist")), {
       notPrintErr: true
     });
   } catch (err) {

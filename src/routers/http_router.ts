@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import Router from "@koa/router";
 import fs from "fs-extra";
 import path from "path";
@@ -22,17 +23,17 @@ router.get("/download/:key/:fileName", async (ctx) => {
   try {
     // 从任务中心取任务
     const mission = missionPassport.getMission(key, "download");
-    if (!mission) throw new Error((ctx.body = "No task, Access denied | 无下载任务，非法访问"));
+    if (!mission) throw new Error((ctx.body = "No task, Access denied"));
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
-    if (!instance) throw new Error("实例不存在");
-    if (!FileManager.checkFileName(paramsFileName)) throw new Error("用户文件下载名不符合规范");
+    if (!instance) throw new Error($t("http_router.instanceNotExist"));
+    if (!FileManager.checkFileName(paramsFileName)) throw new Error($t("http_router.fileNameNotSpec"));
 
     const cwd = instance.config.cwd;
     const fileRelativePath = mission.parameter.fileName;
     const ext = path.extname(fileRelativePath);
     // 检查文件跨目录安全隐患
     const fileManager = new FileManager(cwd);
-    if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied | 参数不正确"));
+    if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied,incorrect param"));
 
     // 开始给用户下载文件
     ctx.response.set("Content-Disposition", `attachment; filename="${encodeURIComponent(paramsFileName)}"`);
@@ -41,7 +42,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
     // 任务已执行，销毁护照
     missionPassport.deleteMission(key);
   } catch (error) {
-    ctx.body = `下载出错: ${error.message}`;
+    ctx.body = $t("http_router.downloadErr", { error: error.message });
     ctx.status = 500;
   } finally {
     missionPassport.deleteMission(key);
@@ -92,7 +93,7 @@ router.post("/upload/:key", async (ctx) => {
       });
       return (ctx.body = "OK");
     }
-    ctx.body = "未知原因: 上传失败";
+    ctx.body = $t("http_router.updateErr");
     ctx.status = 500;
   } catch (error) {
     ctx.body = error.message;

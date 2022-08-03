@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import path from "path";
 import fs from "fs-extra";
 
@@ -25,7 +26,7 @@ class StorageSubsystem {
   public store(category: string, uuid: string, object: any) {
     const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category);
     if (!fs.existsSync(dirPath)) fs.mkdirsSync(dirPath);
-    if (!this.checkFileName(uuid)) throw new Error(`UUID ${uuid} 不符合规范`);
+    if (!this.checkFileName(uuid)) throw new Error($t("common.uuidIrregular", { uuid: uuid }));
     const filePath = path.join(dirPath, `${uuid}.json`);
     const data = JSON.stringify(object, null, 4);
     fs.writeFileSync(filePath, data, { encoding: "utf-8" });
@@ -56,7 +57,7 @@ class StorageSubsystem {
   public load(category: string, classz: any, uuid: string) {
     const dirPath = path.join(StorageSubsystem.STIRAGE_DATA_PATH, category);
     if (!fs.existsSync(dirPath)) fs.mkdirsSync(dirPath);
-    if (!this.checkFileName(uuid)) throw new Error(`UUID ${uuid} 不符合规范`);
+    if (!this.checkFileName(uuid)) throw new Error($t("common.uuidIrregular", { uuid: uuid }));
     const filePath = path.join(dirPath, `${uuid}.json`);
     if (!fs.existsSync(filePath)) return null;
     const data = fs.readFileSync(filePath, { encoding: "utf-8" });

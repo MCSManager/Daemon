@@ -1,5 +1,6 @@
 // Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
 
+import { $t } from "../i18n";
 import { EventEmitter } from "events";
 import { Socket } from "socket.io";
 import logger from "./log";
@@ -81,4 +82,4 @@ import "../routers/stream_router";
 import "../routers/environment_router";
 import "../routers/schedule_router";
 
-logger.info(`所有功能模块与权限防火墙已初始化完毕`);
+logger.info($t("router.initComplete"));
