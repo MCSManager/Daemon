@@ -44,7 +44,7 @@ routerApp.use(async (event, ctx, _, next) => {
 routerApp.on("auth", (ctx, data) => {
   if (data === globalConfiguration.config.key) {
     // 身份认证通过，注册会话为可信会话
-    logger.info($t("auth_router.access"), { id: ctx.socket.id, address: ctx.socket.handshake.address });
+    logger.info($t("auth_router.access", { id: ctx.socket.id, address: ctx.socket.handshake.address }));
     loginSuccessful(ctx, data);
     protocol.msg(ctx, "auth", true);
   } else {
