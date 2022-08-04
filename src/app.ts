@@ -116,6 +116,7 @@ logger.info($t("app.addr", { port: config.port }));
 logger.info($t("app.configPathTip", { path: "" }));
 logger.info($t("app.password", { key: config.key }));
 logger.info($t("app.passwordTip"));
+logger.info($t("app.exitTip"));
 logger.info("----------------------------");
 console.log("");
 
@@ -128,8 +129,7 @@ console.log("");
       console.log("\n\n\n\n");
       logger.warn(`${sig} close process signal detected.`);
       await InstanceSubsystem.exit();
-      logger.info("The data is saved, thanks for using, goodbye!");
-      logger.info("Closed.");
+      logger.info("Exit...");
     } catch (err) {
       logger.error("ERROR:", err);
     } finally {

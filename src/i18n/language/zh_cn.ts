@@ -15,7 +15,8 @@ export default {
     addr: "访问地址：http://<IP地址>:{{port}}/ 或 ws://<IP地址>:{{port}}",
     configPathTip: "配置文件：data/Config/global.json",
     password: "访问密钥：{{key}}",
-    passwordTip: "密钥作为守护进程唯一认证手段"
+    passwordTip: "密钥作为唯一认证方式，请使用 MCSManager 面板的节点功能连接程序",
+    exitTip: "你可以使用 Ctrl+C 快捷键即可关闭程序"
   },
 
   // -----------------------
