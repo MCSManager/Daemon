@@ -1,4 +1,4 @@
-// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com> and RimuruChan
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com> and RimuruChan
 
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";

@@ -1,4 +1,4 @@
-// Copyright (C) 2022 MCSManager Team <mcsmanager-dev@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
 export function configureEntityParams(self: any, args: any, key: string, typeFn?: Function): any {
   const selfDefaultValue = self[key] ?? null;
