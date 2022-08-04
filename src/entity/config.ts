@@ -18,6 +18,7 @@ class Config {
   public key = builderPassword();
   public maxFileTask = 2;
   public maxZipFileSize = 60;
+  public language = "";
 }
 
 // 守护进程配置类

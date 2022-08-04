@@ -1,6 +1,6 @@
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-import { $t } from "./i18n";
+import { $t, i18next } from "./i18n";
 import { getVersion, initVersionManager } from "./service/version";
 
 initVersionManager();
@@ -42,6 +42,11 @@ initDependent();
 // Initialize the global configuration service
 globalConfiguration.load();
 const config = globalConfiguration.config;
+
+// If language is not configured, get the system language
+const lang = config.language || "en_us";
+logger.info(`LANGUAGE: ${lang}`);
+i18next.changeLanguage(lang);
 
 // Initialize HTTP service
 const koaApp = koa.initKoa();
