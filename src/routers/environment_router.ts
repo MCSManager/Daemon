@@ -58,7 +58,7 @@ routerApp.on("environment/new_image", async (ctx, data) => {
     const dockerFilepath = path.normalize(path.join(dockerFileDir, "Dockerfile"));
     await fs.writeFile(dockerFilepath, dockerFileText, { encoding: "utf-8" });
 
-    logger.info($t("environment_router.crateImage", { name: name, tag: tag }));
+    logger.info($t("environment_router.crateImage", { name: name, tag: tag, dockerFileText: dockerFileText }));
 
     // 预先响应
     protocol.response(ctx, true);

@@ -200,7 +200,7 @@ export default {
   // src\routers\environment_router.ts
   environment_router: {
     dockerInfoErr: "无法获取镜像信息，请确保您已正确安装Docker环境",
-    crateImage: "守护进程正在创建镜像 {{name}}:{{tag}} DockerFile 如下:\n${dockerFileText}\n",
+    crateImage: "守护进程正在创建镜像 {{name}}:{{tag}} DockerFile 如下:\n{{dockerFileText}}\n",
     crateSuccess: "创建镜像 {{name}}:{{tag}} 完毕",
     crateErr: "创建镜像 {{name}}:{{tag}} 错误:{{error}}",
     delImage: "守护进程正在删除镜像 {{imageId}}"
