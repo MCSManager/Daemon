@@ -18,7 +18,7 @@ Please go to the main project repository: [https://github.com/MCSManager/MCSMana
 
 ## Introduction to MCSManager
 
-**Distributed, stable and reliable, out-of-the-box, highly scalable, support control panel for Minecraft and few other games. **
+**Distributed, stable and reliable, out-of-the-box, highly scalable, support control panel for Minecraft and few other games.**
 
 The MCSManager panel (referred to as: MCSM panel) is an all-Chinese, lightweight, out-of-the-box, multi-instance and Docker-supported Minecraft server management panel.
 
@@ -26,13 +26,6 @@ This software has a certain popularity in Minecraft and other gaming communities
 
 <br />
 
-## project status
-
-The project is in the release state. If you want to promote development or follow the progress, you can click `star` `watch` in the upper right corner to give us basic support.
-
-If you want to become a sponsor of this project, please visit the official website and browse to the bottom.
-
-<br />
 
 ## Manual installation
 
