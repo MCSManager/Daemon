@@ -2,8 +2,7 @@
 
 import { Socket } from "socket.io";
 
-// 应用实例数据流转发适配器
-
+// Application instance data stream forwarding adapter
 export default class InstanceStreamListener {
   // Instance uuid -> Socket[]
   public readonly listenMap = new Map<string, Socket[]>();

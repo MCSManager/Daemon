@@ -10,7 +10,7 @@ import archiver from "archiver";
 import StreamZip, { async } from "node-stream-zip";
 // const StreamZip = require('node-stream-zip');
 
-// 跨平台的高效率/低效率结合的解压缩方案
+// Cross-platform high-efficiency/low-efficiency decompression scheme
 const system = os.platform();
 
 function checkFileName(fileName: string) {
@@ -142,7 +142,7 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
       if (code) return reject(false);
       return resolve(true);
     });
-    // 超时，终止任务
+    // timeout, terminate the task
     setTimeout(() => {
       if (end) return;
       process.kill("SIGKILL");
@@ -152,7 +152,7 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 }
 
 // zip -r a.zip css css_v1 js
-// 此功能压缩的ZIP文件和文件所在目录必须在同一个目录下
+// The ZIP file compressed by this function and the directory where the file is located must be in the same directory
 async function linuxZip(sourceZip: string, files: string[]) {
   if (!files || files.length == 0) return false;
   return new Promise((resolve, reject) => {
@@ -167,7 +167,7 @@ async function linuxZip(sourceZip: string, files: string[]) {
       if (code) return reject(false);
       return resolve(true);
     });
-    // 超时，终止任务
+    // timeout, terminate the task
     setTimeout(() => {
       if (end) return;
       process.kill("SIGKILL");
