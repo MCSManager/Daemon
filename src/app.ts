@@ -2,6 +2,7 @@
 
 import { $t, i18next } from "./i18n";
 import { getVersion, initVersionManager } from "./service/version";
+import { globalConfiguration } from "./entity/config";
 
 initVersionManager();
 const VERSION = getVersion();
@@ -27,18 +28,6 @@ import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
 
-logger.info($t("app.welcome"));
-
-import { globalConfiguration } from "./entity/config";
-import * as router from "./service/router";
-import * as koa from "./service/http";
-import * as protocol from "./service/protocol";
-import InstanceSubsystem from "./service/system_instance";
-import { initDependent } from "./service/install";
-
-// initialize optional dependencies asynchronously
-initDependent();
-
 // Initialize the global configuration service
 globalConfiguration.load();
 const config = globalConfiguration.config;
@@ -47,6 +36,17 @@ const config = globalConfiguration.config;
 const lang = config.language || "en_us";
 logger.info(`LANGUAGE: ${lang}`);
 i18next.changeLanguage(lang);
+
+logger.info($t("app.welcome"));
+
+import * as router from "./service/router";
+import * as koa from "./service/http";
+import * as protocol from "./service/protocol";
+import InstanceSubsystem from "./service/system_instance";
+import { initDependent } from "./service/install";
+
+// initialize optional dependencies asynchronously
+initDependent();
 
 // Initialize HTTP service
 const koaApp = koa.initKoa();
