@@ -5,7 +5,7 @@ import Docker from "dockerode";
 
 export class DockerManager {
   // 1=creating 2=creating completed -1=creating error
-  public static readonly builerProgress = new Map<string, number>();
+  public static readonly builderProgress = new Map<string, number>();
 
   public docker: Docker = null;
 
@@ -17,18 +17,18 @@ export class DockerManager {
     return this.docker;
   }
 
-  public static setBuilerProgress(imageName: string, status: number) {
-    DockerManager.builerProgress.set(imageName, status);
+  public static setBuilderProgress(imageName: string, status: number) {
+    DockerManager.builderProgress.set(imageName, status);
   }
 
-  public static getBuilerProgress(imageName: string) {
-    return DockerManager.builerProgress.get(imageName);
+  public static getBuilderProgress(imageName: string) {
+    return DockerManager.builderProgress.get(imageName);
   }
 
   async startBuildImage(dockerFileDir: string, dockerImageName: string) {
     try {
       // Set the current image creation progress
-      DockerManager.setBuilerProgress(dockerImageName, 1);
+      DockerManager.setBuilderProgress(dockerImageName, 1);
       // Issue the create image command
       const stream = await this.docker.buildImage(
         {
@@ -42,10 +42,10 @@ export class DockerManager {
         this.docker.modem.followProgress(stream, (err, res) => (err ? reject(err) : resolve(res)));
       });
       // Set the current image creation progress
-      DockerManager.setBuilerProgress(dockerImageName, 2);
+      DockerManager.setBuilderProgress(dockerImageName, 2);
     } catch (error) {
       // Set the current image creation progress
-      DockerManager.setBuilerProgress(dockerImageName, -1);
+      DockerManager.setBuilderProgress(dockerImageName, -1);
     }
   }
 }
