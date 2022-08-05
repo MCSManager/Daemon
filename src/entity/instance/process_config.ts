@@ -23,7 +23,7 @@ export class ProcessConfig {
     iProcessConfig.path = path.normalize(iProcessConfig.path);
   }
 
-  // 自动根据类型解析本地文件并返回配置对象
+  // Automatically parse the local file according to the type and return the configuration object
   read(): any {
     const text = fs.readFileSync(this.iProcessConfig.path, { encoding: CONFIG_FILE_ENCODE });
     if (this.iProcessConfig.type === "yml") {
@@ -40,7 +40,7 @@ export class ProcessConfig {
     }
   }
 
-  // 自动根据参数对象保存到本地配置文件
+  // Automatically save to the local configuration file according to the parameter object
   write(object: Object) {
     let text = "";
     if (this.iProcessConfig.type === "yml") {

@@ -16,7 +16,7 @@ import { IInstanceProcess } from "./interface";
 import StartCommand from "../commands/start";
 import { configureEntityParams } from "../../common/typecheck";
 import { PTY_PATH } from "../../const";
-// 实例无需持久化储存的额外信息
+// The instance does not need to store additional information persistently
 interface IInstanceInfo {
   currentPlayers: number;
   maxPlayers: number;
@@ -25,40 +25,40 @@ interface IInstanceInfo {
   playersChart: Array<{ value: string }>;
 }
 
-// 实例类
+// instance class
 export default class Instance extends EventEmitter {
-  // 实例类状态常量
+  // instance class state constants
   public static readonly STATUS_BUSY = -1;
   public static readonly STATUS_STOP = 0;
   public static readonly STATUS_STOPPING = 1;
   public static readonly STATUS_STARTING = 2;
   public static readonly STATUS_RUNNING = 3;
 
-  // 实例类型常量
-  public static readonly TYPE_UNIVERSAL = "universal"; // 通用输入输出程序
+  // instance type constant
+  public static readonly TYPE_UNIVERSAL = "universal"; // Universal input and output program
 
-  // Minecraft 服务端类型
-  public static readonly TYPE_MINECRAFT_JAVA = "minecraft/java"; // Minecraft PC 版通用服务端
-  public static readonly TYPE_MINECRAFT_BEDROCK = "minecraft/bedrock"; // Minecraft 基岩版
+  // Minecraft server type
+  public static readonly TYPE_MINECRAFT_JAVA = "minecraft/java"; // Universal server for Minecraft PC version
+  public static readonly TYPE_MINECRAFT_BEDROCK = "minecraft/bedrock"; // Minecraft Bedrock Edition
 
-  // 实例基本属性，无需持久化
+  // Instance basic properties, no need to persist
   public instanceStatus: number;
   public instanceUuid: string;
   public lock: boolean;
   public startCount: number;
   public startTimestamp: number = 0;
-  // 正在进行的异步任务
+  // ongoing asynchronous task
   public asynchronousTask: IExecutable = null;
 
-  // 生命周期任务，定时任务管理器
+  // Life cycle tasks, timed task manager
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);
-  // 预设命令管理器
+  // default command manager
   public readonly presetCommandManager = new PresetCommandManager(this);
 
-  // 实例需要持久化保存并且作为配置的实体类
+  // The instance needs to be persisted and used as the configured entity class
   public config: InstanceConfig;
 
-  // 实例无需持久化保存的具体信息
+  // The instance does not need to persist the specific information saved
   public info: IInstanceInfo = {
     currentPlayers: -1,
     maxPlayers: -1,
@@ -67,10 +67,10 @@ export default class Instance extends EventEmitter {
     playersChart: []
   };
 
-  // 实例的真实进程
+  // the real process of the instance
   public process: IInstanceProcess;
 
-  // 初始化实例时必须通过uuid与配置类进行初始化实例，否则实例将处于不可用
+  // When initializing an instance, the instance must be initialized through uuid and configuration class, otherwise the instance will be unavailable
   constructor(instanceUuid: string, config: InstanceConfig) {
     super();
 
@@ -89,21 +89,21 @@ export default class Instance extends EventEmitter {
     this.startCount = 0;
   }
 
-  // 传入实例配置，松散型动态的给实例参数设置配置项
+  // Pass in instance configuration, loosely and dynamically set configuration items for instance parameters
   parameters(cfg: any) {
-    // 若实例类型改变，则必须重置预设命令与生命周期事件
+    // If the instance type changes, default commands and lifecycle events must be reset
     if (cfg?.type && cfg?.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyInstanceType"));
       configureEntityParams(this.config, cfg, "type", String);
       this.forceExec(new FunctionDispatcher());
     }
-    // 若进程类型改变，则必须重置预设命令与生命周期事件
+    // If the process type changes, the default commands and lifecycle events must be reset
     if (cfg?.processType && cfg?.processType !== this.config.processType) {
       if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyProcessType"));
       configureEntityParams(this.config, cfg, "processType", String);
       this.forceExec(new FunctionDispatcher());
     }
-    // 若终端类型改变，则必须重置预设命令
+    // If the terminal type is changed, the default command must be reset
     if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
       if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyPtyModel"));
       if (!fs.existsSync(PTY_PATH) && cfg?.terminalOption?.pty === true)
@@ -111,7 +111,7 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
     }
-    // 只准许服务器停止时修改某些配置项目
+    // Only allow some configuration items to be modified when the server is stopped
     if (this.status() === Instance.STATUS_STOP && cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowCol", Number);
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
@@ -161,63 +161,63 @@ export default class Instance extends EventEmitter {
     this.lock = bool;
   }
 
-  // 对本实例执行对应的命令
+  // Execute the corresponding command for this instance
   async execCommand(command: InstanceCommand) {
     if (this.lock) throw new Error($t("instanceConf.instanceLock", { info: command.info }));
     if (this.status() == Instance.STATUS_BUSY) throw new Error($t("instanceConf.instanceBusy"));
     return await command.exec(this);
   }
 
-  // 对本实例执行对应的命令 别名
+  // Execute the corresponding command for this instance Alias
   async exec(command: InstanceCommand) {
     return await this.execCommand(command);
   }
 
-  // 强制执行命令
+  // force the command to execute
   async forceExec(command: InstanceCommand) {
     return await command.exec(this);
   }
 
-  // 设置实例状态或获取状态
+  // set instance state or get state
   status(v?: number) {
     if (v != null) this.instanceStatus = v;
     return this.instanceStatus;
   }
 
-  // 实例启动后必须执行的函数
-  // 触发 open 事件和绑定 data 与 exit 事件等
+  // function that must be executed after the instance starts
+  // Trigger the open event and bind the data and exit events, etc.
   started(process: IInstanceProcess) {
     this.config.lastDatetime = this.fullTime();
     process.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
-    process.on("exit", (code) => this.stoped(code));
+    process.on("exit", (code) => this.stopped(code));
     this.process = process;
     this.instanceStatus = Instance.STATUS_RUNNING;
     this.emit("open", this);
-    // 启动所有生命周期任务
+    // start all lifecycle tasks
     this.lifeCycleTaskManager.execLifeCycleTask(1);
   }
 
-  // 实例进行任何操作异常则必须通过此函数抛出异常
-  // 触发 failure 事件
+  // If the instance performs any operation exception, it must throw an exception through this function
+  // trigger failure event
   failure(error: Error) {
     this.emit("failure", error);
-    this.println("错误", error.message);
+    this.println("Error", error.message);
     throw error;
   }
 
-  // 实例已关闭后必须执行的函数
-  // 触发 exit 事件
-  stoped(code = 0) {
+  // function that must be executed after the instance has been closed
+  // trigger exit event
+  stopped(code = 0) {
     this.releaseResources();
     if (this.instanceStatus != Instance.STATUS_STOP) {
       this.instanceStatus = Instance.STATUS_STOP;
       this.emit("exit", code);
       StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
     }
-    // 关闭所有生命周期任务
+    // Close all lifecycle tasks
     this.lifeCycleTaskManager.execLifeCycleTask(0);
 
-    // 若启用自动重启则立刻执行启动操作
+    // If automatic restart is enabled, the startup operation is performed immediately
     if (this.config.eventTask.autoRestart) {
       if (!this.config.eventTask.ignore) {
         this.forceExec(new StartCommand("Event Task: Auto Restart"))
@@ -231,7 +231,7 @@ export default class Instance extends EventEmitter {
       this.config.eventTask.ignore = false;
     }
 
-    // 启动后瞬间关闭警告，一般是启动命令编写错误
+    // Turn off the warning immediately after startup, usually the startup command is written incorrectly
     const currentTimestamp = new Date().getTime();
     const startThreshold = 3 * 1000;
     if (currentTimestamp - this.startTimestamp < startThreshold) {
@@ -239,23 +239,23 @@ export default class Instance extends EventEmitter {
     }
   }
 
-  // 自定义输出方法，格式化
+  // custom output method, formatting
   println(level: string, text: string) {
     const str = `\n[MCSMANAGER] [${level}] ${text}\n`;
     this.emit("data", str);
   }
 
-  // 自定义输出方法
+  // custom output method
   print(data: any) {
     this.emit("data", data);
   }
 
-  // 释放资源（主要释放进程相关的资源）
+  // Release resources (mainly release process-related resources)
   releaseResources() {
     this.process = null;
   }
 
-  // 销毁本实例
+  // destroy this instance
   destroy() {
     if (this.process && this.process.pid) {
       this.process.kill("SIGKILL");
@@ -280,18 +280,18 @@ export default class Instance extends EventEmitter {
     // const topPath = tmp ? tmp : this.absoluteCwdPath();
     // const files = await fs.readdir(topPath);
     // for (const fileName of files) {
-    //   const absPath = path.join(topPath, fileName);
-    //   const info = await fs.stat(absPath);
-    //   if (info.isDirectory()) {
-    //     size += await this.usedSpace(absPath, maxDeep, deep + 1);
-    //   } else {
-    //     size += info.size;
-    //   }
+    // const absPath = path.join(topPath, fileName);
+    // const info = await fs.stat(absPath);
+    // if (info.isDirectory()) {
+    // size += await this.usedSpace(absPath, maxDeep, deep + 1);
+    // } else {
+    // size += info.size;
+    // }
     // }
     return 0;
   }
 
-  // 执行预设命令动作
+  // execute the preset command action
   async execPreset(action: string, p?: any) {
     if (this.presetCommandManager) {
       return await this.presetCommandManager.execPreset(action, p);

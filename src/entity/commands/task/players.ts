@@ -14,31 +14,31 @@ export default class RefreshPlayer implements ILifeCycleTask {
   async start(instance: Instance) {
     this.task = setInterval(async () => {
       // {
-      //   host: 'localhost',
-      //   port: 28888,
-      //   status: true,
-      //   version: '1.17.1',
-      //   motd: 'A Minecraft Server',
-      //   current_players: '0',
-      //   max_players: '20',
-      //   latency: 1
+      // host: 'localhost',
+      // port: 28888,
+      // status: true,
+      // version: '1.17.1',
+      // motd: 'A Minecraft Server',
+      // current_players: '0',
+      // max_players: '20',
+      // latency: 1
       // }
       try {
-        // 获取玩家人数版本等信息
+        // Get information such as the number of players, version, etc.
         const result = await instance.execPreset("getPlayer");
         if (!result) return;
         instance.info.maxPlayers = result.max_players ? result.max_players : -1;
         instance.info.currentPlayers = result.current_players ? result.current_players : -1;
         instance.info.version = result.version ? result.version : "";
 
-        // 当第一次正确获取用户人数时，初始化玩家人数图表
+        // When the number of users is correctly obtained for the first time, initialize the number of players graph
         if (this.playersChart.length === 0) {
           this.initPlayersChart(instance);
         }
       } catch (error) {}
     }, 3000);
 
-    // 开启查询在线人数报表数据定时器
+    // Start the timer for querying the online population report data
     this.playersChartTask = setInterval(() => {
       this.getPlayersChartData(instance);
     }, 600000);

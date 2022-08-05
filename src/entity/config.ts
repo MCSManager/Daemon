@@ -18,10 +18,10 @@ class Config {
   public key = builderPassword();
   public maxFileTask = 2;
   public maxZipFileSize = 60;
-  public language = "zh_cn";
+  public language = "en_cn";
 }
 
-// 守护进程配置类
+// daemon configuration class
 class GlobalConfiguration {
   public config = new Config();
   private static readonly ID = "global";

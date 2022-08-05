@@ -18,14 +18,14 @@ import FunctionDispatcher from "../dispatcher";
 import StartCommand from "../start";
 import { PTY_PATH } from "../../../const";
 
-// 启动时错误异常
+// Error exception at startup
 class StartupError extends Error {
   constructor(msg: string) {
     super(msg);
   }
 }
 
-// 进程适配器
+// process adapter
 class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -48,7 +48,7 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       if (this.process && this.process.stdout && this.process.stderr) {
-        // 移除所有动态新增的事件监听者
+        // remove all dynamically added event listeners
         for (const eventName of this.process.stdout.eventNames()) this.process.stdout.removeAllListeners(eventName);
         for (const eventName of this.process.stderr.eventNames()) this.process.stderr.removeAllListeners(eventName);
         for (const eventName of this.process.eventNames()) this.process.removeAllListeners(eventName);
@@ -70,7 +70,7 @@ export default class PtyStartCommand extends InstanceCommand {
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("pty_start.cwdNotExist")));
 
     try {
-      // PTY 模式正确性检查
+      // PTY mode correctness check
       logger.info($t("pty_start.startPty", { source: source }));
       let checkPtyEnv = true;
 
@@ -85,19 +85,19 @@ export default class PtyStartCommand extends InstanceCommand {
       }
 
       if (checkPtyEnv === false) {
-        // 关闭 PTY 类型，重新配置实例功能组，重新启动实例
+        // Close the PTY type, reconfigure the instance function group, and restart the instance
         instance.config.terminalOption.pty = false;
         await instance.forceExec(new FunctionDispatcher());
-        await instance.execPreset("start", source); // 直接执行预设命令
+        await instance.execPreset("start", source); // execute the preset command directly
         return;
       }
 
-      // 设置启动状态 & 启动次数增加
+      // Set the startup state & increase the number of startups
       instance.setLock(true);
       instance.status(Instance.STATUS_STARTING);
       instance.startCount++;
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       if (commandList.length === 0) return instance.failure(new StartupError($t("pty_start.cmdEmpty")));
       const ptyParameter = [
@@ -119,8 +119,8 @@ export default class PtyStartCommand extends InstanceCommand {
       logger.info($t("pty_start.ptyCwd", { cwd: instance.config.cwd }));
       logger.info("----------------");
 
-      // 创建子进程
-      // 参数1直接传进程名或路径（含空格），无需双引号
+      // create child process
+      // Parameter 1 directly passes the process name or path (including spaces) without double quotes
       // console.log(path.dirname(ptyAppPath));
       const subProcess = spawn(PTY_PATH, ptyParameter, {
         cwd: path.dirname(PTY_PATH),
@@ -128,7 +128,7 @@ export default class PtyStartCommand extends InstanceCommand {
         windowsHide: true
       });
 
-      // 子进程创建结果检查
+      // child process creation result check
       if (!subProcess || !subProcess.pid) {
         instance.println(
           "ERROR",
@@ -137,10 +137,10 @@ export default class PtyStartCommand extends InstanceCommand {
         throw new StartupError($t("pty_start.instanceStartErr"));
       }
 
-      // 创建进程适配器
+      // create process adapter
       const processAdapter = new ProcessAdapter(subProcess);
 
-      // 产生开启事件
+      // generate open event
       instance.started(processAdapter);
       logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
       instance.println("INFO", $t("pty_start.startEmulatedTerminal"));

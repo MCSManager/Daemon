@@ -9,10 +9,10 @@ export default class KillCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    // 若启用自动重启功能则设置忽略一次
+    // If the automatic restart function is enabled, the setting is ignored once
     if (instance.config.eventTask && instance.config.eventTask.autoRestart) instance.config.eventTask.ignore = true;
 
-    // 发送终止命令
+    // send stop command
     return await instance.execPreset("kill");
   }
 }

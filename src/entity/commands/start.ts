@@ -31,11 +31,11 @@ export default class StartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    // 状态检查
+    // status check
     const instanceStatus = instance.status();
     if (instanceStatus !== Instance.STATUS_STOP) return instance.failure(new StartupError($t("start.instanceNotDown")));
 
-    // 到期时间检查
+    // expiration time check
     const endTime = new Date(instance.config.endTime).getTime();
     if (endTime) {
       const currentTime = new Date().getTime();

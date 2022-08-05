@@ -44,7 +44,7 @@ async function request(ip: string, port: number) {
   });
 }
 
-// 适配至 MCSManager 生命周期任务
+// Adapt to MCSManager lifecycle tasks
 export default class MinecraftBedrockGetPlayersCommand extends InstanceCommand {
   constructor() {
     super("MinecraftBedrockGetPlayersCommand");

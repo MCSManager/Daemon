@@ -3,14 +3,14 @@
 import Instance from "./instance";
 
 export interface ILifeCycleTask {
-  name: string; // 任务名
-  status: number; // 运行状态，默认为0即可，任务管理器会自动改变
+  name: string; // task name
+  status: number; // Running status, the default is 0, the task manager will automatically change
   start: (instance: Instance) => Promise<void>;
   stop: (instance: Instance) => Promise<void>;
 }
 
 export class LifeCycleTaskManager {
-  // 生命周期任务列表
+  // list of life cycle tasks
   public readonly lifeCycleTask: ILifeCycleTask[] = [];
 
   constructor(private self: any) {}

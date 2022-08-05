@@ -26,7 +26,7 @@ export default class InstanceConfig {
   public updateCommand: string = "";
   public crlf = 1; // 1: \n 2: \r\n
 
-  // 自定义命令列表
+  // custom command list
   public actionCommandList: IActionCommand[] = [];
 
   // terminal option

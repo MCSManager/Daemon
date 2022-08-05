@@ -21,34 +21,34 @@ import PtyStartCommand from "./pty/pty_start";
 import PtyStopCommand from "./pty/pty_stop";
 import { PTY_PATH } from "../../const";
 
-// 实例功能调度器
-// 根据不同的类型调度分配不同的功能
+// instance function scheduler
+// Dispatch and assign different functions according to different types
 export default class FunctionDispatcher extends InstanceCommand {
   constructor() {
     super("FunctionDispatcher");
   }
 
   async exec(instance: Instance) {
-    // 初始化所有模块
+    // initialize all modules
     instance.lifeCycleTaskManager.clearLifeCycleTask();
     instance.clearPreset();
 
-    // 实例必须装载的组件
+    // the component that the instance must mount
     instance.lifeCycleTaskManager.registerLifeCycleTask(new TimeCheck());
 
-    // 实例通用预设能力
+    // Instance general preset capabilities
     instance.setPreset("command", new GeneralSendCommand());
     instance.setPreset("stop", new GeneralStopCommand());
     instance.setPreset("kill", new GeneralKillCommand());
     instance.setPreset("restart", new GeneralRestartCommand());
     instance.setPreset("update", new GeneralUpdateCommand());
 
-    // 根据实例启动类型来进行基本操作方式的预设
+    // Preset the basic operation mode according to the instance startup type
     if (!instance.config.processType || instance.config.processType === "general") {
       instance.setPreset("start", new GeneralStartCommand());
     }
 
-    // 启用仿真终端模式
+    // Enable emulated terminal mode
     if (
       instance.config.terminalOption.pty &&
       instance.config.terminalOption.ptyWindowCol &&
@@ -59,13 +59,13 @@ export default class FunctionDispatcher extends InstanceCommand {
       instance.setPreset("stop", new PtyStopCommand());
       instance.setPreset("resize", new NullCommand());
     }
-    // 是否启用 Docker PTY 模式
+    // Whether to enable Docker PTY mode
     if (instance.config.processType === "docker") {
       instance.setPreset("resize", new NullCommand());
       instance.setPreset("start", new DockerStartCommand());
     }
 
-    // 根据不同类型设置不同预设功能与作用
+    // Set different preset functions and functions according to different types
     if (instance.config.type.includes(Instance.TYPE_UNIVERSAL)) {
       instance.setPreset("getPlayer", new NullCommand());
     }

@@ -6,7 +6,7 @@ import { EventEmitter } from "events";
 export interface IDockerConfig {
   containerName: string;
   image: string;
-  memory: number; //以字节为单位的内存限制。
+  memory: number; // Memory limit in bytes.
   ports: string[];
   extraVolumes: string[];
   maxSpace: number;
@@ -14,11 +14,11 @@ export interface IDockerConfig {
   io: number;
   networkMode: string;
   networkAliases: string[];
-  cpusetCpus: string; //允许执行的 CPU（例如0-3，，0,1）
+  cpusetCpus: string; // CPU allowed to execute (eg 0-3, , 0, 1)
   cpuUsage: number;
 }
 
-// 实例具体进程接口
+// Instance specific process interface
 export interface IInstanceProcess extends EventEmitter {
   pid?: number | string;
   kill: (signal?: any) => any;

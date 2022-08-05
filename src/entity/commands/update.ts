@@ -10,7 +10,7 @@ export default class UpdateCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    // 执行更新预设，预设又功能调度器在启动前设置好
+    // Execute the update preset, the preset and function scheduler are set before starting
     return await instance.execPreset("update");
   }
 }
