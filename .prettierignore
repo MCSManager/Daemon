@@ -22,6 +22,7 @@ docker_temp/
 data/
 production/
 
+
 # config files
 users/*.json
 server/*.json

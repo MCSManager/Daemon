@@ -1,3 +1,4 @@
+// .eslintrc.js
 module.exports = {
   env: {
     commonjs: true,
