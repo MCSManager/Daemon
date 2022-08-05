@@ -6,7 +6,7 @@
 [![Status](https://img.shields.io/badge/node-v14.17.6-blue.svg)](https://nodejs.org/en/download/)
 [![Status](https://img.shields.io/badge/License-AGPL-red.svg)](https://github.com/Suwings/MCSManager)
 
-[Official Website](http://mcsmanager.com/) | [Usage Documentation](https://docs.mcsmanager.com/) | [Team Homepage](https://github.com/MCSManager) | [Panels side project](https://github.com/MCSManager/MCSManager) | [web front-end project](https://github.com/MCSManager/UI) | [daemon project](https://github.com/ MCSManager/Daemon)
+[Official Website](http://mcsmanager.com/) | [Usage Documentation](https://docs.mcsmanager.com/) | [Team Homepage](https://github.com/MCSManager) | [MCSManager Project](https://github.com/MCSManager/MCSManager)
 
 A distributed daemon program for MCSManager, separate from the panel side to directly manage and control the real program.
 
