@@ -43,8 +43,8 @@ function installPtyForLinux(url: string) {
   });
 }
 
-// 仿真终端依赖程序，基于 Go/C++ 实现的 PTY 程序
-// 参考：https://github.com/MCSManager/pty
+// Emulate terminal-dependent programs, PTY programs based on Go/C++
+// Reference: https://github.com/MCSManager/pty
 export function initDependent() {
   if (os.platform() !== "linux") return logger.info($t("install.skipInstall"));
   const ptyUrls = ["https://mcsmanager.com/download/pty_linux", "https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/pty_linux"];

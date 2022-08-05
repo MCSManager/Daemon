@@ -3,7 +3,7 @@
 import { globalConfiguration } from "../entity/config";
 
 export function initApiKey() {
-  // 初始化全局配置服务
+  // Initialize the global configuration service
   globalConfiguration.load();
   const config = globalConfiguration.config;
 }

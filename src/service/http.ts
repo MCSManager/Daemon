@@ -3,11 +3,11 @@
 import Koa from "koa";
 import koaBody from "koa-body";
 
-// 装载 HTTP 服务路由
+// Load the HTTP service route
 import koaRouter from "../routers/http_router";
 
 export function initKoa() {
-  // 初始化 Koa 框架
+  // Initialize the Koa framework
   const koaApp = new Koa();
   koaApp.use(
     koaBody({
@@ -18,10 +18,10 @@ export function initKoa() {
     })
   );
 
-  // 装载 Koa 最高级中间件
+  // Load Koa top-level middleware
   koaApp.use(async (ctx, next) => {
     await next();
-    // 因所有HTTP请求必须由面板端创建任务护照才可使用，因此准许跨域请求，也可保证安全
+    // Because all HTTP requests can only be used by creating a task passport on the panel side, cross-domain requests are allowed, and security can also be guaranteed
     ctx.response.set("Access-Control-Allow-Origin", "*");
     ctx.response.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
     ctx.response.set(

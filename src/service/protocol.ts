@@ -5,12 +5,12 @@ import { Socket } from "socket.io";
 import RouterContext from "../entity/ctx";
 import logger from "./log";
 
-// 定义网络协议与常用发送/广播/解析功能，客户端也应当拥有此文件
+// Define network protocols and common send/broadcast/parse functions, the client should also have this file
 
 const STATUS_OK = 200;
 const STATUS_ERR = 500;
 
-// 数据包格式定义
+// packet format definition
 export interface IPacket {
   uuid?: string;
   status: number;
@@ -22,7 +22,7 @@ export interface IResponseErrorConfig {
   notPrintErr: boolean;
 }
 
-// 全局 Socket 储存
+// global socket storage
 const globalSocket = new Map<String, Socket>();
 
 export class Packet implements IPacket {
@@ -39,7 +39,7 @@ export function responseError(ctx: RouterContext, err: Error | string, config?: 
   if (err) errinfo = err.toString();
   else errinfo = err;
   const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
-  // 忽略因为重启守护进程没有刷新网页的权限不足错误
+  // Ignore insufficient permission errors because restarting the daemon did not refresh the page
   if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
   if (!config?.notPrintErr)
     logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
@@ -53,7 +53,7 @@ export function msg(ctx: RouterContext, event: string, data: any) {
 
 export function error(ctx: RouterContext, event: string, err: any) {
   const packet = new Packet(ctx.uuid, STATUS_ERR, event, err);
-  // 忽略因为重启守护进程没有刷新网页的权限不足错误
+  // Ignore insufficient permission errors because restarting the daemon did not refresh the page
   if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
   logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
   ctx.socket.emit(event, packet);
@@ -83,7 +83,7 @@ export function socketObjects() {
   return globalSocket;
 }
 
-// 全局 Socket 广播
+// global socket broadcast
 export function broadcast(event: string, obj: any) {
   globalSocket.forEach((socket) => {
     msg(new RouterContext(null, socket), event, obj);

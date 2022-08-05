@@ -35,7 +35,7 @@ class InstanceSubsystem extends EventEmitter {
     super();
   }
 
-  // 开机自动启动
+  // start automatically at boot
   private autoStart() {
     this.instances.forEach((instance) => {
       if (instance.config.eventTask.autoStart) {
@@ -60,7 +60,7 @@ class InstanceSubsystem extends EventEmitter {
       try {
         const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
         const instance = new Instance(uuid, instanceConfig);
-        // 所有实例全部进行功能调度器
+        // All instances are all function schedulers
         instance
           .forceExec(new FunctionDispatcher())
           .then((v) => {})
@@ -71,21 +71,21 @@ class InstanceSubsystem extends EventEmitter {
         logger.error($t("system_instance.checkConf", { uuid: uuid }));
       }
     });
-    // 处理自动启动
+    // handle autostart
     this.autoStart();
   }
 
   createInstance(cfg: any) {
     const newUuid = v4().replace(/-/gim, "");
     const instance = new Instance(newUuid, new InstanceConfig());
-    // 实例工作目录验证与自动创建
+    // Instance working directory verification and automatic creation
     if (!cfg.cwd || cfg.cwd === ".") {
       cfg.cwd = path.normalize(`${INSTANCE_DATA_DIR}/${instance.instanceUuid}`);
       if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     }
-    // 设置默认输入输出编码
+    // Set the default input and output encoding
     cfg.ie = cfg.oe = cfg.fileCode = "utf8";
-    // 根据参数构建并初始化类型
+    // Build and initialize the type from the parameters
     instance.parameters(cfg);
     instance.forceExec(new FunctionDispatcher());
     this.addInstance(instance);
@@ -138,12 +138,12 @@ class InstanceSubsystem extends EventEmitter {
     const instance = this.getInstance(instanceUuid);
     if (instance) {
       instance.destroy();
-      // 销毁记录
+      // destroy record
       this.instances.delete(instanceUuid);
       StorageSubsystem.delete("InstanceConfig", instanceUuid);
-      // 删除计划任务
+      // delete scheduled task
       InstanceControl.deleteInstanceAllTask(instanceUuid);
-      // 异步删除文件
+      // delete the file asynchronously
       if (deleteFile) fs.remove(instance.config.cwd, (err) => {});
       return true;
     }

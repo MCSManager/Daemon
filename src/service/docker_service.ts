@@ -4,7 +4,7 @@ import dockerode from "dockerode";
 import Docker from "dockerode";
 
 export class DockerManager {
-  // 1=正在创建 2=创建完毕 -1=创建错误
+  // 1=creating 2=creating completed -1=creating error
   public static readonly builerProgress = new Map<string, number>();
 
   public docker: Docker = null;
@@ -27,9 +27,9 @@ export class DockerManager {
 
   async startBuildImage(dockerFileDir: string, dockerImageName: string) {
     try {
-      // 设置当前镜像创建进度
+      // Set the current image creation progress
       DockerManager.setBuilerProgress(dockerImageName, 1);
-      // 发出创建镜像指令
+      // Issue the create image command
       const stream = await this.docker.buildImage(
         {
           context: dockerFileDir,
@@ -37,14 +37,14 @@ export class DockerManager {
         },
         { t: dockerImageName }
       );
-      // 等待创建完毕
+      // wait for creation to complete
       await new Promise((resolve, reject) => {
         this.docker.modem.followProgress(stream, (err, res) => (err ? reject(err) : resolve(res)));
       });
-      // 设置当前镜像创建进度
+      // Set the current image creation progress
       DockerManager.setBuilerProgress(dockerImageName, 2);
     } catch (error) {
-      // 设置当前镜像创建进度
+      // Set the current image creation progress
       DockerManager.setBuilerProgress(dockerImageName, -1);
     }
   }

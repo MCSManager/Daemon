@@ -12,7 +12,7 @@ import RestartCommand from "../entity/commands/restart";
 import KillCommand from "../entity/commands/kill";
 import FileManager from "./system_file";
 
-// 计划任务配置项接口
+// Scheduled task configuration item interface
 interface IScheduleTask {
   instanceUuid: string;
   name: string;
@@ -23,13 +23,13 @@ interface IScheduleTask {
   type: number;
 }
 
-// 计划任务定时器/周期任务接口
+// Scheduled task timer/periodic task interface
 interface IScheduleJob {
   cancel: Function;
 }
 
 // @Entity
-// 计划任务配置数据实体类
+// Schedule task configuration data entity class
 class TaskConfig implements IScheduleTask {
   instanceUuid = "";
   name: string = "";
@@ -52,7 +52,7 @@ class IntervalJob implements IScheduleJob {
   }
 }
 
-// 计划任务实例类
+// Scheduled task instance class
 class Task {
   constructor(public config: TaskConfig, public job?: IScheduleJob) {}
 }
@@ -62,14 +62,14 @@ class InstanceControlSubsystem {
   public readonly taskJobMap = new Map<string, schedule.Job>();
 
   constructor() {
-    // 初始化所有持久化数据并逐一装载到内存
+    // Initialize all persistent data and load into memory one by one
     StorageSubsystem.list("TaskConfig").forEach((uuid) => {
       const config = StorageSubsystem.load("TaskConfig", TaskConfig, uuid) as TaskConfig;
       try {
         this.registerScheduleJob(config, false);
       } catch (error) {
-        // 可能会遗留掉某些计划任务，但是上限不会变
-        // 忽略启动时的计划任务注册
+        // Some scheduled tasks may be left, but the upper limit will not change
+        // Ignore the scheduled task registration at startup
       }
     });
   }
@@ -86,12 +86,12 @@ class InstanceControlSubsystem {
 
     let job: IScheduleJob;
 
-    // 最小间隔时间检查
+    // min interval check
     if (task.type === 1) {
       let internalTime = Number(task.time);
       if (isNaN(internalTime) || internalTime < 1) internalTime = 1;
 
-      // task.type=1: 时间间隔型计划任务，采用内置定时器实现
+      // task.type=1: Time interval scheduled task, implemented with built-in timer
       job = new IntervalJob(() => {
         this.action(task);
         if (task.count === -1) return;
@@ -104,7 +104,7 @@ class InstanceControlSubsystem {
         }
       }, internalTime);
     } else {
-      // 表达式合法性检查: 8 19 14 * * 1,2,3,4
+      // Expression validity check: 8 19 14 * * 1,2,3,4
       const timeArray = task.time.split(" ");
       const checkIndex = [0, 1, 2];
       checkIndex.forEach((item) => {
@@ -112,7 +112,7 @@ class InstanceControlSubsystem {
           throw new Error($t("system_instance_control.crateTaskErr", { name: task.name, timeArray: timeArray }));
         }
       });
-      // task.type=2: 指定时间型计划任务，采用 node-schedule 库实现
+      // task.type=2: Specify time-based scheduled tasks, implemented by node-schedule library
       job = schedule.scheduleJob(task.time, () => {
         this.action(task);
         if (task.count === -1) return;
@@ -148,12 +148,12 @@ class InstanceControlSubsystem {
       const payload = task.payload;
       const instanceUuid = task.instanceUuid;
       const instance = InstanceSubsystem.getInstance(instanceUuid);
-      // 若实例已被删除则需自动销毁
+      // If the instance has been deleted, it needs to be automatically destroyed
       if (!instance) {
         return this.deleteScheduleTask(task.instanceUuid, task.name);
       }
       const instanceStatus = instance.status();
-      // logger.info(`执行计划任务: ${task.name} ${task.action} ${task.time} ${task.count} `);
+      // logger.info(`Execute scheduled task: ${task.name} ${task.action} ${task.time} ${task.count} `);
       if (task.action === "start") {
         if (instanceStatus === 0) {
           return await instance.exec(new StartCommand("ScheduleJob"));
