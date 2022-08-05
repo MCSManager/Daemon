@@ -6,6 +6,7 @@
 [![Status](https://img.shields.io/badge/node-v14.17.6-blue.svg)](https://nodejs.org/en/download/)
 [![Status](https://img.shields.io/badge/License-AGPL-red.svg)](https://github.com/Suwings/MCSManager)
 
+
 English | [简体中文](readme_cn.md)
 
 [Official Website](http://mcsmanager.com/) | [Usage Documentation](https://docs.mcsmanager.com/) | [Team Homepage](https://github.com/MCSManager) | [MCSManager Project](https://github.com/MCSManager/MCSManager)
@@ -25,7 +26,6 @@ The MCSManager panel (referred to as: MCSM panel) is an all-Chinese, lightweight
 This software has a certain popularity in Minecraft and other gaming communities, it can help you centrally manage multiple physical servers, dynamically create game servers on any host, and provide a secure and reliable multi-user permission system that can be easily Easily help you manage multiple servers.
 
 <br />
-
 
 ## Manual installation
 
