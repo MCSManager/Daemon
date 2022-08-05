@@ -7,7 +7,7 @@ import InstanceSubsystem from "../service/system_instance";
 import { getFileManager } from "../service/file_router_service";
 import { globalConfiguration, globalEnv } from "../entity/config";
 
-// 部分路由器操作路由器验证中间件
+// Some routers operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
   if (event.startsWith("file/")) {
     const instanceUuid = data.instanceUuid;
@@ -21,7 +21,7 @@ routerApp.use((event, ctx, data, next) => {
   next();
 });
 
-// 列出指定实例工作目录的文件列表
+// List the files in the specified instance working directory
 routerApp.on("file/list", (ctx, data) => {
   try {
     const fileManager = getFileManager(data.instanceUuid);
@@ -34,7 +34,7 @@ routerApp.on("file/list", (ctx, data) => {
   }
 });
 
-// 查询文件管理系统状态
+// Query the status of the file management system
 routerApp.on("file/status", (ctx, data) => {
   try {
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
@@ -47,7 +47,7 @@ routerApp.on("file/status", (ctx, data) => {
   }
 });
 
-// 创建目录
+// Create a directory
 routerApp.on("file/mkdir", (ctx, data) => {
   try {
     const target = data.target;
@@ -59,7 +59,7 @@ routerApp.on("file/mkdir", (ctx, data) => {
   }
 });
 
-// 复制文件
+// copy the file
 routerApp.on("file/copy", async (ctx, data) => {
   try {
     // [["a.txt","b.txt"],["cxz","zzz"]]
@@ -74,7 +74,7 @@ routerApp.on("file/copy", async (ctx, data) => {
   }
 });
 
-// 移动文件
+// move the file
 routerApp.on("file/move", async (ctx, data) => {
   try {
     // [["a.txt","b.txt"],["cxz","zzz"]]
@@ -89,13 +89,13 @@ routerApp.on("file/move", async (ctx, data) => {
   }
 });
 
-// 删除文件
+// Delete Files
 routerApp.on("file/delete", async (ctx, data) => {
   try {
     const targets = data.targets;
     const fileManager = getFileManager(data.instanceUuid);
     for (const target of targets) {
-      // 异步删除
+      // async delete
       fileManager.delete(target);
     }
     protocol.response(ctx, true);
@@ -104,7 +104,7 @@ routerApp.on("file/delete", async (ctx, data) => {
   }
 });
 
-// 编辑文件
+// edit file
 routerApp.on("file/edit", async (ctx, data) => {
   try {
     const target = data.target;
@@ -117,7 +117,7 @@ routerApp.on("file/edit", async (ctx, data) => {
   }
 });
 
-// 压缩/解压文件
+// compress/decompress the file
 routerApp.on("file/compress", async (ctx, data) => {
   const maxFileTask = globalConfiguration.config.maxFileTask;
   try {
@@ -130,7 +130,7 @@ routerApp.on("file/compress", async (ctx, data) => {
     if (instance.info.fileLock >= maxFileTask) {
       throw new Error($t("file_router.unzipLimit", { maxFileTask: maxFileTask, fileLock: instance.info.fileLock }));
     }
-    // 单个实例文件任务量与整个守护进程文件任务量数统计
+    // Statistics of the number of tasks in a single instance file and the number of tasks in the entire daemon process
     function fileTaskStart() {
       instance.info.fileLock++;
       globalEnv.fileTaskCount++;
@@ -140,7 +140,7 @@ routerApp.on("file/compress", async (ctx, data) => {
       globalEnv.fileTaskCount--;
     }
 
-    // 开始解压或压缩文件
+    // start decompressing or compressing the file
     fileTaskStart();
     try {
       if (type === 1) {

@@ -20,12 +20,12 @@ import FileManager from "../service/system_file";
 import { ProcessConfig } from "../entity/instance/process_config";
 import RestartCommand from "../entity/commands/restart";
 
-// 部分实例操作路由器验证中间件
+// Some instances operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
   if (event == "instance/new" && data) return next();
   if (event == "instance/overview") return next();
   if (event == "instance/select") return next();
-  // 类 AOP
+  // class AOP
   if (event.startsWith("instance")) {
     if (data.instanceUuids) return next();
     const instanceUuid = data.instanceUuid;
@@ -39,21 +39,21 @@ routerApp.use((event, ctx, data, next) => {
   next();
 });
 
-// 获取本守护进程实例列表（查询式）
+// Get the list of instances of this daemon (query)
 routerApp.on("instance/select", (ctx, data) => {
   const page = data.page || 1;
   const pageSize = data.pageSize || 1;
   const condition = data.condition;
   const overview: IInstanceDetail[] = [];
-  // 关键字条件查询
+  // keyword condition query
   const queryWrapper = InstanceSubsystem.getQueryMapWrapper();
   let result = queryWrapper.select<Instance>((v) => {
     if (!v.config.nickname.includes(condition.instanceName)) return false;
     return true;
   });
-  // 分页功能
+  // paging function
   const pageResult = queryWrapper.page<Instance>(result, page, pageSize);
-  // 过滤不需要的数据
+  // filter unwanted data
   pageResult.data.forEach((instance) => {
     overview.push({
       instanceUuid: instance.instanceUuid,
@@ -76,7 +76,7 @@ routerApp.on("instance/select", (ctx, data) => {
   });
 });
 
-// 获取本守护进程实例总览
+// Get an overview of this daemon instance
 routerApp.on("instance/overview", (ctx) => {
   const overview: IInstanceDetail[] = [];
   InstanceSubsystem.instances.forEach((instance) => {
@@ -92,7 +92,7 @@ routerApp.on("instance/overview", (ctx) => {
   protocol.msg(ctx, "instance/overview", overview);
 });
 
-// 获取本守护进程部分实例总览
+// Get an overview of some instances of this daemon
 routerApp.on("instance/section", (ctx, data) => {
   const instanceUuids = data.instanceUuids as string[];
   const overview: IInstanceDetail[] = [];
@@ -112,7 +112,7 @@ routerApp.on("instance/section", (ctx, data) => {
   protocol.msg(ctx, "instance/section", overview);
 });
 
-// 查看单个实例的详细情况
+// View details of a single instance
 routerApp.on("instance/detail", async (ctx, data) => {
   try {
     const instanceUuid = data.instanceUuid;
@@ -120,7 +120,7 @@ routerApp.on("instance/detail", async (ctx, data) => {
     let processInfo = null;
     let space = null;
     try {
-      // 可能因文件权限导致错误的部分，避免影响整个配置的获取
+      // Parts that may be wrong due to file permissions, avoid affecting the acquisition of the entire configuration
       processInfo = await instance.forceExec(new ProcessInfoCommand());
       space = await instance.usedSpace(null, 2);
     } catch (err) {}
@@ -138,7 +138,7 @@ routerApp.on("instance/detail", async (ctx, data) => {
   }
 });
 
-// 新建应用实例
+// create a new application instance
 routerApp.on("instance/new", (ctx, data) => {
   const config = data;
   try {
@@ -149,7 +149,7 @@ routerApp.on("instance/new", (ctx, data) => {
   }
 });
 
-// 更新实例数据
+// update instance data
 routerApp.on("instance/update", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const config = data.config;
@@ -161,7 +161,7 @@ routerApp.on("instance/update", (ctx, data) => {
   }
 });
 
-// 请求转发某实例所有IO数据
+// Request to forward all IO data of an instance
 routerApp.on("instance/forward", (ctx, data) => {
   const targetInstanceUuid = data.instanceUuid;
   const isforward: boolean = data.forward;
@@ -180,7 +180,7 @@ routerApp.on("instance/forward", (ctx, data) => {
   }
 });
 
-// 开启实例
+// open the instance
 routerApp.on("instance/open", async (ctx, data) => {
   const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
@@ -197,14 +197,14 @@ routerApp.on("instance/open", async (ctx, data) => {
   }
 });
 
-// 关闭实例
+// close the instance
 routerApp.on("instance/stop", async (ctx, data) => {
   const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
       await instance.exec(new StopCommand());
-      //Note: 去掉此回复会导致前端响应慢，因为前端会等待面板端消息转发
+      //Note: Removing this reply will cause the front-end response to be slow, because the front-end will wait for the panel-side message to be forwarded
       if (!disableResponse) protocol.msg(ctx, "instance/stop", { instanceUuid });
     } catch (err) {
       if (!disableResponse) protocol.error(ctx, "instance/stop", { instanceUuid: instanceUuid, err: err.message });
@@ -212,7 +212,7 @@ routerApp.on("instance/stop", async (ctx, data) => {
   }
 });
 
-// 重启实例
+// restart the instance
 routerApp.on("instance/restart", async (ctx, data) => {
   const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
@@ -226,7 +226,7 @@ routerApp.on("instance/restart", async (ctx, data) => {
   }
 });
 
-// 终止实例方法
+// terminate instance method
 routerApp.on("instance/kill", async (ctx, data) => {
   const disableResponse = data.disableResponse;
   for (const instanceUuid of data.instanceUuids) {
@@ -241,7 +241,7 @@ routerApp.on("instance/kill", async (ctx, data) => {
   }
 });
 
-// 向应用实例发送命令
+// Send a command to the application instance
 routerApp.on("instance/command", async (ctx, data) => {
   const disableResponse = data.disableResponse;
   const instanceUuid = data.instanceUuid;
@@ -255,7 +255,7 @@ routerApp.on("instance/command", async (ctx, data) => {
   }
 });
 
-// 删除实例
+// delete instance
 routerApp.on("instance/delete", (ctx, data) => {
   const instanceUuids = data.instanceUuids;
   const deleteFile = data.deleteFile;
@@ -267,7 +267,7 @@ routerApp.on("instance/delete", (ctx, data) => {
   protocol.msg(ctx, "instance/delete", instanceUuids);
 });
 
-// 执行复杂异步任务
+// perform complex asynchronous tasks
 routerApp.on("instance/asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const taskName = data.taskName;
@@ -285,7 +285,7 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   protocol.msg(ctx, "instance/asynchronous", true);
 });
 
-// 终止执行复杂异步任务
+// Terminate the execution of complex asynchronous tasks
 routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
@@ -301,10 +301,10 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   protocol.msg(ctx, "instance/stop_asynchronous", true);
 });
 
-// 向应用实例发送数据流
+// send data stream to application instance
 routerApp.on("instance/stdin", (ctx, data) => {
-  // 本路由采用兼容性低且直接原始的方式来进行写数据
-  // 因为此路由将会接收到每个字符
+  // This route uses a low-compatibility and direct and original way to write data
+  // because this route will receive every character
   const instance = InstanceSubsystem.getInstance(data.instanceUuid);
   try {
     if (data.ch == "\r") return instance.process.write("\n");
@@ -333,7 +333,7 @@ routerApp.on("instance/process_config/list", (ctx, data) => {
   }
 });
 
-// 获取或更新实例指定文件的内容
+// Get or update the content of the instance specified file
 routerApp.on("instance/process_config/file", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const fileName = data.fileName;
@@ -364,7 +364,7 @@ routerApp.on("instance/process_config/file", (ctx, data) => {
   }
 });
 
-// 获取实例终端日志
+// Get instance terminal log
 routerApp.on("instance/outputlog", async (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   try {

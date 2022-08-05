@@ -8,7 +8,7 @@ import Instance from "../entity/instance/instance";
 import { systemInfo } from "../common/system_info";
 import { getVersion } from "../service/version";
 
-// 获取守护进程系统基本信息
+// Get the basic information of the daemon system
 routerApp.on("info/overview", async (ctx) => {
   const daemonVersion = getVersion();
   let total = 0;

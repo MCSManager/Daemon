@@ -7,17 +7,17 @@ import { globalConfiguration } from "../entity/config";
 import logger from "../service/log";
 import RouterContext from "../entity/ctx";
 
-// 最迟验证时间
+// latest verification time
 const AUTH_TIMEOUT = 6000;
-// 认证类型标识
+// authentication type identifier
 const TOP_LEVEL = "TOP_LEVEL";
 
-// 顶级权限认证中间件（任何权限验证中间件此为第一位）
+// Top-level authority authentication middleware (this is the first place for any authority authentication middleware)
 routerApp.use(async (event, ctx, _, next) => {
   const socket = ctx.socket;
-  // 放行所有数据流控制器
+  // release all data flow controllers
   if (event.startsWith("stream")) return next();
-  // 除 auth 控制器是公开访问，其他业务控制器必须得到授权才可访问
+  // Except for the auth controller, which is publicly accessible, other business controllers must be authorized before they can be accessed
   if (event === "auth") return await next();
   if (!ctx.session) throw new Error("Session does not exist in authentication middleware.");
   if (ctx.session.key === globalConfiguration.config.key && ctx.session.type === TOP_LEVEL && ctx.session.login && ctx.session.id) {
@@ -27,23 +27,23 @@ routerApp.use(async (event, ctx, _, next) => {
   return protocol.error(ctx, "error", $t("auth_router.illegalAccess"));
 });
 
-// 日志输出中间件
+// log output middleware
 // routerApp.use((event, ctx, data, next) => {
-//   try {
-//     const socket = ctx.socket;
-//     logger.info(`收到 ${socket.id}(${socket.handshake.address}) 的 ${event} 指令.`);
-//     logger.info(` - 数据: ${JSON.stringify(data)}.`);
-//   } catch (err) {
-//     logger.error("日志记录错误:", err);
-//   } finally {
-//     next();
-//   }
+// try {
+// const socket = ctx.socket;
+// logger.info(`Received ${event} command from ${socket.id}(${socket.handshake.address}).`);
+// logger.info(` - data: ${JSON.stringify(data)}.`);
+// } catch (err) {
+// logger.error("Logging error:", err);
+// } finally {
+// next();
+// }
 // });
 
-// 身份认证控制器
+// authentication controller
 routerApp.on("auth", (ctx, data) => {
   if (data === globalConfiguration.config.key) {
-    // 身份认证通过，注册会话为可信会话
+    // The authentication is passed, and the registered session is a trusted session
     logger.info($t("auth_router.access", { id: ctx.socket.id, address: ctx.socket.handshake.address }));
     loginSuccessful(ctx, data);
     protocol.msg(ctx, "auth", true);
@@ -52,7 +52,7 @@ routerApp.on("auth", (ctx, data) => {
   }
 });
 
-// 已连接事件，用于超时身份认证关闭
+// Connected event for timeout authentication close
 routerApp.on("connection", (ctx) => {
   const session = ctx.session;
   setTimeout(() => {
@@ -63,7 +63,7 @@ routerApp.on("connection", (ctx) => {
   }, AUTH_TIMEOUT);
 });
 
-// 登录成功后必须执行此函数
+// This function must be executed after successful login
 function loginSuccessful(ctx: RouterContext, data: string) {
   ctx.session.key = data;
   ctx.session.login = true;

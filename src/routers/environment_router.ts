@@ -10,7 +10,7 @@ import { v4 } from "uuid";
 import logger from "../service/log";
 import os from "os";
 
-// 获取本系统镜像列表
+// Get the image list of this system
 routerApp.on("environment/images", async (ctx, data) => {
   try {
     const docker = new DockerManager().getDocker();
@@ -21,7 +21,7 @@ routerApp.on("environment/images", async (ctx, data) => {
   }
 });
 
-// 获取本系统容器列表
+// Get the list of containers in this system
 routerApp.on("environment/containers", async (ctx, data) => {
   try {
     const docker = new DockerManager().getDocker();
@@ -32,7 +32,7 @@ routerApp.on("environment/containers", async (ctx, data) => {
   }
 });
 
-// 获取本系统网络列表
+// Get the network list of this system
 routerApp.on("environment/networkModes", async (ctx, data) => {
   try {
     const docker = new DockerManager().getDocker();
@@ -43,27 +43,27 @@ routerApp.on("environment/networkModes", async (ctx, data) => {
   }
 });
 
-// 创建镜像
+// create image
 routerApp.on("environment/new_image", async (ctx, data) => {
   try {
     const dockerFileText = data.dockerFile;
     const name = data.name;
     const tag = data.tag;
-    // 初始化镜像文件目录和 Dockerfile
+    // Initialize the image file directory and Dockerfile
     const uuid = v4();
     const dockerFileDir = path.normalize(path.join(process.cwd(), "tmp", uuid));
     if (!fs.existsSync(dockerFileDir)) fs.mkdirsSync(dockerFileDir);
 
-    // 写入 DockerFile
+    // write to DockerFile
     const dockerFilepath = path.normalize(path.join(dockerFileDir, "Dockerfile"));
     await fs.writeFile(dockerFilepath, dockerFileText, { encoding: "utf-8" });
 
     logger.info($t("environment_router.crateImage", { name: name, tag: tag, dockerFileText: dockerFileText }));
 
-    // 预先响应
+    // pre-response
     protocol.response(ctx, true);
 
-    // 开始创建
+    // start creating
     const dockerImageName = `${name}:${tag}`;
     try {
       await new DockerManager().startBuildImage(dockerFileDir, dockerImageName);
@@ -76,7 +76,7 @@ routerApp.on("environment/new_image", async (ctx, data) => {
   }
 });
 
-// 删除镜像
+// delete image
 routerApp.on("environment/del_image", async (ctx, data) => {
   try {
     const imageId = data.imageId;
@@ -94,7 +94,7 @@ routerApp.on("environment/del_image", async (ctx, data) => {
   }
 });
 
-// 获取所有镜像任务进度
+// Get the progress of all mirroring tasks
 routerApp.on("environment/progress", async (ctx) => {
   try {
     const data: any = {};

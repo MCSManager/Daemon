@@ -10,18 +10,18 @@ import FileManager from "../service/system_file";
 
 const router = new Router();
 
-// 定义 HTTP 首页展示路由
+// Define the HTTP home page display route
 router.all("/", async (ctx) => {
   ctx.body = "[MCSManager Daemon] Status: online | reference: https://docs.mcsmanager.com/";
   ctx.status = 200;
 });
 
-// 文件下载路由
+// file download route
 router.get("/download/:key/:fileName", async (ctx) => {
   const key = ctx.params.key;
   const paramsFileName = ctx.params.fileName;
   try {
-    // 从任务中心取任务
+    // Get the task from the task center
     const mission = missionPassport.getMission(key, "download");
     if (!mission) throw new Error((ctx.body = "No task, Access denied"));
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
@@ -31,15 +31,15 @@ router.get("/download/:key/:fileName", async (ctx) => {
     const cwd = instance.config.cwd;
     const fileRelativePath = mission.parameter.fileName;
     const ext = path.extname(fileRelativePath);
-    // 检查文件跨目录安全隐患
+    // Check for file cross-directory security risks
     const fileManager = new FileManager(cwd);
     if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied,incorrect param"));
 
-    // 开始给用户下载文件
+    // start downloading the file to the user
     ctx.response.set("Content-Disposition", `attachment; filename="${encodeURIComponent(paramsFileName)}"`);
     ctx.type = ext;
     ctx.body = fs.createReadStream(fileManager.toAbsolutePath(fileRelativePath));
-    // 任务已执行，销毁护照
+    // The task has been executed, destroy the passport
     missionPassport.deleteMission(key);
   } catch (error) {
     ctx.body = $t("http_router.downloadErr", { error: error.message });
@@ -49,13 +49,13 @@ router.get("/download/:key/:fileName", async (ctx) => {
   }
 });
 
-// 文件上载路由
+// file upload route
 router.post("/upload/:key", async (ctx) => {
   const key = ctx.params.key;
   const unzip = ctx.query.unzip;
   const zipCode = String(ctx.query.code);
   try {
-    // 领取任务 & 检查任务 & 检查实例是否存在
+    // Get the task & check the task & check if the instance exists
     const mission = missionPassport.getMission(key, "upload");
     if (!mission) throw new Error("Access denied 0x061");
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
@@ -65,28 +65,28 @@ router.post("/upload/:key", async (ctx) => {
 
     const file = ctx.request.files.file as any;
     if (file) {
-      // 确认存储位置
+      // Confirm storage location
       const fullFileName = file.name as string;
       const fileSaveRelativePath = path.normalize(path.join(uploadDir, fullFileName));
 
-      // 文件名特殊字符过滤(杜绝任何跨目录入侵手段)
+      // File name special character filtering (to prevent any cross-directory intrusion)
       if (!FileManager.checkFileName(fullFileName)) throw new Error("Access denied 0x063");
 
-      // 检查文件跨目录安全隐患
+      // Check for file cross-directory security risks
       const fileManager = new FileManager(cwd);
       if (!fileManager.checkPath(fileSaveRelativePath)) throw new Error("Access denied 0x064");
       const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath);
 
-      // 禁止覆盖原文件
-      // if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("文件存在，无法覆盖");
+      // prohibit overwriting the original file
+      // if (fs.existsSync(fileSaveAbsolutePath)) throw new Error("The file exists and cannot be overwritten");
 
-      // 将文件从临时文件夹复制到指定目录
+      // Copy the file from the temporary folder to the specified directory
       const reader = fs.createReadStream(file.path);
       const upStream = fs.createWriteStream(fileSaveAbsolutePath);
       reader.pipe(upStream);
       reader.on("close", () => {
         if (unzip) {
-          // 如果需要解压则进行解压任务
+          // If decompression is required, perform the decompression task
           const filemanager = new FileManager(instance.config.cwd);
           filemanager.unzip(fullFileName, "", zipCode);
         }

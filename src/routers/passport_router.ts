@@ -8,7 +8,9 @@ import * as protocol from "../service/protocol";
 const ONE_HOUR_TIME = 3600000;
 const TASK_MAX_TIME = 1;
 
-// 注册临时任务护照
+// register temporary task passport
+// For example, file upload, file download, these operations that need to bypass the Web side,
+// all need to use this route
 routerApp.on("passport/register", (ctx, data) => {
   const name = data.name;
   const password = data.password;

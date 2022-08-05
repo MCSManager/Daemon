@@ -4,7 +4,7 @@ import { routerApp } from "../service/router";
 import * as protocol from "../service/protocol";
 import InstanceControlSubsystem from "../service/system_instance_control";
 
-// 创建计划任务
+// create a scheduled task
 routerApp.on("schedule/register", (ctx, data) => {
   try {
     InstanceControlSubsystem.registerScheduleJob(data);
@@ -14,12 +14,12 @@ routerApp.on("schedule/register", (ctx, data) => {
   }
 });
 
-// 获取任务列表
+// get the task list
 routerApp.on("schedule/list", (ctx, data) => {
   protocol.response(ctx, InstanceControlSubsystem.listScheduleJob(data.instanceUuid));
 });
 
-// 删除任务计划
+// delete the task plan
 routerApp.on("schedule/delete", (ctx, data) => {
   InstanceControlSubsystem.deleteScheduleTask(data.instanceUuid, data.name);
   protocol.response(ctx, true);

@@ -8,7 +8,7 @@ import InstanceSubsystem from "../service/system_instance";
 import fs from "fs-extra";
 const MAX_LOG_SIZE = 512;
 
-// 缓存区
+// buffer
 const buffer = new Map<string, string>();
 setInterval(() => {
   buffer.forEach((buf, instanceUuid) => {
@@ -25,15 +25,15 @@ setInterval(() => {
   });
 }, 500);
 
-// 输出流记录到缓存区
+// output stream record to buffer
 async function outputLog(instanceUuid: string, text: string) {
   const buf = (buffer.get(instanceUuid) ?? "") + text;
   if (buf.length > 1024 * 1024) buffer.set(instanceUuid, "");
   buffer.set(instanceUuid, buf ?? null);
 }
 
-// 实例输出流事件
-// 默认加入到数据缓存中以控制发送速率确保其稳定性
+// instance output stream event
+// By default, it is added to the data cache to control the sending rate to ensure its stability
 InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
   InstanceSubsystem.forEachForward(instanceUuid, (socket) => {
     protocol.msg(new RouterContext(null, socket), "instance/stdout", {
@@ -41,13 +41,13 @@ InstanceSubsystem.on("data", (instanceUuid: string, text: string) => {
       text: text
     });
   });
-  // 输出内容追加到log文件
+  // Append the output to the log file
   outputLog(instanceUuid, text)
     .then(() => {})
     .catch(() => {});
 });
 
-// 实例退出事件
+// instance exit event
 InstanceSubsystem.on("exit", (obj: any) => {
   InstanceSubsystem.forEachForward(obj.instanceUuid, (socket) => {
     protocol.msg(new RouterContext(null, socket), "instance/stopped", {
@@ -57,7 +57,7 @@ InstanceSubsystem.on("exit", (obj: any) => {
   });
 });
 
-// 实例启动事件
+// instance start event
 InstanceSubsystem.on("open", (obj: any) => {
   InstanceSubsystem.forEachForward(obj.instanceUuid, (socket) => {
     protocol.msg(new RouterContext(null, socket), "instance/opened", {
@@ -67,7 +67,7 @@ InstanceSubsystem.on("open", (obj: any) => {
   });
 });
 
-// 实例失败事件（一般用于启动失败，也可能是其他操作失败）
+// Instance failure event (usually used for startup failure, or other operation failures)
 InstanceSubsystem.on("failure", (obj: any) => {
   InstanceSubsystem.forEachForward(obj.instanceUuid, (socket) => {
     protocol.msg(new RouterContext(null, socket), "instance/failure", {
