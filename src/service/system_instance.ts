@@ -1,24 +1,6 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t } from "../i18n";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
@@ -53,17 +35,19 @@ class InstanceSubsystem extends EventEmitter {
     super();
   }
 
-  // 开机自动启动
+  // start automatically at boot
   private autoStart() {
     this.instances.forEach((instance) => {
       if (instance.config.eventTask.autoStart) {
         instance
           .exec(new StartCommand())
           .then(() => {
-            logger.info(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动指令已发出`);
+            logger.info($t("system_instance.autoStart", { name: instance.config.nickname, uuid: instance.instanceUuid }));
           })
           .catch((reason) => {
-            logger.error(`实例 ${instance.config.nickname} ${instance.instanceUuid} 自动启动时错误: ${reason}`);
+            logger.error(
+              $t("system_instance.autoStartErr", { name: instance.config.nickname, uuid: instance.instanceUuid, reason: reason })
+            );
           });
       }
     });
@@ -76,32 +60,32 @@ class InstanceSubsystem extends EventEmitter {
       try {
         const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
         const instance = new Instance(uuid, instanceConfig);
-        // 所有实例全部进行功能调度器
+        // All instances are all function schedulers
         instance
           .forceExec(new FunctionDispatcher())
           .then((v) => {})
           .catch((v) => {});
         this.addInstance(instance);
       } catch (error) {
-        logger.error(`读取 ${uuid} 应用实例失败: ${error.message}`);
-        logger.error(`请检查或删除文件：data/InstanceConfig/${uuid}.json`);
+        logger.error($t("system_instance.readInstanceFailed", { uuid: uuid, error: error.message }));
+        logger.error($t("system_instance.checkConf", { uuid: uuid }));
       }
     });
-    // 处理自动启动
+    // handle autostart
     this.autoStart();
   }
 
   createInstance(cfg: any) {
     const newUuid = v4().replace(/-/gim, "");
     const instance = new Instance(newUuid, new InstanceConfig());
-    // 实例工作目录验证与自动创建
+    // Instance working directory verification and automatic creation
     if (!cfg.cwd || cfg.cwd === ".") {
       cfg.cwd = path.normalize(`${INSTANCE_DATA_DIR}/${instance.instanceUuid}`);
       if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     }
-    // 设置默认输入输出编码
+    // Set the default input and output encoding
     cfg.ie = cfg.oe = cfg.fileCode = "utf8";
-    // 根据参数构建并初始化类型
+    // Build and initialize the type from the parameters
     instance.parameters(cfg);
     instance.forceExec(new FunctionDispatcher());
     this.addInstance(instance);
@@ -109,7 +93,7 @@ class InstanceSubsystem extends EventEmitter {
   }
 
   addInstance(instance: Instance) {
-    if (instance.instanceUuid == null) throw new Error("无法新增某实例，因为实例UUID为空");
+    if (instance.instanceUuid == null) throw new Error($t("system_instance.uuidEmpty"));
     if (this.instances.has(instance.instanceUuid)) {
       throw new Error(`The application instance ${instance.instanceUuid} already exists.`);
     }
@@ -154,12 +138,12 @@ class InstanceSubsystem extends EventEmitter {
     const instance = this.getInstance(instanceUuid);
     if (instance) {
       instance.destroy();
-      // 销毁记录
+      // destroy record
       this.instances.delete(instanceUuid);
       StorageSubsystem.delete("InstanceConfig", instanceUuid);
-      // 删除计划任务
+      // delete scheduled task
       InstanceControl.deleteInstanceAllTask(instanceUuid);
-      // 异步删除文件
+      // delete the file asynchronously
       if (deleteFile) fs.remove(instance.config.cwd, (err) => {});
       return true;
     }

@@ -1,42 +1,24 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t, i18next } from "./i18n";
 import { getVersion, initVersionManager } from "./service/version";
+import { globalConfiguration } from "./entity/config";
 
 initVersionManager();
 const VERSION = getVersion();
 
-console.log(`______  _______________________  ___                                         
-___   |/  /_  ____/_  ___/__   |/  /_____ _____________ _______ _____________
-__  /|_/ /_  /    _____ \\__  /|_/ /_  __  /_  __ \\  __  /_  __  /  _ \\_  ___/
-_  /  / / / /___  ____/ /_  /  / / / /_/ /_  / / / /_/ /_  /_/ //  __/  /    
-/_/  /_/  \\____/  /____/ /_/  /_/  \\__,_/ /_/ /_/\\__,_/ _\\__, / \\___//_/     
-________                                                /____/                                          
-___  __ \\_____ ____________ ________________ 
-__  / / /  __  /  _ \\_  __  __ \\  __ \\_  __ \\
-_  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
-/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/   
+console.log(`______ _______________________ ___
+___ |/ /_ ____/_ ___/__ |/ /_____ _____________ _______ _____________
+__ /|_/ /_ / _____ \\__ /|_/ /_ __ /_ __ \\ __ /_ __ / _ \\_ ___/
+_ / / / / /___ ____/ /_ / / / / /_/ /_ / / /_/ /_ /_/ // __/ /
+/_/ /_/ \\____/ /____/ /_/ /_/ \\__,_/ /_/ /_/\\__,_/ _\\__, / \\___//_/
+________ /____/
+___ __ \\_____ ____________ ________________
+__ / / / __ / _ \\_ __ __ \\ __ \\_ __ \\
+_ /_/ // /_/ // __/ / / / / / /_/ / / / /
+/_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/
 
- + Released under the AGPL-3.0 License
- + Copyright 2022 Suwings
+ + Copyright 2022 MCSManager Dev <mcsmanager-dev@outlook.com>
  + Version ${VERSION}
 `);
 
@@ -46,35 +28,39 @@ import { Server, Socket } from "socket.io";
 
 import logger from "./service/log";
 
-logger.info(`欢迎使用 MCSManager 守护进程`);
+// Initialize the global configuration service
+globalConfiguration.load();
+const config = globalConfiguration.config;
 
-import { globalConfiguration } from "./entity/config";
+// If language is not configured, get the system language
+const lang = config.language || "en_us";
+logger.info(`LANGUAGE: ${lang}`);
+i18next.changeLanguage(lang);
+
+logger.info($t("app.welcome"));
+
 import * as router from "./service/router";
 import * as koa from "./service/http";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 import { initDependent } from "./service/install";
 
-// 异步初始化可选依赖库
+// initialize optional dependencies asynchronously
 initDependent();
 
-// 初始化全局配置服务
-globalConfiguration.load();
-const config = globalConfiguration.config;
-
-// 初始化 HTTP 服务
+// Initialize HTTP service
 const koaApp = koa.initKoa();
 
-// 监听 Koa 错误
+// Listen for Koa errors
 koaApp.on("error", (error) => {
-  // 屏蔽所有 Koa 框架级别事件
-  // 当 Koa 遭遇短连接洪水攻击时，很容易错误信息刷屏，有可能会间接影响某些应用程序运作
+  // Block all Koa framework level events
+  // When Koa is attacked by a short connection flood, it is easy for error messages to swipe the screen, which may indirectly affect the operation of some applications
 });
 
 const httpServer = http.createServer(koaApp.callback());
 httpServer.listen(config.port, config.ip);
 
-// 初始化 Websocket 服务到 HTTP 服务
+// Initialize Websocket service to HTTP service
 const io = new Server(httpServer, {
   serveClient: false,
   pingInterval: 5000,
@@ -87,19 +73,18 @@ const io = new Server(httpServer, {
   }
 });
 
-// 初始化应用实例系统 & 装载应用实例
+// Initialize application instance system & load application instance
 try {
-  logger.info("正在读取本地应用实例中");
   InstanceSubsystem.loadInstances();
-  logger.info(`所有应用实例已加载，总计 ${InstanceSubsystem.instances.size} 个`);
+  logger.info($t("app.instanceLoad", { n: InstanceSubsystem.instances.size }));
 } catch (err) {
-  logger.error("读取本地实例文件失败:", err);
+  logger.error($t("app.instanceLoadError"), err);
   process.exit(-1);
 }
 
-// 注册 Websocket 连接事件
+// Register for Websocket connection events
 io.on("connection", (socket: Socket) => {
-  logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已连接.`);
+  logger.info($t("app.sessionConnect", { ip: socket.handshake.address, uuid: socket.id }));
 
   // Join the global Socket object
   protocol.addGlobalSocket(socket);
@@ -108,36 +93,35 @@ io.on("connection", (socket: Socket) => {
   router.navigation(socket);
 
   // Disconnect event
+  // Remove from the global Socket object
   socket.on("disconnect", () => {
-    // Remove from the global Socket object
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
-    logger.info(`会话 ${socket.id}(${socket.handshake.address}) 已断开`);
+    logger.info($t("app.sessionDisconnect", { ip: socket.handshake.address, uuid: socket.id }));
   });
 });
 
-// Error report monitoring
 process.on("uncaughtException", function (err) {
-  logger.error(`错误报告 (uncaughtException):`, err);
+  logger.error(`Error: UncaughtException:`, err);
 });
 
-// Error report monitoring
 process.on("unhandledRejection", (reason, p) => {
-  logger.error(`错误报告 (unhandledRejection):`, reason, p);
+  logger.error(`Error: UnhandledRejection:`, reason, p);
 });
 
-// Started up
-logger.info(`守护进程现已成功启动`);
-logger.info("================================");
-logger.info("参考文档：https://docs.mcsmanager.com/");
-logger.info(`访问地址：http://${config.ip ? config.ip : "localhost"}:${config.port}`);
-logger.info(`访问密钥：${config.key}`);
-logger.info("密钥作为守护进程唯一认证手段");
-logger.info("================================");
+logger.info("----------------------------");
+logger.info($t("app.started"));
+logger.info($t("app.doc"));
+logger.info($t("app.addr", { port: config.port }));
+logger.info($t("app.configPathTip", { path: "" }));
+logger.info($t("app.password", { key: config.key }));
+logger.info($t("app.passwordTip"));
+logger.info($t("app.exitTip"));
+logger.info("----------------------------");
 console.log("");
 
-// 装载 终端界面UI
-import "./service/ui";
+// Load the terminal interface UI
+// import "./service/ui";
 
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
   process.on(sig, async function () {
@@ -145,8 +129,7 @@ import "./service/ui";
       console.log("\n\n\n\n");
       logger.warn(`${sig} close process signal detected.`);
       await InstanceSubsystem.exit();
-      logger.info("The data is saved, thanks for using, goodbye!");
-      logger.info("Closed.");
+      logger.info("Exit...");
     } catch (err) {
       logger.error("ERROR:", err);
     } finally {

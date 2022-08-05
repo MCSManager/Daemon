@@ -1,24 +1,5 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  According to the AGPL, it is forbidden to delete all copyright notices,
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
+import { $t } from "../../../i18n";
 import Instance from "../../instance/instance";
 import InstanceCommand from "../base/command";
 import Docker from "dockerode";
@@ -29,11 +10,11 @@ import fs from "fs-extra";
 import { commandStringToArray } from "../base/command_parser";
 import path from "path";
 
-// 用户身份函数
+// user identity function
 const processUserUid = process.getuid ? process.getuid : () => 0;
 const processGroupGid = process.getgid ? process.getgid : () => 0;
 
-// 启动时错误异常
+// Error exception at startup
 class StartupDockerProcessError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -46,7 +27,7 @@ interface IDockerProcessAdapterStartParam {
   w: number;
 }
 
-// 进程适配器
+// process adapter
 export class DockerProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -56,7 +37,7 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
     super();
   }
 
-  // 一旦真实启动程序之后，任何错误都不可阻断接下来的启动流程
+  // Once the program is actually started, no errors can block the next startup process
   public async start(param?: IDockerProcessAdapterStartParam) {
     try {
       await this.container.start();
@@ -112,30 +93,30 @@ export default class DockerStartCommand extends InstanceCommand {
 
   async exec(instance: Instance, source = "Unknown") {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupDockerProcessError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError("工作目录并不存在"));
+      return instance.failure(new StartupDockerProcessError($t("instance.dirEmpty")));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 
     try {
-      // 锁死实例
+      // lock the instance
       instance.setLock(true);
-      // 设置启动状态
+      // set startup state
       instance.status(Instance.STATUS_STARTING);
-      // 启动次数增加
+      // increase the number of starts
       instance.startCount++;
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const cwd = instance.absoluteCwdPath();
 
-      // 解析端口开放
+      // parsing port open
       // {
-      //   "PortBindings": {
-      //     "22/tcp": [
-      //       {
-      //         "HostPort": "11022"
-      //       }
-      //     ]
-      //   }
+      // "PortBindings": {
+      // "22/tcp": [
+      // {
+      // "HostPort": "11022"
+      // }
+      // ]
+      // }
       // }
       // 25565:25565/tcp 8080:8080/tcp
       const portMap = instance.config.docker.ports;
@@ -146,14 +127,14 @@ export default class DockerStartCommand extends InstanceCommand {
         if (elemt.length != 2) continue;
         const ports = elemt[0];
         const protocol = elemt[1];
-        //主机(宿主)端口:容器端口
+        //Host (host) port: container port
         const publicAndPrivatePort = ports.split(":");
         if (publicAndPrivatePort.length != 2) continue;
         publicPortArray[`${publicAndPrivatePort[1]}/${protocol}`] = [{ HostPort: publicAndPrivatePort[0] }];
         exposedPorts[`${publicAndPrivatePort[1]}/${protocol}`] = {};
       }
 
-      // 解析额外路径挂载
+      // resolve extra path mounts
       const extraVolumes = instance.config.docker.extraVolumes;
       const extraBinds = [];
       for (const it of extraVolumes) {
@@ -175,11 +156,11 @@ export default class DockerStartCommand extends InstanceCommand {
         extraBinds.push(`${hostPath}:${containerPath}`);
       }
 
-      // 内存限制
+      // memory limit
       let maxMemory = undefined;
       if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
 
-      // CPU使用率计算
+      // CPU usage calculation
       let cpuQuota = undefined;
       let cpuPeriod = undefined;
       if (instance.config.docker.cpuUsage) {
@@ -187,42 +168,42 @@ export default class DockerStartCommand extends InstanceCommand {
         cpuPeriod = 1000 * 1000;
       }
 
-      // CPU 核心数校验
+      // Check the number of CPU cores
       let cpusetCpus = undefined;
       if (instance.config.docker.cpusetCpus) {
         const arr = instance.config.docker.cpusetCpus.split(",");
         arr.forEach((v) => {
-          if (isNaN(Number(v))) throw new Error(`非法的CPU核心指定: ${v}`);
+          if (isNaN(Number(v))) throw new Error($t("instance.invalidCpu", { v }));
         });
         cpusetCpus = instance.config.docker.cpusetCpus;
-        // Note: 检验
+        // Note: check
       }
 
-      // 容器名校验
+      // container name check
       let containerName = instance.config.docker.containerName;
       if (containerName && (containerName.length > 64 || containerName.length < 2)) {
-        throw new Error(`非法的容器名: ${containerName}`);
+        throw new Error($t("instance.invalidContainerName", { v: containerName }));
       }
 
-      // 输出启动日志
+      // output startup log
       logger.info("----------------");
-      logger.info(`会话 ${source}: 请求开启实例`);
-      logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`容器名称: [${containerName}]`);
-      logger.info(`启动命令: ${commandList.join(" ")}`);
-      logger.info(`工作目录: ${cwd}`);
-      logger.info(`网络模式: ${instance.config.docker.networkMode}`);
-      logger.info(`端口映射: ${JSON.stringify(publicPortArray)}`);
-      if (extraBinds.length > 0) logger.info(`额外挂载: ${JSON.stringify(extraBinds)}`);
-      logger.info(`网络别名: ${JSON.stringify(instance.config.docker.networkAliases)}`);
-      if (maxMemory) logger.info(`内存限制: ${maxMemory} MB`);
-      logger.info(`类型: Docker 容器`);
+      logger.info(`Session ${source}: Request to start an instance`);
+      logger.info(`UUID: [${instance.instanceUuid}] [${instance.config.nickname}]`);
+      logger.info(`NAME: [${containerName}]`);
+      logger.info(`COMMAND: ${commandList.join(" ")}`);
+      logger.info(`WORKSPACE: ${cwd}`);
+      logger.info(`NET_MODE: ${instance.config.docker.networkMode}`);
+      logger.info(`OPEN_PORT: ${JSON.stringify(publicPortArray)}`);
+      logger.info(`EXT_MOUNT: ${JSON.stringify(extraBinds)}`);
+      logger.info(`NET_ALIASES: ${JSON.stringify(instance.config.docker.networkAliases)}`);
+      logger.info(`MEM_LIMIT: ${maxMemory} MB`);
+      logger.info(`TYPE: Docker Container`);
       logger.info("----------------");
 
-      // 是否使用 TTY 模式
+      // Whether to use TTY mode
       const isTty = instance.config.terminalOption.pty;
 
-      // 开始 Docker 容器创建并运行
+      // Start Docker container creation and running
       const docker = new Docker();
       const container = await docker.createContainer({
         name: containerName,
@@ -256,7 +237,7 @@ export default class DockerStartCommand extends InstanceCommand {
         }
       });
 
-      // Docker 对接到进程适配器
+      // Docker docks to the process adapter
       const processAdapter = new DockerProcessAdapter(container);
       await processAdapter.start({
         isTty,
@@ -265,7 +246,7 @@ export default class DockerStartCommand extends InstanceCommand {
       });
 
       instance.started(processAdapter);
-      logger.info(`实例 ${instance.instanceUuid} 成功启动.`);
+      logger.info($t("instance.successful", { v: `${instance.config.nickname} ${instance.instanceUuid}` }));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();

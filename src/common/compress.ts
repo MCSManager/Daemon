@@ -1,24 +1,6 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t } from "../i18n";
 import fs from "fs-extra";
 import path from "path";
 import * as compressing from "compressing";
@@ -28,7 +10,7 @@ import archiver from "archiver";
 import StreamZip, { async } from "node-stream-zip";
 // const StreamZip = require('node-stream-zip');
 
-// 跨平台的高效率/低效率结合的解压缩方案
+// Cross-platform high-efficiency/low-efficiency decompression scheme
 const system = os.platform();
 
 function checkFileName(fileName: string) {
@@ -100,7 +82,7 @@ export async function decompress(zipPath: string, dest: string, fileCode?: strin
 
 async function _7zipCompress(zipPath: string, files: string[]) {
   const cmd = `7z.exe a ${zipPath} ${files.join(" ")}`.split(" ");
-  console.log(`[7zip 压缩任务] ${cmd.join(" ")}`);
+  console.log($t("common._7zip"), `${cmd.join(" ")}`);
   return new Promise((resolve, reject) => {
     const p = cmd.splice(1);
     const process = child_process.spawn(cmd[0], [...p], {
@@ -117,7 +99,7 @@ async function _7zipCompress(zipPath: string, files: string[]) {
 async function _7zipDecompress(sourceZip: string, destDir: string) {
   // ./7z.exe x archive.zip -oD:\7-Zip
   const cmd = `7z.exe x ${sourceZip} -o${destDir}`.split(" ");
-  console.log(`[7zip 解压任务] ${cmd.join(" ")}`);
+  console.log($t("common._7unzip"), `${cmd.join(" ")}`);
   return new Promise((resolve, reject) => {
     const process = child_process.spawn(cmd[0], [cmd[1], cmd[2], cmd[3]], {
       cwd: "./7zip/"
@@ -160,7 +142,7 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
       if (code) return reject(false);
       return resolve(true);
     });
-    // 超时，终止任务
+    // timeout, terminate the task
     setTimeout(() => {
       if (end) return;
       process.kill("SIGKILL");
@@ -170,7 +152,7 @@ async function linuxUnzip(sourceZip: string, destDir: string) {
 }
 
 // zip -r a.zip css css_v1 js
-// 此功能压缩的ZIP文件和文件所在目录必须在同一个目录下
+// The ZIP file compressed by this function and the directory where the file is located must be in the same directory
 async function linuxZip(sourceZip: string, files: string[]) {
   if (!files || files.length == 0) return false;
   return new Promise((resolve, reject) => {
@@ -185,7 +167,7 @@ async function linuxZip(sourceZip: string, files: string[]) {
       if (code) return reject(false);
       return resolve(true);
     });
-    // 超时，终止任务
+    // timeout, terminate the task
     setTimeout(() => {
       if (end) return;
       process.kill("SIGKILL");

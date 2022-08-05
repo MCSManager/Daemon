@@ -1,24 +1,6 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t } from "../i18n";
 import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
@@ -26,7 +8,7 @@ import os from "os";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
 
-const ERROR_MSG_01 = "非法访问路径";
+const ERROR_MSG_01 = $t("system_file.illegalAccess");
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
 
 interface IFile {
@@ -162,8 +144,7 @@ export default class FileManager {
   private zipFileCheck(path: string) {
     const fileInfo = fs.statSync(path);
     const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
-    if (fileInfo.size > 1024 * 1024 * 1024 * MAX_ZIP_GB)
-      throw new Error(`文件解压缩只支持最大 ${MAX_ZIP_GB}GB 文件的解压缩，如需改变上限请前往 data/Config/global.json 文件`);
+    if (fileInfo.size > 1024 * 1024 * 1024 * MAX_ZIP_GB) throw new Error($t("system_file.unzipLimit", { max: MAX_ZIP_GB }));
   }
 
   unzip(sourceZip: string, destDir: string, code?: string) {
@@ -191,8 +172,7 @@ export default class FileManager {
         } catch (error) {}
       }
     }
-    if (totalSize > MAX_TOTAL_FIELS_SIZE)
-      throw new Error(`文件解压缩只支持所有文件大小和 ${MAX_ZIP_GB}GB 的压缩，如需改变上限请前往 data/Config/global.json 文件`);
+    if (totalSize > MAX_TOTAL_FIELS_SIZE) throw new Error($t("system_file.unzipLimit", { max: MAX_ZIP_GB }));
     compress(sourceZipPath, filesPath, code)
       .then(() => {})
       .catch(() => {});
@@ -204,7 +184,7 @@ export default class FileManager {
       const absPath = this.toAbsolutePath(target);
       const info = fs.statSync(absPath);
       if (info.size > MAX_EDIT_SIZE) {
-        throw new Error("超出最大文件编辑限制");
+        throw new Error($t("system_file.execLimit"));
       }
       return await this.readFile(target);
     } else {

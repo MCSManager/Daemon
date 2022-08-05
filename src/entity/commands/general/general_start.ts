@@ -1,24 +1,6 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t } from "../../../i18n";
 import os from "os";
 import Instance from "../../instance/instance";
 import logger from "../../../service/log";
@@ -31,14 +13,14 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";
 
-// 启动时错误异常
+// Error exception at startup
 class StartupError extends Error {
   constructor(msg: string) {
     super(msg);
   }
 }
 
-// Docker 进程适配器
+// Docker process adapter
 class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -61,7 +43,7 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       if (this.process && this.process.stdout && this.process.stderr) {
-        // 移除所有动态新增的事件监听者
+        // remove all dynamically added event listeners
         for (const eventName of this.process.stdout.eventNames()) this.process.stdout.removeAllListeners(eventName);
         for (const eventName of this.process.stderr.eventNames()) this.process.stderr.removeAllListeners(eventName);
         for (const eventName of this.process.eventNames()) this.process.removeAllListeners(eventName);
@@ -79,67 +61,59 @@ export default class GeneralStartCommand extends InstanceCommand {
 
   async exec(instance: Instance, source = "Unknown") {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
-      return instance.failure(new StartupError("启动命令，输入输出编码或工作目录为空值"));
-    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError("工作目录并不存在"));
+      return instance.failure(new StartupError($t("general_start.instanceConfigErr")));
+    if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("general_start.cwdPathNotExist")));
 
     try {
       instance.setLock(true);
-      // 设置启动状态
+      // set startup state
       instance.status(Instance.STATUS_STARTING);
-      // 启动次数增加
+      // increase the number of starts
       instance.startCount++;
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const commandExeFile = commandList[0];
       const commandParameters = commandList.slice(1);
       if (commandList.length === 0) {
-        return instance.failure(new StartupError("无法启动实例，启动命令为空"));
+        return instance.failure(new StartupError($t("general_start.cmdEmpty")));
       }
 
       logger.info("----------------");
-      logger.info(`会话 ${source}: 请求开启实例.`);
-      logger.info(`实例标识符: [${instance.instanceUuid}]`);
-      logger.info(`启动命令: ${JSON.stringify(commandList)}`);
-      logger.info(`工作目录: ${instance.config.cwd}`);
+      logger.info($t("general_start.startInstance", { source: source }));
+      logger.info($t("general_start.instanceUuid", { uuid: instance.instanceUuid }));
+      logger.info($t("general_start.startCmd", { cmdList: JSON.stringify(commandList) }));
+      logger.info($t("general_start.cwd", { cwd: instance.config.cwd }));
       logger.info("----------------");
 
-      // 创建子进程
-      // 参数1直接传进程名或路径（含空格），无需双引号
+      // create child process
+      // Parameter 1 directly passes the process name or path (including spaces) without double quotes
       const process = spawn(commandExeFile, commandParameters, {
         cwd: instance.config.cwd,
         stdio: "pipe",
         windowsHide: true
       });
 
-      // 子进程创建结果检查
+      // child process creation result check
       if (!process || !process.pid) {
         instance.println(
           "ERROR",
-          `检测到实例进程/容器启动失败（PID 为空），其可能的原因是：
-1. 实例启动命令编写错误，请前往实例设置界面检查启动命令与参数。
-2. 系统主机环境不正确或缺少环境，如 Java 环境等。
-
-原生启动命令：
-${instance.config.startCommand}
-
-启动命令解析体:
-程序：${commandExeFile}
-参数：${JSON.stringify(commandParameters)}
-
-请将此信息报告给管理员，技术人员或自行排查故障。
-`
+          $t("general_start.pidErr", {
+            startCommand: instance.config.startCommand,
+            commandExeFile: commandExeFile,
+            commandParameters: JSON.stringify(commandParameters)
+          })
         );
-        throw new StartupError("实例启动失败，请检查启动命令，主机环境和配置文件等");
+        throw new StartupError($t("general_start.startErr"));
       }
 
-      // 创建进程适配器
+      // create process adapter
       const processAdapter = new ProcessAdapter(process);
 
-      // 产生开启事件
+      // generate open event
       instance.started(processAdapter);
-      logger.info(`实例 ${instance.instanceUuid} 成功启动 PID: ${process.pid}.`);
-      instance.println("INFO", "应用实例已运行，终端为普通终端模式，您可以在底部的命令输入框发送命令，不支持 Ctrl，Tab 等功能键");
+      logger.info($t("general_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
+      instance.println("INFO", $t("general_start.startOrdinaryTerminal"));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();

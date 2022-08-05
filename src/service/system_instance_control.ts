@@ -1,24 +1,6 @@
-/*
-  Copyright (C) 2022 Suwings <Suwings@outlook.com>
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  According to the AGPL, it is forbidden to delete all copyright notices, 
-  and if you modify the source code, you must open source the
-  modified source code.
-
-  版权所有 (C) 2022 Suwings <Suwings@outlook.com>
-
-  该程序是免费软件，您可以重新分发和/或修改据 GNU Affero 通用公共许可证的条款，
-  由自由软件基金会，许可证的第 3 版，或（由您选择）任何更高版本。
-
-  根据 AGPL 与用户协议，您必须保留所有版权声明，如果修改源代码则必须开源修改后的源代码。
-  可以前往 https://mcsmanager.com/ 阅读用户协议，申请闭源开发授权等。
-*/
-
+import { $t } from "../i18n";
 import schedule from "node-schedule";
 import InstanceSubsystem from "./system_instance";
 import StorageSubsystem from "../common/system_storage";
@@ -30,7 +12,7 @@ import RestartCommand from "../entity/commands/restart";
 import KillCommand from "../entity/commands/kill";
 import FileManager from "./system_file";
 
-// 计划任务配置项接口
+// Scheduled task configuration item interface
 interface IScheduleTask {
   instanceUuid: string;
   name: string;
@@ -41,13 +23,13 @@ interface IScheduleTask {
   type: number;
 }
 
-// 计划任务定时器/周期任务接口
+// Scheduled task timer/periodic task interface
 interface IScheduleJob {
   cancel: Function;
 }
 
 // @Entity
-// 计划任务配置数据实体类
+// Schedule task configuration data entity class
 class TaskConfig implements IScheduleTask {
   instanceUuid = "";
   name: string = "";
@@ -70,7 +52,7 @@ class IntervalJob implements IScheduleJob {
   }
 }
 
-// 计划任务实例类
+// Scheduled task instance class
 class Task {
   constructor(public config: TaskConfig, public job?: IScheduleJob) {}
 }
@@ -80,14 +62,14 @@ class InstanceControlSubsystem {
   public readonly taskJobMap = new Map<string, schedule.Job>();
 
   constructor() {
-    // 初始化所有持久化数据并逐一装载到内存
+    // Initialize all persistent data and load into memory one by one
     StorageSubsystem.list("TaskConfig").forEach((uuid) => {
       const config = StorageSubsystem.load("TaskConfig", TaskConfig, uuid) as TaskConfig;
       try {
         this.registerScheduleJob(config, false);
       } catch (error) {
-        // 可能会遗留掉某些计划任务，但是上限不会变
-        // 忽略启动时的计划任务注册
+        // Some scheduled tasks may be left, but the upper limit will not change
+        // Ignore the scheduled task registration at startup
       }
     });
   }
@@ -97,19 +79,19 @@ class InstanceControlSubsystem {
     if (!this.taskMap.has(key)) {
       this.taskMap.set(key, []);
     }
-    if (this.taskMap.get(key)?.length >= 8) throw new Error("无法继续创建计划任务，以达到上限");
-    if (!this.checkTask(key, task.name)) throw new Error("已存在重复的任务");
-    if (!FileManager.checkFileName(task.name)) throw new Error("非法的计划名，仅支持下划线，数字，字母和部分本地语言");
-    if (needStore) logger.info(`创建计划任务 ${task.name}:\n${JSON.stringify(task)}`);
+    if (this.taskMap.get(key)?.length >= 8) throw new Error($t("system_instance_control.execLimit"));
+    if (!this.checkTask(key, task.name)) throw new Error($t("system_instance_control.existRepeatTask"));
+    if (!FileManager.checkFileName(task.name)) throw new Error($t("system_instance_control.illegalName"));
+    if (needStore) logger.info($t("system_instance_control.crateTask", { name: task.name, task: JSON.stringify(task) }));
 
     let job: IScheduleJob;
 
-    // 最小间隔时间检查
+    // min interval check
     if (task.type === 1) {
       let internalTime = Number(task.time);
       if (isNaN(internalTime) || internalTime < 1) internalTime = 1;
 
-      // task.type=1: 时间间隔型计划任务，采用内置定时器实现
+      // task.type=1: Time interval scheduled task, implemented with built-in timer
       job = new IntervalJob(() => {
         this.action(task);
         if (task.count === -1) return;
@@ -122,15 +104,15 @@ class InstanceControlSubsystem {
         }
       }, internalTime);
     } else {
-      // 表达式合法性检查: 8 19 14 * * 1,2,3,4
+      // Expression validity check: 8 19 14 * * 1,2,3,4
       const timeArray = task.time.split(" ");
       const checkIndex = [0, 1, 2];
       checkIndex.forEach((item) => {
         if (isNaN(Number(timeArray[item])) && Number(timeArray[item]) >= 0) {
-          throw new Error(`计划任务创建错误，不正确的时间表达式: \n${task.name}: ${timeArray}\n请尝试删除 data/TaskConfig/${task.name}.json 文件解决此问题`);
+          throw new Error($t("system_instance_control.crateTaskErr", { name: task.name, timeArray: timeArray }));
         }
       });
-      // task.type=2: 指定时间型计划任务，采用 node-schedule 库实现
+      // task.type=2: Specify time-based scheduled tasks, implemented by node-schedule library
       job = schedule.scheduleJob(task.time, () => {
         this.action(task);
         if (task.count === -1) return;
@@ -148,7 +130,7 @@ class InstanceControlSubsystem {
     if (needStore) {
       StorageSubsystem.store("TaskConfig", `${key}_${newTask.config.name}`, newTask.config);
     }
-    if (needStore) logger.info(`创建计划任务 ${task.name} 完毕`);
+    if (needStore) logger.info($t("system_instance_control.crateSuccess", { name: task.name }));
   }
 
   public listScheduleJob(instanceUuid: string) {
@@ -166,12 +148,12 @@ class InstanceControlSubsystem {
       const payload = task.payload;
       const instanceUuid = task.instanceUuid;
       const instance = InstanceSubsystem.getInstance(instanceUuid);
-      // 若实例已被删除则需自动销毁
+      // If the instance has been deleted, it needs to be automatically destroyed
       if (!instance) {
         return this.deleteScheduleTask(task.instanceUuid, task.name);
       }
       const instanceStatus = instance.status();
-      // logger.info(`执行计划任务: ${task.name} ${task.action} ${task.time} ${task.count} `);
+      // logger.info(`Execute scheduled task: ${task.name} ${task.action} ${task.time} ${task.count} `);
       if (task.action === "start") {
         if (instanceStatus === 0) {
           return await instance.exec(new StartCommand("ScheduleJob"));
@@ -196,7 +178,7 @@ class InstanceControlSubsystem {
         return await instance.exec(new KillCommand());
       }
     } catch (error) {
-      logger.error(`实例 ${task.instanceUuid} 计划任务 ${task.name} 执行错误: \n ${error} `);
+      logger.error($t("system_instance_control.execCmdErr", { uuid: task.instanceUuid, name: task.name, error: error }));
     }
   }
 
