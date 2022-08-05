@@ -98,7 +98,7 @@ routerApp.on("environment/del_image", async (ctx, data) => {
 routerApp.on("environment/progress", async (ctx) => {
   try {
     const data: any = {};
-    DockerManager.builerProgress.forEach((v, k) => {
+    DockerManager.builderProgress.forEach((v, k) => {
       data[k] = v;
     });
     protocol.response(ctx, data);
