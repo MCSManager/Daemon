@@ -7,6 +7,8 @@ import Instance from "../entity/instance/instance";
 
 import { systemInfo } from "../common/system_info";
 import { getVersion } from "../service/version";
+import { globalConfiguration } from "../entity/config";
+import i18next from "i18next";
 
 // Get the basic information of the daemon system
 routerApp.on("info/overview", async (ctx) => {
@@ -31,4 +33,16 @@ routerApp.on("info/overview", async (ctx) => {
     system: systemInfo()
   };
   protocol.response(ctx, info);
+});
+
+routerApp.on("info/setting", async (ctx, data) => {
+  const language = String(data.language);
+  try {
+    i18next.changeLanguage(language);
+    globalConfiguration.config.language = language;
+    globalConfiguration.store();
+    protocol.response(ctx, true);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
 });
