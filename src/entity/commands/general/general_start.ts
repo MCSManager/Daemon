@@ -13,14 +13,14 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";
 
-// 启动时错误异常
+// Error exception at startup
 class StartupError extends Error {
   constructor(msg: string) {
     super(msg);
   }
 }
 
-// Docker 进程适配器
+// Docker process adapter
 class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
@@ -43,7 +43,7 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   public async destroy() {
     try {
       if (this.process && this.process.stdout && this.process.stderr) {
-        // 移除所有动态新增的事件监听者
+        // remove all dynamically added event listeners
         for (const eventName of this.process.stdout.eventNames()) this.process.stdout.removeAllListeners(eventName);
         for (const eventName of this.process.stderr.eventNames()) this.process.stderr.removeAllListeners(eventName);
         for (const eventName of this.process.eventNames()) this.process.removeAllListeners(eventName);
@@ -66,12 +66,12 @@ export default class GeneralStartCommand extends InstanceCommand {
 
     try {
       instance.setLock(true);
-      // 设置启动状态
+      // set startup state
       instance.status(Instance.STATUS_STARTING);
-      // 启动次数增加
+      // increase the number of starts
       instance.startCount++;
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const commandExeFile = commandList[0];
       const commandParameters = commandList.slice(1);
@@ -86,15 +86,15 @@ export default class GeneralStartCommand extends InstanceCommand {
       logger.info($t("general_start.cwd", { cwd: instance.config.cwd }));
       logger.info("----------------");
 
-      // 创建子进程
-      // 参数1直接传进程名或路径（含空格），无需双引号
+      // create child process
+      // Parameter 1 directly passes the process name or path (including spaces) without double quotes
       const process = spawn(commandExeFile, commandParameters, {
         cwd: instance.config.cwd,
         stdio: "pipe",
         windowsHide: true
       });
 
-      // 子进程创建结果检查
+      // child process creation result check
       if (!process || !process.pid) {
         instance.println(
           "ERROR",
@@ -107,10 +107,10 @@ export default class GeneralStartCommand extends InstanceCommand {
         throw new StartupError($t("general_start.startErr"));
       }
 
-      // 创建进程适配器
+      // create process adapter
       const processAdapter = new ProcessAdapter(process);
 
-      // 产生开启事件
+      // generate open event
       instance.started(processAdapter);
       logger.info($t("general_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
       instance.println("INFO", $t("general_start.startOrdinaryTerminal"));

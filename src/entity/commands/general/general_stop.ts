@@ -25,7 +25,7 @@ export default class GeneralStopCommand extends InstanceCommand {
     instance.println("INFO", $t("general_stop.execCmd"));
     const cacheStartCount = instance.startCount;
 
-    // 若 10 分钟后实例还处于停止中状态，则恢复状态
+    // If the instance is still in the stopped state after 10 minutes, restore the state
     setTimeout(() => {
       if (instance.status() === Instance.STATUS_STOPPING && instance.startCount === cacheStartCount) {
         instance.println("ERROR", $t("general_stop.stopErr"));

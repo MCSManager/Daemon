@@ -16,7 +16,7 @@ export default class GeneralUpdateCommand extends InstanceCommand {
     super("GeneralUpdateCommand");
   }
 
-  private stoped(instance: Instance) {
+  private stopped(instance: Instance) {
     instance.asynchronousTask = null;
     instance.setLock(false);
     instance.status(Instance.STATUS_STOP);
@@ -33,7 +33,7 @@ export default class GeneralUpdateCommand extends InstanceCommand {
       logger.info($t("general_update.updateCmd", { instanceUuid: instance.instanceUuid }));
       logger.info(updateCommand);
 
-      // 命令解析
+      // command parsing
       const commandList = commandStringToArray(updateCommand);
       const commandExeFile = commandList[0];
       const commnadParameters = commandList.slice(1);
@@ -41,22 +41,22 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         return instance.failure(new Error($t("general_update.cmdFormatErr")));
       }
 
-      // 启动更新命令
+      // start the update command
       const process = spawn(commandExeFile, commnadParameters, {
         cwd: instance.config.cwd,
         stdio: "pipe",
         windowsHide: true
       });
       if (!process || !process.pid) {
-        this.stoped(instance);
+        this.stopped(instance);
         return instance.println($t("general_update.err"), $t("general_update.updateFailed"));
       }
 
-      // process & pid 保存
+      // process & pid
       this.pid = process.pid;
       this.process = process;
 
-      // 设置实例正在运行的异步任务
+      // Set the asynchronous task that the instance is running
       instance.asynchronousTask = this;
       instance.status(Instance.STATUS_BUSY);
 
@@ -67,7 +67,7 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         instance.print(iconv.decode(text, instance.config.oe));
       });
       process.on("exit", (code) => {
-        this.stoped(instance);
+        this.stopped(instance);
         if (code === 0) {
           instance.println($t("general_update.update"), $t("general_update.updateSuccess"));
         } else {
@@ -75,7 +75,7 @@ export default class GeneralUpdateCommand extends InstanceCommand {
         }
       });
     } catch (err) {
-      this.stoped(instance);
+      this.stopped(instance);
       instance.println($t("general_update.update"), $t("general_update.error", { err: err }));
     }
   }

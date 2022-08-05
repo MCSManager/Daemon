@@ -11,10 +11,10 @@ export default class GeneralSendCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, buf?: any): Promise<any> {
-    // 关服命令需要发送命令，但关服命令执行前会设置状态为关闭中状态。
-    // 所以这里只能通过进程是否存在来执行命令
+    // The server shutdown command needs to send a command, but before the server shutdown command is executed, the status will be set to the shutdown state.
+    // So here the command can only be executed by whether the process exists or not
     if (!instance.process) instance.failure(new Error($t("command.instanceNotOpen")));
-    // instance.process.write(buf);
+
     instance.process.write(encode(buf, instance.config.oe));
     if (instance.config.crlf === 2) return instance.process.write("\r\n");
     return instance.process.write("\n");

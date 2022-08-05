@@ -14,7 +14,8 @@ export default class GeneralRestartCommand extends InstanceCommand {
       await instance.execPreset("stop");
       instance.setLock(true);
       const startCount = instance.startCount;
-      // 每秒检查实例状态，如果实例状态为已停止，则立刻重启服务器
+      // Check the instance status every second,
+      // if the instance status is stopped, restart the server immediately
       const task = setInterval(async () => {
         try {
           if (startCount !== instance.startCount) {
