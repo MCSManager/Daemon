@@ -148,8 +148,6 @@ export default class PtyStartCommand extends InstanceCommand {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
       return instance.failure(err);
-    } finally {
-      instance.setLock(false);
     }
   }
 }

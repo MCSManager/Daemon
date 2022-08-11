@@ -31,25 +31,35 @@ export default class StartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    // status check
-    const instanceStatus = instance.status();
-    if (instanceStatus !== Instance.STATUS_STOP) return instance.failure(new StartupError($t("start.instanceNotDown")));
+    if (instance.status() !== Instance.STATUS_STOP) return instance.failure(new StartupError($t("start.instanceNotDown")));
+    try {
+      instance.setLock(true);
+      instance.status(Instance.STATUS_STARTING);
+      instance.startCount++;
 
-    // expiration time check
-    const endTime = new Date(instance.config.endTime).getTime();
-    if (endTime) {
-      const currentTime = new Date().getTime();
-      if (endTime <= currentTime) {
-        return instance.failure(new Error($t("start.instanceMaturity")));
+      // expiration time check
+      const endTime = new Date(instance.config.endTime).getTime();
+      if (endTime) {
+        const currentTime = new Date().getTime();
+        if (endTime <= currentTime) {
+          return instance.failure(new Error($t("start.instanceMaturity")));
+        }
       }
+
+      const currentTimestamp = new Date().getTime();
+      instance.startTimestamp = currentTimestamp;
+
+      instance.println("INFO", $t("start.startInstance"));
+
+      // prevent the dead-loop from starting
+      await this.sleep();
+
+      return await instance.execPreset("start", this.source);
+    } catch (error) {
+      instance.status(Instance.STATUS_STOP);
+      instance.failure(error);
+    } finally {
+      instance.setLock(false);
     }
-
-    const currentTimestamp = new Date().getTime();
-    instance.startTimestamp = currentTimestamp;
-
-    instance.println("INFO", $t("start.startInstance"));
-    await this.sleep();
-
-    return await instance.execPreset("start", this.source);
   }
 }

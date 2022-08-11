@@ -97,13 +97,6 @@ export default class DockerStartCommand extends InstanceCommand {
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 
     try {
-      // lock the instance
-      instance.setLock(true);
-      // set startup state
-      instance.status(Instance.STATUS_STARTING);
-      // increase the number of starts
-      instance.startCount++;
-
       // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const cwd = instance.absoluteCwdPath();
@@ -251,8 +244,6 @@ export default class DockerStartCommand extends InstanceCommand {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
       return instance.failure(err);
-    } finally {
-      instance.setLock(false);
     }
   }
 }

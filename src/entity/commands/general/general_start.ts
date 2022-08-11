@@ -65,12 +65,6 @@ export default class GeneralStartCommand extends InstanceCommand {
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("general_start.cwdPathNotExist")));
 
     try {
-      instance.setLock(true);
-      // set startup state
-      instance.status(Instance.STATUS_STARTING);
-      // increase the number of starts
-      instance.startCount++;
-
       // command parsing
       const commandList = commandStringToArray(instance.config.startCommand);
       const commandExeFile = commandList[0];
@@ -118,8 +112,6 @@ export default class GeneralStartCommand extends InstanceCommand {
       instance.instanceStatus = Instance.STATUS_STOP;
       instance.releaseResources();
       return instance.failure(err);
-    } finally {
-      instance.setLock(false);
     }
   }
 }

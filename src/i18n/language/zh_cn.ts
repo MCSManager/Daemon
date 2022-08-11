@@ -53,7 +53,7 @@ export default {
   start: {
     instanceNotDown: "实例未处于关闭状态，无法再进行启动",
     instanceMaturity: "实例使用到期时间已到，无法再启动实例",
-    startInstance: "正在启动实例..."
+    startInstance: "正在准备启动实例..."
   },
   // src\entity\commands\general\general_restart.ts
   restart: {
@@ -84,8 +84,9 @@ export default {
     
     请将此信息报告给管理员，技术人员或自行排查故障。`,
     startErr: "实例启动失败，请检查启动命令，主机环境和配置文件等",
-    startSuccess: "实例 {{instanceUuid}} 成功启动 PID: {{pid}}.",
-    startOrdinaryTerminal: "应用实例已运行，终端为普通终端模式，您可以在底部的命令输入框发送命令，不支持 Ctrl，Tab 等功能键"
+    startSuccess: "实例 {{instanceUuid}} 成功启动 PID: {{pid}}",
+    startOrdinaryTerminal:
+      "应用实例已运行，您可以在底部的命令输入框发送命令，如果您需要支持 Ctrl，Tab 等快捷键等高级控制台功能，请前往终端设置开启仿真终端功能"
   },
   // src\entity\commands\general\general_stop.ts
   general_stop: {
@@ -281,8 +282,7 @@ export default {
     existRepeatTask: "已存在重复的任务",
     illegalName: "非法的计划名，仅支持下划线，数字，字母和部分本地语言",
     crateTask: "创建计划任务 {{name}}:\n{{task}}",
-    crateTaskErr:
-      "计划任务创建错误，不正确的时间表达式: \n{{name}}: {{timeArray}}\n请尝试删除 data/TaskConfig/{{name}}.json 文件解决此问题",
+    crateTaskErr: "计划任务创建错误，不正确的时间表达式: \n{{name}}: {{timeArray}}\n请尝试删除 data/TaskConfig/{{name}}.json 文件解决此问题",
     crateSuccess: "创建计划任务 {{name}} 完毕",
     execCmdErr: "实例 {{uuid}} 计划任务 {{name}} 执行错误: \n {{error}}"
   },
