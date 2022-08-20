@@ -79,7 +79,7 @@ export default class FileManager {
           });
         }
       } catch (error) {
-        // 忽略一个文件信息获取错误，以防止导致整体错误
+        // Ignore a file information retrieval error to prevent an overall error
       }
     });
     files.sort((a, b) => (a.name > b.name ? 1 : -1));
