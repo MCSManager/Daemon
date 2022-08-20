@@ -56,6 +56,7 @@ export default class StartCommand extends InstanceCommand {
 
       return await instance.execPreset("start", this.source);
     } catch (error) {
+      instance.releaseResources();
       instance.status(Instance.STATUS_STOP);
       instance.failure(error);
     } finally {

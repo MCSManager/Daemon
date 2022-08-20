@@ -96,154 +96,148 @@ export default class DockerStartCommand extends InstanceCommand {
       return instance.failure(new StartupDockerProcessError($t("instance.dirEmpty")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 
-    try {
-      // command parsing
-      const commandList = commandStringToArray(instance.config.startCommand);
-      const cwd = instance.absoluteCwdPath();
+    // command parsing
+    const commandList = commandStringToArray(instance.config.startCommand);
+    const cwd = instance.absoluteCwdPath();
 
-      // parsing port open
-      // {
-      // "PortBindings": {
-      // "22/tcp": [
-      // {
-      // "HostPort": "11022"
-      // }
-      // ]
-      // }
-      // }
-      // 25565:25565/tcp 8080:8080/tcp
-      const portMap = instance.config.docker.ports;
-      const publicPortArray: any = {};
-      const exposedPorts: any = {};
-      for (const iterator of portMap) {
-        const elemt = iterator.split("/");
-        if (elemt.length != 2) continue;
-        const ports = elemt[0];
-        const protocol = elemt[1];
-        //Host (host) port: container port
-        const publicAndPrivatePort = ports.split(":");
-        if (publicAndPrivatePort.length != 2) continue;
-        publicPortArray[`${publicAndPrivatePort[1]}/${protocol}`] = [{ HostPort: publicAndPrivatePort[0] }];
-        exposedPorts[`${publicAndPrivatePort[1]}/${protocol}`] = {};
+    // parsing port open
+    // {
+    // "PortBindings": {
+    // "22/tcp": [
+    // {
+    // "HostPort": "11022"
+    // }
+    // ]
+    // }
+    // }
+    // 25565:25565/tcp 8080:8080/tcp
+    const portMap = instance.config.docker.ports;
+    const publicPortArray: any = {};
+    const exposedPorts: any = {};
+    for (const iterator of portMap) {
+      const elemt = iterator.split("/");
+      if (elemt.length != 2) continue;
+      const ports = elemt[0];
+      const protocol = elemt[1];
+      //Host (host) port: container port
+      const publicAndPrivatePort = ports.split(":");
+      if (publicAndPrivatePort.length != 2) continue;
+      publicPortArray[`${publicAndPrivatePort[1]}/${protocol}`] = [{ HostPort: publicAndPrivatePort[0] }];
+      exposedPorts[`${publicAndPrivatePort[1]}/${protocol}`] = {};
+    }
+
+    // resolve extra path mounts
+    const extraVolumes = instance.config.docker.extraVolumes;
+    const extraBinds = [];
+    for (const it of extraVolumes) {
+      if (!it) continue;
+      const element = it.split(":");
+      if (element.length != 2) continue;
+      let [hostPath, containerPath] = element;
+
+      if (path.isAbsolute(containerPath)) {
+        containerPath = path.normalize(containerPath);
+      } else {
+        containerPath = path.normalize(path.join("/workspace/", containerPath));
       }
-
-      // resolve extra path mounts
-      const extraVolumes = instance.config.docker.extraVolumes;
-      const extraBinds = [];
-      for (const it of extraVolumes) {
-        if (!it) continue;
-        const element = it.split(":");
-        if (element.length != 2) continue;
-        let [hostPath, containerPath] = element;
-
-        if (path.isAbsolute(containerPath)) {
-          containerPath = path.normalize(containerPath);
-        } else {
-          containerPath = path.normalize(path.join("/workspace/", containerPath));
-        }
-        if (path.isAbsolute(hostPath)) {
-          hostPath = path.normalize(hostPath);
-        } else {
-          hostPath = path.normalize(path.join(process.cwd(), hostPath));
-        }
-        extraBinds.push(`${hostPath}:${containerPath}`);
+      if (path.isAbsolute(hostPath)) {
+        hostPath = path.normalize(hostPath);
+      } else {
+        hostPath = path.normalize(path.join(process.cwd(), hostPath));
       }
+      extraBinds.push(`${hostPath}:${containerPath}`);
+    }
 
-      // memory limit
-      let maxMemory = undefined;
-      if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
+    // memory limit
+    let maxMemory = undefined;
+    if (instance.config.docker.memory) maxMemory = instance.config.docker.memory * 1024 * 1024;
 
-      // CPU usage calculation
-      let cpuQuota = undefined;
-      let cpuPeriod = undefined;
-      if (instance.config.docker.cpuUsage) {
-        cpuQuota = instance.config.docker.cpuUsage * 10 * 1000;
-        cpuPeriod = 1000 * 1000;
-      }
+    // CPU usage calculation
+    let cpuQuota = undefined;
+    let cpuPeriod = undefined;
+    if (instance.config.docker.cpuUsage) {
+      cpuQuota = instance.config.docker.cpuUsage * 10 * 1000;
+      cpuPeriod = 1000 * 1000;
+    }
 
-      // Check the number of CPU cores
-      let cpusetCpus = undefined;
-      if (instance.config.docker.cpusetCpus) {
-        const arr = instance.config.docker.cpusetCpus.split(",");
-        arr.forEach((v) => {
-          if (isNaN(Number(v))) throw new Error($t("instance.invalidCpu", { v }));
-        });
-        cpusetCpus = instance.config.docker.cpusetCpus;
-        // Note: check
-      }
+    // Check the number of CPU cores
+    let cpusetCpus = undefined;
+    if (instance.config.docker.cpusetCpus) {
+      const arr = instance.config.docker.cpusetCpus.split(",");
+      arr.forEach((v) => {
+        if (isNaN(Number(v))) throw new Error($t("instance.invalidCpu", { v }));
+      });
+      cpusetCpus = instance.config.docker.cpusetCpus;
+      // Note: check
+    }
 
-      // container name check
-      let containerName = instance.config.docker.containerName;
-      if (containerName && (containerName.length > 64 || containerName.length < 2)) {
-        throw new Error($t("instance.invalidContainerName", { v: containerName }));
-      }
+    // container name check
+    let containerName = instance.config.docker.containerName;
+    if (containerName && (containerName.length > 64 || containerName.length < 2)) {
+      throw new Error($t("instance.invalidContainerName", { v: containerName }));
+    }
 
-      // output startup log
-      logger.info("----------------");
-      logger.info(`Session ${source}: Request to start an instance`);
-      logger.info(`UUID: [${instance.instanceUuid}] [${instance.config.nickname}]`);
-      logger.info(`NAME: [${containerName}]`);
-      logger.info(`COMMAND: ${commandList.join(" ")}`);
-      logger.info(`WORKSPACE: ${cwd}`);
-      logger.info(`NET_MODE: ${instance.config.docker.networkMode}`);
-      logger.info(`OPEN_PORT: ${JSON.stringify(publicPortArray)}`);
-      logger.info(`EXT_MOUNT: ${JSON.stringify(extraBinds)}`);
-      logger.info(`NET_ALIASES: ${JSON.stringify(instance.config.docker.networkAliases)}`);
-      logger.info(`MEM_LIMIT: ${maxMemory} MB`);
-      logger.info(`TYPE: Docker Container`);
-      logger.info("----------------");
+    // output startup log
+    logger.info("----------------");
+    logger.info(`Session ${source}: Request to start an instance`);
+    logger.info(`UUID: [${instance.instanceUuid}] [${instance.config.nickname}]`);
+    logger.info(`NAME: [${containerName}]`);
+    logger.info(`COMMAND: ${commandList.join(" ")}`);
+    logger.info(`WORKSPACE: ${cwd}`);
+    logger.info(`NET_MODE: ${instance.config.docker.networkMode}`);
+    logger.info(`OPEN_PORT: ${JSON.stringify(publicPortArray)}`);
+    logger.info(`EXT_MOUNT: ${JSON.stringify(extraBinds)}`);
+    logger.info(`NET_ALIASES: ${JSON.stringify(instance.config.docker.networkAliases)}`);
+    logger.info(`MEM_LIMIT: ${maxMemory} MB`);
+    logger.info(`TYPE: Docker Container`);
+    logger.info("----------------");
 
-      // Whether to use TTY mode
-      const isTty = instance.config.terminalOption.pty;
+    // Whether to use TTY mode
+    const isTty = instance.config.terminalOption.pty;
 
-      // Start Docker container creation and running
-      const docker = new Docker();
-      const container = await docker.createContainer({
-        name: containerName,
-        Image: instance.config.docker.image,
-        AttachStdin: true,
-        AttachStdout: true,
-        AttachStderr: true,
-        Tty: isTty,
-        User: `${processUserUid()}:${processGroupGid()}`,
-        WorkingDir: "/workspace/",
-        Cmd: commandList,
-        OpenStdin: true,
-        StdinOnce: false,
-        ExposedPorts: exposedPorts,
-        HostConfig: {
-          Memory: maxMemory,
-          Binds: [`${cwd}:/workspace/`, ...extraBinds],
-          AutoRemove: true,
-          CpusetCpus: cpusetCpus,
-          CpuPeriod: cpuPeriod,
-          CpuQuota: cpuQuota,
-          PortBindings: publicPortArray,
-          NetworkMode: instance.config.docker.networkMode
-        },
-        NetworkingConfig: {
-          EndpointsConfig: {
-            [instance.config.docker.networkMode]: {
-              Aliases: instance.config.docker.networkAliases
-            }
+    // Start Docker container creation and running
+    const docker = new Docker();
+    const container = await docker.createContainer({
+      name: containerName,
+      Image: instance.config.docker.image,
+      AttachStdin: true,
+      AttachStdout: true,
+      AttachStderr: true,
+      Tty: isTty,
+      User: `${processUserUid()}:${processGroupGid()}`,
+      WorkingDir: "/workspace/",
+      Cmd: commandList,
+      OpenStdin: true,
+      StdinOnce: false,
+      ExposedPorts: exposedPorts,
+      HostConfig: {
+        Memory: maxMemory,
+        Binds: [`${cwd}:/workspace/`, ...extraBinds],
+        AutoRemove: true,
+        CpusetCpus: cpusetCpus,
+        CpuPeriod: cpuPeriod,
+        CpuQuota: cpuQuota,
+        PortBindings: publicPortArray,
+        NetworkMode: instance.config.docker.networkMode
+      },
+      NetworkingConfig: {
+        EndpointsConfig: {
+          [instance.config.docker.networkMode]: {
+            Aliases: instance.config.docker.networkAliases
           }
         }
-      });
+      }
+    });
 
-      // Docker docks to the process adapter
-      const processAdapter = new DockerProcessAdapter(container);
-      await processAdapter.start({
-        isTty,
-        w: instance.config.terminalOption.ptyWindowCol,
-        h: instance.config.terminalOption.ptyWindowCol
-      });
+    // Docker docks to the process adapter
+    const processAdapter = new DockerProcessAdapter(container);
+    await processAdapter.start({
+      isTty,
+      w: instance.config.terminalOption.ptyWindowCol,
+      h: instance.config.terminalOption.ptyWindowCol
+    });
 
-      instance.started(processAdapter);
-      logger.info($t("instance.successful", { v: `${instance.config.nickname} ${instance.instanceUuid}` }));
-    } catch (err) {
-      instance.instanceStatus = Instance.STATUS_STOP;
-      instance.releaseResources();
-      return instance.failure(err);
-    }
+    instance.started(processAdapter);
+    logger.info($t("instance.successful", { v: `${instance.config.nickname} ${instance.instanceUuid}` }));
   }
 }

@@ -95,83 +95,77 @@ export default class PtyStartCommand extends InstanceCommand {
       return instance.failure(new StartupError($t("pty_start.cmdErr")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("pty_start.cwdNotExist")));
 
-    try {
-      // PTY mode correctness check
-      logger.info($t("pty_start.startPty", { source: source }));
-      let checkPtyEnv = true;
+    // PTY mode correctness check
+    logger.info($t("pty_start.startPty", { source: source }));
+    let checkPtyEnv = true;
 
-      if (!fs.existsSync(PTY_PATH)) {
-        instance.println("ERROR", $t("pty_start.startErr"));
-        checkPtyEnv = false;
-      }
-
-      if (checkPtyEnv === false) {
-        // Close the PTY type, reconfigure the instance function group, and restart the instance
-        instance.config.terminalOption.pty = false;
-        await instance.forceExec(new FunctionDispatcher());
-        await instance.execPreset("start", source); // execute the preset command directly
-        return;
-      }
-
-      // Set the startup state & increase the number of startups
-      instance.setLock(true);
-      instance.status(Instance.STATUS_STARTING);
-      instance.startCount++;
-
-      // command parsing
-      const commandList = commandStringToArray(instance.config.startCommand);
-      if (commandList.length === 0) return instance.failure(new StartupError($t("pty_start.cmdEmpty")));
-      const ptyParameter = [
-        "-dir",
-        instance.config.cwd,
-        "-cmd",
-        JSON.stringify(commandList),
-        "-size",
-        `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`,
-        "-color",
-        "-coder",
-        instance.config.oe
-      ];
-
-      logger.info("----------------");
-      logger.info($t("pty_start.sourceRequest", { source: source }));
-      logger.info($t("pty_start.instanceUuid", { instanceUuid: instance.instanceUuid }));
-      logger.info($t("pty_start.startCmd", { cmd: commandList.join(" ") }));
-      logger.info($t("pty_start.ptyPath", { path: PTY_PATH }));
-      logger.info($t("pty_start.ptyParams", { param: ptyParameter.join(" ") }));
-      logger.info($t("pty_start.ptyCwd", { cwd: instance.config.cwd }));
-      logger.info("----------------");
-
-      // create child process
-      // Parameter 1 directly passes the process name or path (including spaces) without double quotes
-      // console.log(path.dirname(ptyAppPath));
-      const subProcess = spawn(PTY_PATH, ptyParameter, {
-        cwd: path.dirname(PTY_PATH),
-        stdio: "pipe",
-        windowsHide: true
-      });
-
-      // child process creation result check
-      if (!subProcess || !subProcess.pid) {
-        instance.println(
-          "ERROR",
-          $t("pty_start.ptyCwd", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
-        );
-        throw new StartupError($t("pty_start.instanceStartErr"));
-      }
-
-      // create process adapter
-      const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
-      const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
-
-      // generate open event
-      instance.started(processAdapter);
-      logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: ptySubProcessCfg.pid }));
-      instance.println("INFO", $t("pty_start.startEmulatedTerminal"));
-    } catch (err) {
-      instance.instanceStatus = Instance.STATUS_STOP;
-      instance.releaseResources();
-      return instance.failure(err);
+    if (!fs.existsSync(PTY_PATH)) {
+      instance.println("ERROR", $t("pty_start.startErr"));
+      checkPtyEnv = false;
     }
+
+    if (checkPtyEnv === false) {
+      // Close the PTY type, reconfigure the instance function group, and restart the instance
+      instance.config.terminalOption.pty = false;
+      await instance.forceExec(new FunctionDispatcher());
+      await instance.execPreset("start", source); // execute the preset command directly
+      return;
+    }
+
+    // Set the startup state & increase the number of startups
+    instance.setLock(true);
+    instance.status(Instance.STATUS_STARTING);
+    instance.startCount++;
+
+    // command parsing
+    const commandList = commandStringToArray(instance.config.startCommand);
+    if (commandList.length === 0) return instance.failure(new StartupError($t("pty_start.cmdEmpty")));
+    const ptyParameter = [
+      "-dir",
+      instance.config.cwd,
+      "-cmd",
+      JSON.stringify(commandList),
+      "-size",
+      `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`,
+      "-color",
+      "-coder",
+      instance.config.oe
+    ];
+
+    logger.info("----------------");
+    logger.info($t("pty_start.sourceRequest", { source: source }));
+    logger.info($t("pty_start.instanceUuid", { instanceUuid: instance.instanceUuid }));
+    logger.info($t("pty_start.startCmd", { cmd: commandList.join(" ") }));
+    logger.info($t("pty_start.ptyPath", { path: PTY_PATH }));
+    logger.info($t("pty_start.ptyParams", { param: ptyParameter.join(" ") }));
+    logger.info($t("pty_start.ptyCwd", { cwd: instance.config.cwd }));
+    logger.info("----------------");
+
+    // create child process
+    // Parameter 1 directly passes the process name or path (including spaces) without double quotes
+    // console.log(path.dirname(ptyAppPath));
+    const subProcess = spawn(PTY_PATH, ptyParameter, {
+      cwd: path.dirname(PTY_PATH),
+      stdio: "pipe",
+      windowsHide: true
+    });
+
+    // child process creation result check
+    if (!subProcess || !subProcess.pid) {
+      instance.println(
+        "ERROR",
+        $t("pty_start.ptyCwd", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
+      );
+      throw new StartupError($t("pty_start.instanceStartErr"));
+    }
+
+    // create process adapter
+    const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
+    const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
+
+    // generate open event
+    instance.started(processAdapter);
+    logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: ptySubProcessCfg.pid }));
+    instance.println("INFO", $t("pty_start.startEmulatedTerminal"));
   }
 }
