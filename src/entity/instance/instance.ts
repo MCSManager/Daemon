@@ -106,8 +106,7 @@ export default class Instance extends EventEmitter {
     // If the terminal type is changed, the default command must be reset
     if (cfg?.terminalOption?.pty != null && cfg?.terminalOption?.pty !== this.config.terminalOption.pty) {
       if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyPtyModel"));
-      if (!fs.existsSync(PTY_PATH) && cfg?.terminalOption?.pty === true)
-        throw new Error($t("instanceConf.ptyNotExist", { path: PTY_PATH }));
+      if (!fs.existsSync(PTY_PATH) && cfg?.terminalOption?.pty === true) throw new Error($t("instanceConf.ptyNotExist", { path: PTY_PATH }));
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "pty", Boolean);
       this.forceExec(new FunctionDispatcher());
     }
@@ -188,7 +187,8 @@ export default class Instance extends EventEmitter {
   // Trigger the open event and bind the data and exit events, etc.
   started(process: IInstanceProcess) {
     this.config.lastDatetime = this.fullTime();
-    process.on("data", (text) => this.emit("data", iconv.decode(text, this.config.oe)));
+    const outputCode = this.config.terminalOption.pty ? "utf-8" : this.config.oe;
+    process.on("data", (text) => this.emit("data", iconv.decode(text, outputCode)));
     process.on("exit", (code) => this.stopped(code));
     this.process = process;
     this.instanceStatus = Instance.STATUS_RUNNING;

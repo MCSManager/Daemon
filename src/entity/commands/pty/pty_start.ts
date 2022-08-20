@@ -6,17 +6,21 @@ import Instance from "../../instance/instance";
 import logger from "../../../service/log";
 import fs from "fs-extra";
 import path from "path";
-
+import readline from "readline";
 import InstanceCommand from "../base/command";
 import EventEmitter from "events";
 import { IInstanceProcess } from "../../instance/interface";
-import { ChildProcess, exec, spawn } from "child_process";
+import { ChildProcess, ChildProcessWithoutNullStreams, exec, spawn } from "child_process";
 import { commandStringToArray } from "../base/command_parser";
 import { killProcess } from "../../../common/process_tools";
 import GeneralStartCommand from "../general/general_start";
 import FunctionDispatcher from "../dispatcher";
 import StartCommand from "../start";
 import { PTY_PATH } from "../../../const";
+
+interface IPtySubProcessCfg {
+  pid: number;
+}
 
 // Error exception at startup
 class StartupError extends Error {
@@ -29,9 +33,9 @@ class StartupError extends Error {
 class ProcessAdapter extends EventEmitter implements IInstanceProcess {
   pid?: number | string;
 
-  constructor(private process: ChildProcess) {
+  constructor(private process: ChildProcess, ptySubProcessPid: number) {
     super();
-    this.pid = this.process.pid;
+    this.pid = ptySubProcessPid;
     process.stdout.on("data", (text) => this.emit("data", text));
     process.stderr.on("data", (text) => this.emit("data", text));
     process.on("exit", (code) => this.emit("exit", code));
@@ -62,6 +66,27 @@ class ProcessAdapter extends EventEmitter implements IInstanceProcess {
 export default class PtyStartCommand extends InstanceCommand {
   constructor() {
     super("PtyStartCommand");
+  }
+
+  readPtySubProcessConfig(subProcess: ChildProcessWithoutNullStreams): Promise<IPtySubProcessCfg> {
+    return new Promise((r, j) => {
+      const rl = readline.createInterface({
+        input: subProcess.stdout,
+        crlfDelay: Infinity
+      });
+      rl.on("line", (line = "") => {
+        console.log("FirstLine:", line);
+        try {
+          rl.removeAllListeners();
+          r(JSON.parse(line) as IPtySubProcessCfg);
+        } catch (error) {
+          j(error);
+        }
+      });
+      setTimeout(() => {
+        j("timeout");
+      }, 1000 * 10);
+    });
   }
 
   async exec(instance: Instance, source = "Unknown") {
@@ -107,7 +132,9 @@ export default class PtyStartCommand extends InstanceCommand {
         JSON.stringify(commandList),
         "-size",
         `${instance.config.terminalOption.ptyWindowCol},${instance.config.terminalOption.ptyWindowRow}`,
-        "-color"
+        "-color",
+        "-coder",
+        instance.config.oe
       ];
 
       logger.info("----------------");
@@ -138,11 +165,12 @@ export default class PtyStartCommand extends InstanceCommand {
       }
 
       // create process adapter
-      const processAdapter = new ProcessAdapter(subProcess);
+      const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
+      const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
 
       // generate open event
       instance.started(processAdapter);
-      logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: process.pid }));
+      logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: ptySubProcessCfg.pid }));
       instance.println("INFO", $t("pty_start.startEmulatedTerminal"));
     } catch (err) {
       instance.instanceStatus = Instance.STATUS_STOP;
