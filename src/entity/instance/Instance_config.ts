@@ -2,7 +2,7 @@
 
 import Instance from "./instance";
 import { IDockerConfig } from "./interface";
-
+import os from "os";
 interface IActionCommand {
   name: string;
   command: string;
@@ -24,7 +24,7 @@ export default class InstanceConfig {
   public fileCode: string = "utf-8";
   public processType: string = "general";
   public updateCommand: string = "";
-  public crlf = 1; // 1: \n 2: \r\n
+  public crlf = os.platform() === "win32" ? 2 : 1; // 1: \n  2: \r\n
 
   // custom command list
   public actionCommandList: IActionCommand[] = [];

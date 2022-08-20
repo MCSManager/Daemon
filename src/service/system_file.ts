@@ -1,6 +1,6 @@
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-import { $t } from "../i18n";
+import { $t, i18next } from "../i18n";
 import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
@@ -28,8 +28,8 @@ export default class FileManager {
       this.topPath = path.normalize(topPath);
     }
     if (!fileCode) {
-      if (os.platform() === "win32") this.fileCode = "gbk";
-      else this.fileCode = "utf-8";
+      this.fileCode = "utf-8";
+      if (i18next.language == "zh_cn") this.fileCode = "gbk";
     }
   }
 
