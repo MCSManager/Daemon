@@ -6,6 +6,9 @@ import zh_cn from "./language/zh_cn";
 import en_us from "./language/en_us";
 
 i18next.init({
+  interpolation: {
+    escapeValue: false
+  },
   lng: "en_us",
   fallbackLng: "en_us",
   resources: {
