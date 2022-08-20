@@ -81,7 +81,7 @@ export default class PtyStartCommand extends InstanceCommand {
           const cfg = JSON.parse(line) as IPtySubProcessCfg;
           r(cfg);
         } catch (error) {
-          j(line);
+          j(new Error(line));
         }
       });
       setTimeout(() => {
