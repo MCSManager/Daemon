@@ -78,9 +78,10 @@ export default class PtyStartCommand extends InstanceCommand {
         console.log("FirstLine:", line);
         try {
           rl.removeAllListeners();
-          r(JSON.parse(line) as IPtySubProcessCfg);
+          const cfg = JSON.parse(line) as IPtySubProcessCfg;
+          r(cfg);
         } catch (error) {
-          j(error);
+          j(line);
         }
       });
       setTimeout(() => {
