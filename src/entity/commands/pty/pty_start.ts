@@ -104,11 +104,6 @@ export default class PtyStartCommand extends InstanceCommand {
         checkPtyEnv = false;
       }
 
-      if ((os.platform() !== "linux" && os.platform() !== "win32") || os.arch() !== "x64") {
-        instance.println("ERROR", $t("pty_start.notSupportPty"));
-        checkPtyEnv = false;
-      }
-
       if (checkPtyEnv === false) {
         // Close the PTY type, reconfigure the instance function group, and restart the instance
         instance.config.terminalOption.pty = false;

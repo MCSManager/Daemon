@@ -3,7 +3,9 @@
 import os from "os";
 import path from "path";
 
-const PTY_PATH = path.normalize(path.join(process.cwd(), "lib", os.platform() === "win32" ? "pty.exe" : "pty"));
+const ptyName = `pty_${os.platform()}_${os.arch()}${os.platform() === "win32" ? ".exe" : ""}`;
+
+const PTY_PATH = path.normalize(path.join(process.cwd(), "lib", ptyName));
 
 const FILENAME_BLACKLIST = ["\\", "/", ".", "'", '"', "?", "*", "<", ">"];
 
