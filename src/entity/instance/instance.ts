@@ -233,7 +233,7 @@ export default class Instance extends EventEmitter {
 
     // Turn off the warning immediately after startup, usually the startup command is written incorrectly
     const currentTimestamp = new Date().getTime();
-    const startThreshold = 3 * 1000;
+    const startThreshold = 6 * 1000;
     if (currentTimestamp - this.startTimestamp < startThreshold) {
       this.println("ERROR", $t("instanceConf.instantExit"));
     }
