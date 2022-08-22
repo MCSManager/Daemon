@@ -151,7 +151,6 @@ export default {
   },
   // src\entity\commands\pty\pty_stop.ts
   pty_stop: {
-    ctrlC: "The emulated terminal cannot use the Ctrl+C command to close the process, please reset the shutdown command",
     notRunning: "The instance is not running and cannot be stopped.",
     execCmd:
       "The default shutdown command has been executed: {{stopCommand}}\nIf the instance cannot be shut down, please go to the instance settings to change the correct command to shut down the instance, such as exit, stop, end, etc.",
