@@ -66,12 +66,12 @@ export function navigation(socket: Socket) {
       routerApp.emitRouter(event as string, ctx, protocol.data);
     });
   }
-  // 触发已连接事件路由
+  // The connected event route is triggered
   const ctx = new RouterContext(null, socket, session);
   routerApp.emitRouter("connection", ctx, null);
 }
 
-// 身份验证路由顺序必须是第一位装载，这些路由顺序均不可擅自改变
+// The authentication routing order must be the first load. These routing orders cannot be changed without authorization
 import "../routers/auth_router";
 import "../routers/passport_router";
 import "../routers/info_router";

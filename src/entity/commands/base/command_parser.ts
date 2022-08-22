@@ -53,9 +53,7 @@ export function commandStringToArray(cmd: string) {
 
   for (const index in cmdArray) {
     const element = cmdArray[index];
-    // 去掉最外层的双引号
     if (element[0] === '"' && element[element.length - 1] === '"') cmdArray[index] = element.slice(1, element.length - 1);
-    // 分号替换回来
     while (cmdArray[index].indexOf(QUOTES_KEY) != -1) cmdArray[index] = cmdArray[index].replace(QUOTES_KEY, '"');
   }
 

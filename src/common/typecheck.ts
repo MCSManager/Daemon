@@ -38,7 +38,6 @@ export function configureEntityParams(self: any, args: any, key: string, typeFn?
     return;
   }
 
-  // 最后处理
   if (typeFn) {
     self[key] = typeFn(v);
   } else {
