@@ -11,8 +11,8 @@ export default class PtyStopCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance) {
-    const stopCommand = instance.config.stopCommand;
-    if (stopCommand.toLocaleLowerCase() == "^c") return instance.failure(new Error($t("pty_stop.ctrlC")));
+    let stopCommand = instance.config.stopCommand;
+    if (stopCommand.toLocaleLowerCase() == "^c") stopCommand = "\x03";
 
     if (instance.status() === Instance.STATUS_STOP || !instance.process) return instance.failure(new Error($t("pty_stop.notRunning")));
     instance.status(Instance.STATUS_STOPPING);

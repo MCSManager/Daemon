@@ -53,9 +53,7 @@ routerApp.on("stream/auth", (ctx, data) => {
     // Cancel forwarding events when registration is disconnected
     ctx.socket.on("disconnect", () => {
       InstanceSubsystem.stopForward(instance.instanceUuid, ctx.socket);
-      logger.info(
-        $t("stream_router.disconnect", { id: ctx.socket.id, address: ctx.socket.handshake.address, uuid: instance.instanceUuid })
-      );
+      logger.info($t("stream_router.disconnect", { id: ctx.socket.id, address: ctx.socket.handshake.address, uuid: instance.instanceUuid }));
     });
     protocol.response(ctx, true);
   } catch (error) {

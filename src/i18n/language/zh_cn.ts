@@ -144,7 +144,6 @@ export default {
   },
   // src\entity\commands\pty\pty_stop.ts
   pty_stop: {
-    ctrlC: "仿真终端无法使用Ctrl+C命令关闭进程，请重新设置关服命令",
     notRunning: "实例未处于运行中状态，无法进行停止.",
     execCmd: "已执行预设的关闭命令：{{stopCommand}}\n如果无法关闭实例请前往实例设置更改关闭实例的正确命令，比如 exit，stop，end 等",
     stopErr:

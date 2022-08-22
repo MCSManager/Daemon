@@ -301,17 +301,6 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   protocol.msg(ctx, "instance/stop_asynchronous", true);
 });
 
-// send data stream to application instance
-routerApp.on("instance/stdin", (ctx, data) => {
-  // This route uses a low-compatibility and direct and original way to write data
-  // because this route will receive every character
-  const instance = InstanceSubsystem.getInstance(data.instanceUuid);
-  try {
-    if (data.ch == "\r") return instance.process.write("\n");
-    instance.process.write(data.ch);
-  } catch (err) {}
-});
-
 routerApp.on("instance/process_config/list", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
   const files = data.files;
