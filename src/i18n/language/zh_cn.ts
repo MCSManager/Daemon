@@ -240,7 +240,7 @@ export default {
     instanceNotExist: "实例不存在",
     authSuccess: "会话 {{id}} {{address}} 数据流通道身份验证成功",
     establishConnection: "会话 {{id}} {{address}} 已与 {{uuid}} 建立数据通道",
-    disconnect: "会话 {{id}} {{address}} 已与 {{instanceUuid}} 断开数据通道"
+    disconnect: "会话 {{id}} {{address}} 已与 {{uuid}} 断开数据通道"
   },
 
   // -----------------------
