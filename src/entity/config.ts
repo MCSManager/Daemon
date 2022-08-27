@@ -18,7 +18,7 @@ class Config {
   public key = builderPassword();
   public maxFileTask = 2;
   public maxZipFileSize = 60;
-  public language = "zh_cn";
+  public language = "en_us";
 }
 
 // daemon configuration class
