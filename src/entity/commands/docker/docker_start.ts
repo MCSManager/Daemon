@@ -132,8 +132,9 @@ export default class DockerStartCommand extends InstanceCommand {
     for (const it of extraVolumes) {
       if (!it) continue;
       const element = it.split(":");
-      if (element.length != 2) continue;
-      let [hostPath, containerPath] = element;
+      if (element.length < 2) continue;
+      let hostPath = element[0];
+      let containerPath = element.slice(1).join(":");
 
       if (path.isAbsolute(containerPath)) {
         containerPath = path.normalize(containerPath);
