@@ -45,12 +45,5 @@ If you need to run in the background for a long time, please use the `Screen` so
 
 <br />
 
-## Contribute
-
-If you find any problems during use, you can submit an Issue or submit a Pull Request after fork modification.
-
-The code needs to keep the existing format, and no redundant code should be formatted. For details, please refer to [here](https://github.com/MCSManager/MCSManager/issues/544).
-
-<br />
 
 
