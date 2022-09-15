@@ -8,8 +8,8 @@
     "build": "tsc && webpack --config webpack.config.js"
   },
   "homepage": "https://mcsmanager.com/",
-  "author": "https://github.com/Suwings",
-  "license": "AGPL-3.0",
+  "author": "https://github.com/unitwk",
+  "license": " Apache-2.0",
   "dependencies": {
     "@koa/router": "^10.0.0",
     "archiver": "^5.3.1",
