@@ -42,7 +42,7 @@ export default class StartCommand extends InstanceCommand {
       if (endTime) {
         const currentTime = new Date().getTime();
         if (endTime <= currentTime) {
-          return instance.failure(new Error($t("start.instanceMaturity")));
+          throw new Error($t("start.instanceMaturity"));
         }
       }
 
