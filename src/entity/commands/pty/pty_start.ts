@@ -164,17 +164,13 @@ export default class PtyStartCommand extends InstanceCommand {
       throw new StartupError($t("pty_start.instanceStartErr"));
     }
 
-    subProcess.stdout.on("data", (text) => console.log("DEBUG", text));
-    subProcess.stderr.on("data", (text) => console.log("DEBUG", text));
-    subProcess.on("exit", (code) => console.log("DEBUG EXIT", code));
-
     // create process adapter
     const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
     const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
     logger.info(`PTY Process Config: ${JSON.stringify(ptySubProcessCfg)}`);
 
     // After reading the configuration, Need to check the process status
-    // The "processAdapter.pid" here represents the child process created by the PTY process
+    // The "processAdapter.pid" here represents the process created by the PTY process
     if (subProcess.exitCode !== null || processAdapter.pid == null || processAdapter.pid === 0) {
       instance.println(
         "ERROR",
