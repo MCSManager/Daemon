@@ -164,6 +164,10 @@ export default class PtyStartCommand extends InstanceCommand {
       throw new StartupError($t("pty_start.instanceStartErr"));
     }
 
+    process.stdout.on("data", (text) => console.log("DEBUG", text));
+    process.stderr.on("data", (text) => console.log("DEBUG", text));
+    process.on("exit", (code) => console.log("DEBUG EXIT", code));
+
     // create process adapter
     const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
     const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
