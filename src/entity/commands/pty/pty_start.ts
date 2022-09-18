@@ -97,9 +97,7 @@ export default class PtyStartCommand extends InstanceCommand {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
       return instance.failure(new StartupError($t("pty_start.cmdErr")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("pty_start.cwdNotExist")));
-    if (!path.isAbsolute(path.normalize(instance.config.cwd))) {
-      return instance.failure(new StartupError($t("pty_start.mustAbsolutePath")));
-    }
+    if (!path.isAbsolute(path.normalize(instance.config.cwd))) return instance.failure(new StartupError($t("pty_start.mustAbsolutePath")));
 
     // PTY mode correctness check
     logger.info($t("pty_start.startPty", { source: source }));
