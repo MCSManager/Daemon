@@ -75,7 +75,6 @@ export default class PtyStartCommand extends InstanceCommand {
         crlfDelay: Infinity
       });
       rl.on("line", (line = "") => {
-        console.log("FirstLine:", line);
         try {
           rl.removeAllListeners();
           const cfg = JSON.parse(line) as IPtySubProcessCfg;
@@ -85,8 +84,8 @@ export default class PtyStartCommand extends InstanceCommand {
         }
       });
       setTimeout(() => {
-        j("timeout");
-      }, 1000 * 10);
+        j(new Error("start subprocess error: await pty pid timeout!"));
+      }, 1000 * 3);
     });
   }
 
@@ -143,7 +142,6 @@ export default class PtyStartCommand extends InstanceCommand {
 
     // create child process
     // Parameter 1 directly passes the process name or path (including spaces) without double quotes
-    // console.log(path.dirname(ptyAppPath));
     const subProcess = spawn(PTY_PATH, ptyParameter, {
       cwd: path.dirname(PTY_PATH),
       stdio: "pipe",
@@ -163,8 +161,14 @@ export default class PtyStartCommand extends InstanceCommand {
     const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
     const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
 
+    // After reading the configuration, Need to check the process status
+    if (subProcess.exitCode !== null) {
+      throw new Error(`Start SubProcess failed, Exit code: ${process.exitCode}`);
+    }
+
     // generate open event
     instance.started(processAdapter);
+
     logger.info($t("pty_start.startSuccess", { instanceUuid: instance.instanceUuid, pid: ptySubProcessCfg.pid }));
     instance.println("INFO", $t("pty_start.startEmulatedTerminal"));
   }
