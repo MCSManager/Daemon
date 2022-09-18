@@ -139,8 +139,9 @@ export default {
     请将此信息报告给管理员，技术人员或自行排查故障。
     如果您认为是面板仿真终端导致的问题，请在左侧终端设置中关闭“仿真终端”选项，我们将会采用原始输入输出流的方式监听程序。`,
     instanceStartErr: "实例启动失败，请检查启动命令，主机环境和配置文件等",
-    startSuccess: "实例 {{instanceUuid}} 成功启动 PID: {{pid}}.",
-    startEmulatedTerminal: "全仿真终端模式已生效，您可以直接在终端内直接输入内容并使用 Ctrl，Tab 等功能键。"
+    startSuccess: "实例 {{instanceUuid}} 成功启动 PID: {{pid}}",
+    startEmulatedTerminal: "仿真终端模式已生效，您可以直接在终端内直接输入内容并使用 Ctrl，Tab 等功能键",
+    mustAbsolutePath: "仿真终端启动工作目录必须使用绝对路径，请前往实例设置界面重新设置工作路径为绝对路径"
   },
   // src\entity\commands\pty\pty_stop.ts
   pty_stop: {

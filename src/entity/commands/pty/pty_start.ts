@@ -70,6 +70,9 @@ export default class PtyStartCommand extends InstanceCommand {
 
   readPtySubProcessConfig(subProcess: ChildProcessWithoutNullStreams): Promise<IPtySubProcessCfg> {
     return new Promise((r, j) => {
+      const errConfig = {
+        pid: 0
+      };
       const rl = readline.createInterface({
         input: subProcess.stdout,
         crlfDelay: Infinity
@@ -78,13 +81,14 @@ export default class PtyStartCommand extends InstanceCommand {
         try {
           rl.removeAllListeners();
           const cfg = JSON.parse(line) as IPtySubProcessCfg;
+          if (cfg.pid == null) throw new Error("Error");
           r(cfg);
         } catch (error) {
-          j(new Error(line));
+          r(errConfig);
         }
       });
       setTimeout(() => {
-        j(new Error("start subprocess error: await pty pid timeout!"));
+        r(errConfig);
       }, 1000 * 3);
     });
   }
@@ -93,6 +97,9 @@ export default class PtyStartCommand extends InstanceCommand {
     if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
       return instance.failure(new StartupError($t("pty_start.cmdErr")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("pty_start.cwdNotExist")));
+    if (!path.isAbsolute(path.normalize(instance.config.cwd))) {
+      return instance.failure(new StartupError($t("pty_start.mustAbsolutePath")));
+    }
 
     // PTY mode correctness check
     logger.info($t("pty_start.startPty", { source: source }));
@@ -140,7 +147,7 @@ export default class PtyStartCommand extends InstanceCommand {
     logger.info($t("pty_start.ptyCwd", { cwd: instance.config.cwd }));
     logger.info("----------------");
 
-    // create child process
+    // create pty child process
     // Parameter 1 directly passes the process name or path (including spaces) without double quotes
     const subProcess = spawn(PTY_PATH, ptyParameter, {
       cwd: path.dirname(PTY_PATH),
@@ -148,11 +155,11 @@ export default class PtyStartCommand extends InstanceCommand {
       windowsHide: true
     });
 
-    // child process creation result check
+    // pty child process creation result check
     if (!subProcess || !subProcess.pid) {
       instance.println(
         "ERROR",
-        $t("pty_start.ptyCwd", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
+        $t("pty_start.pidErr", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
       );
       throw new StartupError($t("pty_start.instanceStartErr"));
     }
@@ -162,7 +169,12 @@ export default class PtyStartCommand extends InstanceCommand {
     const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
 
     // After reading the configuration, Need to check the process status
-    if (subProcess.exitCode !== null) {
+    // The "processAdapter.pid" here represents the child process created by the PTY process
+    if (subProcess.exitCode !== null || processAdapter.pid == null || processAdapter.pid === 0) {
+      instance.println(
+        "ERROR",
+        $t("pty_start.pidErr", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
+      );
       throw new Error(`Start SubProcess failed, Exit code: ${process.exitCode}`);
     }
 

@@ -147,7 +147,9 @@ export default {
     instanceStartErr: "The instance failed to start, please check the startup command, host environment and configuration file, etc.",
     startSuccess: "Instance {{instanceUuid}} successfully started PID: {{pid}}.",
     startEmulatedTerminal:
-      "Full emulated terminal mode has taken effect. You can directly input content in the terminal and use function keys such as Ctrl and Tab."
+      "Full emulated terminal mode has taken effect. You can directly input content in the terminal and use function keys such as Ctrl and Tab.",
+    mustAbsolutePath:
+      "The working directory of the emulation terminal must use the absolute path. Please go to the instance setting interface to reset the working path to the absolute path."
   },
   // src\entity\commands\pty\pty_stop.ts
   pty_stop: {
