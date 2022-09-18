@@ -175,7 +175,7 @@ export default class PtyStartCommand extends InstanceCommand {
         "ERROR",
         $t("pty_start.pidErr", { startCommand: instance.config.startCommand, path: PTY_PATH, params: JSON.stringify(ptyParameter) })
       );
-      throw new Error(`Start SubProcess failed, Exit code: ${process.exitCode}`);
+      throw new StartupError($t("pty_start.instanceStartErr"));
     }
 
     // generate open event
