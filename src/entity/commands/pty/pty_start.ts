@@ -171,6 +171,7 @@ export default class PtyStartCommand extends InstanceCommand {
     // create process adapter
     const ptySubProcessCfg = await this.readPtySubProcessConfig(subProcess);
     const processAdapter = new ProcessAdapter(subProcess, ptySubProcessCfg.pid);
+    logger.info(`PTY Process Config: ${JSON.stringify(ptySubProcessCfg)}`);
 
     // After reading the configuration, Need to check the process status
     // The "processAdapter.pid" here represents the child process created by the PTY process
