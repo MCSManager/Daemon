@@ -1,7 +1,6 @@
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-const dgram = require("dgram");
-
+import dgram from "dgram";
 import Instance from "../instance/instance";
 import InstanceCommand from "../commands/base/command";
 
@@ -21,26 +20,37 @@ async function request(ip: string, port: number) {
     client.on("error", (err: any) => {
       try {
         client.close();
-      } catch (error) {}
-      j(err);
+        client.removeAllListeners();
+      } finally {
+        j(err);
+      }
     });
     client.on("message", (data: any) => {
       const result = data.toString().split(";");
-      r(result);
-      client.close();
+      try {
+        client.close();
+        client.removeAllListeners();
+      } finally {
+        r(result);
+      }
     });
     client.send(message, Config.port, Config.ip, (err: any) => {
       if (err) {
-        j(err);
-        client.close();
+        try {
+          client.close();
+          client.removeAllListeners();
+        } finally {
+          j(err);
+        }
       }
     });
     setTimeout(() => {
       j("request timeout");
       try {
         client.close();
+        client.removeAllListeners();
       } catch (error) {}
-    }, 5000);
+    }, 3000);
   });
 }
 
@@ -52,13 +62,15 @@ export default class MinecraftBedrockGetPlayersCommand extends InstanceCommand {
 
   async exec(instance: Instance) {
     if (instance.config.pingConfig.ip && instance.config.pingConfig.port) {
-      const info: any = await request(instance.config.pingConfig.ip, instance.config.pingConfig.port);
-      return {
-        version: info[3],
-        motd: info[0],
-        current_players: info[4],
-        max_players: info[5]
-      };
+      try {
+        const info: any = await request(instance.config.pingConfig.ip, instance.config.pingConfig.port);
+        return {
+          version: info[3],
+          motd: info[0],
+          current_players: info[4],
+          max_players: info[5]
+        };
+      } catch (error) {}
     }
     return null;
   }
