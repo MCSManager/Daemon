@@ -20,7 +20,6 @@ async function request(ip: string, port: number) {
     client.on("error", (err: any) => {
       try {
         client.close();
-        client.removeAllListeners();
       } finally {
         j(err);
       }
@@ -29,7 +28,6 @@ async function request(ip: string, port: number) {
       const result = data.toString().split(";");
       try {
         client.close();
-        client.removeAllListeners();
       } finally {
         r(result);
       }
@@ -38,7 +36,6 @@ async function request(ip: string, port: number) {
       if (err) {
         try {
           client.close();
-          client.removeAllListeners();
         } finally {
           j(err);
         }
@@ -48,7 +45,6 @@ async function request(ip: string, port: number) {
       j("request timeout");
       try {
         client.close();
-        client.removeAllListeners();
       } catch (error) {}
     }, 3000);
   });
