@@ -59,7 +59,7 @@ export class ProcessConfig {
     if (this.iProcessConfig.type === "txt") {
       text = object.toString();
     }
-    if (!text) throw new Error($t("process_config.writEmpty"));
+    if (!text && this.iProcessConfig.type !== "txt") throw new Error($t("process_config.writEmpty"));
     fs.writeFileSync(this.iProcessConfig.path, text, { encoding: CONFIG_FILE_ENCODE });
   }
 
