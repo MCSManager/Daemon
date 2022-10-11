@@ -60,6 +60,10 @@ class InstanceSubsystem extends EventEmitter {
       try {
         const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
         const instance = new Instance(uuid, instanceConfig);
+
+        // Fix BUG, reset state
+        instanceConfig.eventTask.ignore = false;
+
         // All instances are all function schedulers
         instance
           .forceExec(new FunctionDispatcher())
