@@ -252,6 +252,7 @@ export default class Instance extends EventEmitter {
 
   // Release resources (mainly release process-related resources)
   releaseResources() {
+    this.process.destroy();
     this.process = null;
   }
 
