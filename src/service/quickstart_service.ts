@@ -22,6 +22,7 @@ export class QuickInstallTask implements IQuickTask {
   private instance: Instance;
   private readonly TMP_ZIP_NAME = "tmp.zip";
   private zipPath = "";
+  private downloadStream: fs.WriteStream = null;
 
   constructor(public instanceName: string, public targetLink: string) {
     this.uid = v4();
@@ -41,7 +42,7 @@ export class QuickInstallTask implements IQuickTask {
         url: this.targetLink,
         responseType: "stream"
       });
-      const w = pipeline(response.data, writeStream, (err) => {
+      this.downloadStream = pipeline(response.data, writeStream, (err) => {
         if (err) {
           reject(err);
         } else {
@@ -58,12 +59,13 @@ export class QuickInstallTask implements IQuickTask {
       const fileManager = getFileManager(this.instance.instanceUuid);
       console.log("OK!!!!");
     } catch (error) {
-      console.log("Download error:", error);
+      console.log("Task error:", error);
       this._status = -1;
     }
   }
 
   stop() {
+    this.downloadStream.destroy(new Error("STOP TASK"));
     this._status = 0;
   }
   status(): number {
@@ -82,7 +84,9 @@ export function createQuickInstallTask(targetLink: string, instanceName: string)
   const task = new QuickInstallTask("123", instanceName);
   TaskCenter.addTask(task);
   task.start();
+
+  setTimeout(() => task.stop(), 3000);
   return task;
 }
 
-createQuickInstallTask("23333", "http://oss.duzuii.com/d/MCSManager/Minecraft-Server-Software/%E5%BD%92%E6%A1%A3.zip");
+createQuickInstallTask("23333", "http://oss.duzuii.com/d/MCSManager/MCSManager_v9.6.0_win_x64.zip");
