@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import https from "https";
 import path from "path";
 import logger from "./log";
+
 const PTY_NAME = `pty_${os.platform()}_${os.arch()}${os.platform() === "win32" ? ".exe" : ""}`;
 const PTY_PATH = path.normalize(path.join(process.cwd(), "lib", PTY_NAME));
 const PTY_DIR_PATH = path.join(process.cwd(), "lib");
@@ -26,15 +27,10 @@ function installPtyForLinux(url: string) {
         if (fs.existsSync(PTY_PATH)) fs.removeSync(PTY_PATH);
         reject(err);
       });
-      file
-        .on("finish", () => {
-          file.close();
-          resolve(0);
-        })
-        .on("error", (err) => {
-          reject(err);
-        });
-
+      res.on("end", () => {
+        file.end();
+        resolve(0);
+      });
       res.pipe(file);
     });
   });
@@ -43,8 +39,8 @@ function installPtyForLinux(url: string) {
 // Emulate terminal-dependent programs, PTY programs based on Go/C++
 // Reference: https://github.com/MCSManager/pty
 export function initDependent() {
-  if (os.platform() !== "linux") return logger.info($t("install.skipInstall"));
-  const ptyUrls = [`https://mcsmanager.com/download/${PTY_NAME}`, `https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/${PTY_NAME}`];
+  // if (os.platform() !== "linux") return logger.info($t("install.skipInstall"));
+  const ptyUrls = [`https://mcsmanager.com/download/pty_windows_x64.exe`, `https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/${PTY_NAME}`];
   function setup(index = 0) {
     installPtyForLinux(ptyUrls[index])
       .then(() => {

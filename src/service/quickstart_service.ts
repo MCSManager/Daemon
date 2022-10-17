@@ -1,4 +1,13 @@
 import { v4 } from "uuid";
+import axios from "axios";
+import { pipeline, Readable } from "stream";
+import fs from "fs-extra";
+import Instance from "../entity/instance/instance";
+import InstanceSubsystem from "../service/system_instance";
+import InstanceConfig from "../entity/instance/Instance_config";
+import { $t } from "../i18n";
+import path from "path";
+import { getFileManager } from "../service/file_router_service";
 
 export interface IQuickTask {
   uid: string;
@@ -8,16 +17,52 @@ export interface IQuickTask {
 }
 
 export class QuickInstallTask implements IQuickTask {
-  private _status = 0; // 0=stop 1=running
+  private _status = 0; // 0=stop 1=running -1=error 2=downloading
   public uid: string;
+  private instance: Instance;
+  private readonly TMP_ZIP_NAME = "tmp.zip";
+  private zipPath = "";
 
   constructor(public instanceName: string, public targetLink: string) {
     this.uid = v4();
+    const config = new InstanceConfig();
+    config.nickname = instanceName;
+    config.cwd = null;
+    config.stopCommand = "stop";
+    config.type = Instance.TYPE_MINECRAFT_JAVA;
+    this.instance = InstanceSubsystem.createInstance(config);
   }
 
-  start() {
-    this._status = 1;
+  private download() {
+    return new Promise(async (resolve, reject) => {
+      this.zipPath = path.normalize(path.join(this.instance.config.cwd, this.TMP_ZIP_NAME));
+      const writeStream = fs.createWriteStream(this.zipPath);
+      const response = await axios<Readable>({
+        url: this.targetLink,
+        responseType: "stream"
+      });
+      const w = pipeline(response.data, writeStream, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    });
   }
+
+  async start() {
+    this._status = 1;
+    try {
+      await this.download();
+      const fileManager = getFileManager(this.instance.instanceUuid);
+      console.log("OK!!!!");
+    } catch (error) {
+      console.log("Download error:", error);
+      this._status = -1;
+    }
+  }
+
   stop() {
     this._status = 0;
   }
@@ -34,7 +79,10 @@ export class TaskCenter {
 }
 
 export function createQuickInstallTask(targetLink: string, instanceName: string) {
-  const task = new QuickInstallTask("123", "adsdas");
+  const task = new QuickInstallTask("123", instanceName);
   TaskCenter.addTask(task);
+  task.start();
   return task;
 }
+
+createQuickInstallTask("23333", "http://oss.duzuii.com/d/MCSManager/Minecraft-Server-Software/%E5%BD%92%E6%A1%A3.zip");

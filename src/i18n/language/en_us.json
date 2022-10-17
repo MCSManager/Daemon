@@ -13,7 +13,6 @@
     "passwordTip": "Key as the only authentication method, please use the node function connection program of the MCSManager panel",
     "exitTip": "You can use the Ctrl+C shortcut to close the program"
   },
-
   "common": {
     "title": "Title",
     "_7zip": "[7zip compression task]",

@@ -44,6 +44,7 @@ import * as koa from "./service/http";
 import * as protocol from "./service/protocol";
 import InstanceSubsystem from "./service/system_instance";
 import { initDependent } from "./service/install";
+import "./service/quickstart_service";
 
 // initialize optional dependencies asynchronously
 initDependent();

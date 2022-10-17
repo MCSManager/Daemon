@@ -13,7 +13,6 @@
     "passwordTip": "密钥作为唯一认证方式，请使用 MCSManager 面板的节点功能连接程序",
     "exitTip": "你可以使用 Ctrl+C 快捷键即可关闭程序"
   },
-
   "common": {
     "title": "标题",
     "_7zip": "[7zip 压缩任务]",
