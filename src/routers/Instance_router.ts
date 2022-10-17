@@ -22,11 +22,12 @@ import RestartCommand from "../entity/commands/restart";
 
 // Some instances operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
-  if (event == "instance/new" && data) return next();
-  if (event == "instance/overview") return next();
-  if (event == "instance/select") return next();
-  // class AOP
+  if (event === "instance/new" && data) return next();
+  if (event === "instance/overview") return next();
+  if (event === "instance/select") return next();
+  if (event === "instance/asynchronous") return next();
   if (event.startsWith("instance")) {
+    // class AOP
     if (data.instanceUuids) return next();
     const instanceUuid = data.instanceUuid;
     if (!InstanceSubsystem.exists(instanceUuid)) {
@@ -273,6 +274,7 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   const taskName = data.taskName;
   const parameter = data.parameter;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
+  if (!instance) return;
   logger.info($t("Instance_router.performTasks", { id: ctx.socket.id, uuid: instanceUuid, taskName: taskName }));
   if (taskName === "update") {
     instance
