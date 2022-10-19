@@ -8,6 +8,8 @@ import child_process from "child_process";
 import os from "os";
 import archiver from "archiver";
 import StreamZip, { async } from "node-stream-zip";
+import { CommandProcess } from "./process_tools";
+import { PTY_PATH } from "../const";
 // const StreamZip = require('node-stream-zip');
 
 // Cross-platform high-efficiency/low-efficiency decompression scheme
@@ -190,3 +192,21 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
     zipFileNameEncoding: fileCode
   });
 }
+
+// ./pty_linux_arm64 -m unzip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996/tmp.zip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996
+async function golangProcessUnzip(zipPath: string, destDir: string, fileCode: string = "utf-8") {
+  return await new CommandProcess(PTY_PATH, ["-coder", fileCode, "-m", "unzip", zipPath, destDir], ".", 60 * 30, {}).start();
+}
+
+// async function test() {
+//   console.log(
+//     "UNZIP::",
+//     await golangProcessUnzip(
+//       "/Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159d255b042da8cb3fd2012b0a996/tmp.zip",
+//       "/Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996",
+//       "utf-8"
+//     )
+//   );
+// }
+
+// test();
