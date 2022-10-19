@@ -19,7 +19,8 @@ import ProcessInfoCommand from "../entity/commands/process_info";
 import FileManager from "../service/system_file";
 import { ProcessConfig } from "../entity/instance/process_config";
 import RestartCommand from "../entity/commands/restart";
-import { createQuickInstallTask, TaskCenter } from "../service/quickstart_service";
+import { TaskCenter } from "../service/async_task_service";
+import { createQuickInstallTask } from "../service/async_task_service/quick_install";
 
 // Some instances operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
@@ -299,28 +300,28 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
 // Terminate the execution of complex asynchronous tasks
 routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
-  const taskName = data.taskName;
+  const { uid } = data.parameter;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
 
-  // Quick install task
-  if (taskName === "quick_install") {
-    const uid = data.uid;
+  // Multi-instance async task
+  if (uid && typeof uid === "string") {
     const task = TaskCenter.getTask(uid);
+    if (!task) throw new Error(`Async Task ID: ${uid} does not exist`);
     task.stop();
+    return;
   }
 
-  // other async task
-  if (!taskName) {
-    const task = instance.asynchronousTask;
-    if (task && task.stop) {
-      task
-        .stop(instance)
-        .then(() => {})
-        .catch((err) => {});
-    } else {
-      return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
-    }
+  // Singleton async task
+  const task = instance.asynchronousTask;
+  if (task && task.stop) {
+    task
+      .stop(instance)
+      .then(() => {})
+      .catch((err) => {});
+  } else {
+    return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
   }
+
   protocol.response(ctx, true);
 });
 
@@ -331,6 +332,7 @@ routerApp.on("instance/query_asynchronous", (ctx, data) => {
   protocol.response(ctx, {
     uid,
     status: task.status()
+    // maybe add toJSON()
   });
 });
 
