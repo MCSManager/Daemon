@@ -8,15 +8,16 @@ import InstanceConfig from "../entity/instance/Instance_config";
 import { $t } from "../i18n";
 import path from "path";
 import { getFileManager } from "../service/file_router_service";
+import EventEmitter from "events";
 
-export interface IQuickTask {
+export interface IQuickTask extends EventEmitter {
   uid: string;
   start(): void;
   stop(): void;
   status(): number;
 }
 
-export class QuickInstallTask implements IQuickTask {
+export class QuickInstallTask extends EventEmitter implements IQuickTask {
   private _status = 0; // 0=stop 1=running -1=error 2=downloading
   public uid: string;
   private instance: Instance;
@@ -25,6 +26,7 @@ export class QuickInstallTask implements IQuickTask {
   private downloadStream: fs.WriteStream = null;
 
   constructor(public instanceName: string, public targetLink: string) {
+    super();
     this.uid = v4();
     const config = new InstanceConfig();
     config.nickname = instanceName;
@@ -54,20 +56,31 @@ export class QuickInstallTask implements IQuickTask {
 
   async start() {
     this._status = 1;
+    this.emit("started");
     try {
       await this.download();
       const fileManager = getFileManager(this.instance.instanceUuid);
       console.log("OK!!!!");
+      this.stop();
     } catch (error) {
       console.log("Task error:", error);
-      this._status = -1;
+      this.emit("failure");
     }
   }
 
   stop() {
-    this.downloadStream.destroy(new Error("STOP TASK"));
+    try {
+      if (this.downloadStream) this.downloadStream.destroy(new Error("STOP TASK"));
+    } catch (error) {}
     this._status = 0;
+    this.emit("stopped");
   }
+
+  failure() {
+    this._status = -1;
+    this.emit("failure");
+  }
+
   status(): number {
     return this._status;
   }
@@ -77,16 +90,32 @@ export class TaskCenter {
   public static tasks = new Array<IQuickTask>();
   public static addTask(t: IQuickTask) {
     TaskCenter.tasks.push(t);
+    t.start();
+    t.on("stopped", () => TaskCenter.onTaskStopped(t));
+    t.on("failure", () => TaskCenter.onTaskFailure(t));
+  }
+
+  public static onTaskStopped(t: IQuickTask) {
+    console.log("任务", t.uid, "已结束");
+  }
+
+  public static onTaskFailure(t: IQuickTask) {
+    console.log("任务", t.uid, "运行失败");
+  }
+
+  public static getTask(uid: string) {
+    for (const iterator of TaskCenter.tasks) {
+      if (iterator.uid === uid) return iterator;
+    }
   }
 }
 
 export function createQuickInstallTask(targetLink: string, instanceName: string) {
-  const task = new QuickInstallTask("123", instanceName);
+  const task = new QuickInstallTask(instanceName, targetLink);
   TaskCenter.addTask(task);
-  task.start();
 
-  setTimeout(() => task.stop(), 3000);
+  // setTimeout(() => task.stop(), 3000);
   return task;
 }
 
-createQuickInstallTask("23333", "http://oss.duzuii.com/d/MCSManager/MCSManager_v9.6.0_win_x64.zip");
+createQuickInstallTask("http://oss.duzuii.com/d/MCSManager/MCSManager_v9.6.0_win_x64.zip", "23333");

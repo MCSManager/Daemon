@@ -19,6 +19,7 @@ import ProcessInfoCommand from "../entity/commands/process_info";
 import FileManager from "../service/system_file";
 import { ProcessConfig } from "../entity/instance/process_config";
 import RestartCommand from "../entity/commands/restart";
+import { createQuickInstallTask, TaskCenter } from "../service/quickstart_service";
 
 // Some instances operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
@@ -26,6 +27,7 @@ routerApp.use((event, ctx, data, next) => {
   if (event === "instance/overview") return next();
   if (event === "instance/select") return next();
   if (event === "instance/asynchronous") return next();
+  if (event === "instance/query_asynchronous") return next();
   if (event.startsWith("instance")) {
     // class AOP
     if (data.instanceUuids) return next();
@@ -276,6 +278,7 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   const instance = InstanceSubsystem.getInstance(instanceUuid);
   if (!instance) return;
   logger.info($t("Instance_router.performTasks", { id: ctx.socket.id, uuid: instanceUuid, taskName: taskName }));
+  // Instance software update task
   if (taskName === "update") {
     instance
       .execPreset("update", parameter)
@@ -284,23 +287,51 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
         logger.error($t("Instance_router.performTasksErr", { uuid: instance.instanceUuid, taskName: taskName, err: err }));
       });
   }
-  protocol.msg(ctx, "instance/asynchronous", true);
+  // Quick install Minecraft server task
+  if (taskName === "quick_install") {
+    const newInstanceName = String(parameter.newInstanceName);
+    const targetLink = String(parameter.targetLink);
+    createQuickInstallTask(targetLink, newInstanceName);
+  }
+  protocol.response(ctx, true);
 });
 
 // Terminate the execution of complex asynchronous tasks
 routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
+  const taskName = data.taskName;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
-  const task = instance.asynchronousTask;
-  if (task && task.stop) {
-    task
-      .stop(instance)
-      .then(() => {})
-      .catch((err) => {});
-  } else {
-    return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
+
+  // Quick install task
+  if (taskName === "quick_install") {
+    const uid = data.uid;
+    const task = TaskCenter.getTask(uid);
+    task.stop();
   }
-  protocol.msg(ctx, "instance/stop_asynchronous", true);
+
+  // other async task
+  if (!taskName) {
+    const task = instance.asynchronousTask;
+    if (task && task.stop) {
+      task
+        .stop(instance)
+        .then(() => {})
+        .catch((err) => {});
+    } else {
+      return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
+    }
+  }
+  protocol.response(ctx, true);
+});
+
+// Query async task status
+routerApp.on("instance/query_asynchronous", (ctx, data) => {
+  const uid = String(data.uid);
+  const task = TaskCenter.getTask(uid);
+  protocol.response(ctx, {
+    uid,
+    status: task.status()
+  });
 });
 
 routerApp.on("instance/process_config/list", (ctx, data) => {
