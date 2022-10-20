@@ -24,8 +24,10 @@ export class CommandProcess extends EventEmitter {
     return new Promise((resolve, reject) => {
       let timeTask: NodeJS.Timeout = null;
       const process = child_process.spawn(this.file, this.args, {
-        ...this.option,
-        cwd: path.normalize(this.cwd)
+        stdio: "pipe",
+        windowsHide: true,
+        cwd: path.normalize(this.cwd),
+        ...this.option
       });
       this.process = process;
       if (!process || !process.pid) return reject(false);
@@ -56,6 +58,7 @@ export class CommandProcess extends EventEmitter {
 
   private async destroy() {
     try {
+      for (const n of this.eventNames()) this.removeAllListeners(n);
       if (this.process.stdout) for (const eventName of this.process.stdout.eventNames()) this.process.stdout.removeAllListeners(eventName);
       if (this.process.stderr) for (const eventName of this.process.stderr.eventNames()) this.process.stderr.removeAllListeners(eventName);
       if (this.process) for (const eventName of this.process.eventNames()) this.process.stdout.removeAllListeners(eventName);

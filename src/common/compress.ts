@@ -79,6 +79,7 @@ export async function compress(sourceZip: string, files: string[], fileCode?: st
 export async function decompress(zipPath: string, dest: string, fileCode?: string) {
   // if (system === "linux" && haveLinuxUnzip()) return await linuxUnzip(zipPath, dest);
   // return await nodeDecompress(zipPath, dest, fileCode);
+  if (canGolangProcess()) return await golangProcessUnzip(zipPath, dest, fileCode);
   return await archiveUnZip(zipPath, dest, fileCode);
 }
 
@@ -191,6 +192,10 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
   return await compressing.zip.uncompress(sourceZip, destDir, {
     zipFileNameEncoding: fileCode
   });
+}
+
+function canGolangProcess() {
+  return fs.existsSync(PTY_PATH);
 }
 
 // ./pty_linux_arm64 -m unzip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996/tmp.zip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996
