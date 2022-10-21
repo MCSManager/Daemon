@@ -20,7 +20,7 @@ export class CommandProcess extends EventEmitter {
     super();
   }
 
-  public start() {
+  public start(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       let timeTask: NodeJS.Timeout = null;
       const process = child_process.spawn(this.file, this.args, {
