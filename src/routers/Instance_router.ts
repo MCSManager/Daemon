@@ -327,12 +327,12 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
 
 // Query async task status
 routerApp.on("instance/query_asynchronous", (ctx, data) => {
-  const uid = String(data.uid);
-  const task = TaskCenter.getTask(uid);
+  const taskId = String(data.taskId);
+  const task = TaskCenter.getTask(taskId);
   protocol.response(ctx, {
-    uid,
-    status: task.status()
-    // maybe add toJSON()
+    taskId,
+    status: task.status(),
+    detail: task.toObject()
   });
 });
 

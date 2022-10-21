@@ -9,7 +9,7 @@ import { $t } from "../../i18n";
 import path from "path";
 import { getFileManager } from "../file_router_service";
 import EventEmitter from "events";
-import { IAsyncTask, TaskCenter } from "./index";
+import { IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
 
 export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   private _status = 0; // 0=stop 1=running -1=error 2=downloading
@@ -77,6 +77,18 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
 
   status(): number {
     return this._status;
+  }
+
+  toObject(): IAsyncTaskJSON {
+    return JSON.parse(
+      JSON.stringify({
+        taskId: this.uid,
+        status: this.status(),
+        instanceUuid: this.instance.instanceUuid,
+        instanceStatus: this.instance.status(),
+        instanceConfig: this.instance.config
+      })
+    );
   }
 }
 

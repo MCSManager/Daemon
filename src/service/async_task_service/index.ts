@@ -1,10 +1,15 @@
 import EventEmitter from "events";
 
+export interface IAsyncTaskJSON {
+  [key: string]: any;
+}
+
 export interface IAsyncTask extends EventEmitter {
   uid: string;
   start(): Promise<boolean | void>;
   stop(): Promise<boolean | void>;
   status(): number;
+  toObject(): IAsyncTaskJSON;
 }
 
 export class TaskCenter {
