@@ -5,7 +5,8 @@ export interface IAsyncTaskJSON {
 }
 
 export interface IAsyncTask extends EventEmitter {
-  uid: string;
+  // The taskId must be complex enough to prevent other users from accessing the information
+  taskId: string;
   start(): Promise<boolean | void>;
   stop(): Promise<boolean | void>;
   status(): number;
@@ -22,16 +23,16 @@ export class TaskCenter {
   }
 
   public static onTaskStopped(t: IAsyncTask) {
-    console.log("Task:", t.uid, "Stopped");
+    console.log("Task:", t.taskId, "Stopped");
   }
 
   public static onTaskFailure(t: IAsyncTask) {
-    console.log("Task:", t.uid, "Failed");
+    console.log("Task:", t.taskId, "Failed");
   }
 
-  public static getTask(uid: string) {
+  public static getTask(taskId: string) {
     for (const iterator of TaskCenter.tasks) {
-      if (iterator.uid === uid) return iterator;
+      if (iterator.taskId === taskId) return iterator;
     }
   }
 }

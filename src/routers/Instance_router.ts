@@ -300,13 +300,13 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
 // Terminate the execution of complex asynchronous tasks
 routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   const instanceUuid = data.instanceUuid;
-  const { uid } = data.parameter;
+  const { taskId } = data.parameter;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
 
   // Multi-instance async task
-  if (uid && typeof uid === "string") {
-    const task = TaskCenter.getTask(uid);
-    if (!task) throw new Error(`Async Task ID: ${uid} does not exist`);
+  if (taskId && typeof taskId === "string") {
+    const task = TaskCenter.getTask(taskId);
+    if (!task) throw new Error(`Async Task ID: ${taskId} does not exist`);
     task.stop();
     return;
   }
@@ -327,7 +327,7 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
 
 // Query async task status
 routerApp.on("instance/query_asynchronous", (ctx, data) => {
-  const taskId = String(data.taskId);
+  const taskId = String(data.parameter.taskId);
   const task = TaskCenter.getTask(taskId);
   protocol.response(ctx, {
     taskId,

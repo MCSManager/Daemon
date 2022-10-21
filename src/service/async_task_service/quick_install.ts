@@ -13,7 +13,7 @@ import { IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
 
 export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   private _status = 0; // 0=stop 1=running -1=error 2=downloading
-  public uid: string;
+  public taskId: string;
   private instance: Instance;
   private readonly TMP_ZIP_NAME = "tmp.zip";
   private zipPath = "";
@@ -27,7 +27,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
     config.stopCommand = "stop";
     config.type = Instance.TYPE_MINECRAFT_JAVA;
     this.instance = InstanceSubsystem.createInstance(config);
-    this.uid = `QuickInstallTask-${this.instance.instanceUuid}-${v4()}`;
+    this.taskId = `QuickInstallTask-${this.instance.instanceUuid}-${v4()}`;
   }
 
   private download() {
@@ -82,7 +82,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   toObject(): IAsyncTaskJSON {
     return JSON.parse(
       JSON.stringify({
-        taskId: this.uid,
+        taskId: this.taskId,
         status: this.status(),
         instanceUuid: this.instance.instanceUuid,
         instanceStatus: this.instance.status(),
