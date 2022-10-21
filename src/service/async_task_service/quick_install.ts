@@ -15,7 +15,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   private _status = 0; // 0=stop 1=running -1=error 2=downloading
   public taskId: string;
   private instance: Instance;
-  private readonly TMP_ZIP_NAME = "__tmp__.zip";
+  private readonly TMP_ZIP_NAME = "mcsm_install_package.zip";
   private zipPath = "";
   private downloadStream: fs.WriteStream = null;
 
@@ -56,6 +56,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
       let result = await this.download();
       result = await fileManager.promiseUnzip(this.TMP_ZIP_NAME, ".", "UTF-8");
       if (!result) throw new Error($t("quick_install.unzipError"));
+      // TODO mcsm-config.json reader
       console.log("OK!!!!");
       this.stop();
     } catch (error) {
@@ -97,6 +98,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
 }
 
 export function createQuickInstallTask(targetLink: string, instanceName: string) {
+  if (!targetLink || !instanceName) throw new Error("targetLink or instanceName is null!");
   const task = new QuickInstallTask(instanceName, targetLink);
   TaskCenter.addTask(task);
   return task;

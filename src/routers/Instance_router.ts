@@ -293,7 +293,8 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
     const newInstanceName = String(parameter.newInstanceName);
     const targetLink = String(parameter.targetLink);
     logger.info(`Quick install: Name: ${newInstanceName} | Download: ${targetLink}`);
-    createQuickInstallTask(targetLink, newInstanceName);
+    const task = createQuickInstallTask(targetLink, newInstanceName);
+    return protocol.response(ctx, task.toObject());
   }
   protocol.response(ctx, true);
 });
