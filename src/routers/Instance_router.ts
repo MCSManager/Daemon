@@ -277,10 +277,10 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   const taskName = data.taskName;
   const parameter = data.parameter;
   const instance = InstanceSubsystem.getInstance(instanceUuid);
-  if (!instance) return;
+
   logger.info($t("Instance_router.performTasks", { id: ctx.socket.id, uuid: instanceUuid, taskName: taskName }));
   // Instance software update task
-  if (taskName === "update") {
+  if (taskName === "update" && instance) {
     instance
       .execPreset("update", parameter)
       .then(() => {})
@@ -292,6 +292,7 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   if (taskName === "quick_install") {
     const newInstanceName = String(parameter.newInstanceName);
     const targetLink = String(parameter.targetLink);
+    logger.info(`Quick install: Name: ${newInstanceName} | Download: ${targetLink}`);
     createQuickInstallTask(targetLink, newInstanceName);
   }
   protocol.response(ctx, true);
