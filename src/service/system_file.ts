@@ -156,6 +156,13 @@ export default class FileManager {
       .catch(() => {});
   }
 
+  async promiseUnzip(sourceZip: string, destDir: string, code?: string): Promise<boolean> {
+    if (!code) code = this.fileCode;
+    if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
+    this.zipFileCheck(this.toAbsolutePath(sourceZip));
+    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
+  }
+
   zip(sourceZip: string, files: string[], code?: string) {
     if (!code) code = this.fileCode;
     if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);

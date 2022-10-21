@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+import logger from "../log";
 
 export interface IAsyncTaskJSON {
   [key: string]: any;
@@ -23,11 +24,11 @@ export class TaskCenter {
   }
 
   public static onTaskStopped(t: IAsyncTask) {
-    console.log("Task:", t.taskId, "Stopped");
+    logger.info("Async Task:", t.taskId, "Stopped.");
   }
 
   public static onTaskFailure(t: IAsyncTask) {
-    console.log("Task:", t.taskId, "Failed");
+    logger.info("Async Task:", t.taskId, "Failed.");
   }
 
   public static getTask(taskId: string) {

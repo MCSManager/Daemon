@@ -240,5 +240,9 @@
 
   "version": {
     "versionDetectErr": "版本检查失败"
+  },
+
+  "quick_install": {
+    "unzipError": "解压文件失败"
   }
 }

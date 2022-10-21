@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import Instance from "../../entity/instance/instance";
 import InstanceSubsystem from "../system_instance";
 import InstanceConfig from "../../entity/instance/Instance_config";
-import { $t } from "../../i18n";
+import { $t, i18next } from "../../i18n";
 import path from "path";
 import { getFileManager } from "../file_router_service";
 import EventEmitter from "events";
@@ -15,7 +15,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   private _status = 0; // 0=stop 1=running -1=error 2=downloading
   public taskId: string;
   private instance: Instance;
-  private readonly TMP_ZIP_NAME = "tmp.zip";
+  private readonly TMP_ZIP_NAME = "__tmp__.zip";
   private zipPath = "";
   private downloadStream: fs.WriteStream = null;
 
@@ -30,7 +30,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
     this.taskId = `QuickInstallTask-${this.instance.instanceUuid}-${v4()}`;
   }
 
-  private download() {
+  private download(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       this.zipPath = path.normalize(path.join(this.instance.config.cwd, this.TMP_ZIP_NAME));
       const writeStream = fs.createWriteStream(this.zipPath);
@@ -51,14 +51,18 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
   async start() {
     this._status = 1;
     this.emit("started");
+    const fileManager = getFileManager(this.instance.instanceUuid);
     try {
-      await this.download();
-      const fileManager = getFileManager(this.instance.instanceUuid);
+      let result = await this.download();
+      result = await fileManager.promiseUnzip(this.TMP_ZIP_NAME, ".", "UTF-8");
+      if (!result) throw new Error($t("quick_install.unzipError"));
       console.log("OK!!!!");
       this.stop();
     } catch (error) {
       console.log("Task error:", error);
       this.emit("failure");
+    } finally {
+      fs.remove(fileManager.toAbsolutePath(this.TMP_ZIP_NAME), () => {});
     }
   }
 
@@ -97,5 +101,3 @@ export function createQuickInstallTask(targetLink: string, instanceName: string)
   TaskCenter.addTask(task);
   return task;
 }
-
-createQuickInstallTask("http://oss.duzuii.com/d/MCSManager/MCSManager_v9.6.0_win_x64.zip", "23333");
