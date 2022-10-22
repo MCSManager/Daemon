@@ -10,13 +10,16 @@ import path from "path";
 import { getFileManager } from "../file_router_service";
 import EventEmitter from "events";
 import { IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
+import logger from "../log";
 
 export class QuickInstallTask extends EventEmitter implements IAsyncTask {
-  private _status = 0; // 0=stop 1=running -1=error 2=downloading
   public taskId: string;
-  private instance: Instance;
-  private readonly TMP_ZIP_NAME = "mcsm_install_package.zip";
-  private zipPath = "";
+  public instance: Instance;
+  public readonly TMP_ZIP_NAME = "mcsm_install_package.zip";
+  public readonly ZIP_CONFIG_JSON = "mcsmanager-config.json";
+  public zipPath = "";
+
+  private _status = 0; // 0=stop 1=running -1=error 2=downloading
   private downloadStream: fs.WriteStream = null;
 
   constructor(public instanceName: string, public targetLink: string) {
@@ -56,11 +59,11 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
       let result = await this.download();
       result = await fileManager.promiseUnzip(this.TMP_ZIP_NAME, ".", "UTF-8");
       if (!result) throw new Error($t("quick_install.unzipError"));
-      // TODO mcsm-config.json reader
-      console.log("OK!!!!");
+      const config = JSON.parse(await fileManager.readFile(this.ZIP_CONFIG_JSON));
+      this.instance.parameters(config);
       this.stop();
     } catch (error) {
-      console.log("Task error:", error);
+      logger.error("QuickInstall Task Error:", error);
       this.emit("failure");
     } finally {
       fs.remove(fileManager.toAbsolutePath(this.TMP_ZIP_NAME), () => {});

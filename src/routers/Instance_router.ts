@@ -329,13 +329,26 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
 
 // Query async task status
 routerApp.on("instance/query_asynchronous", (ctx, data) => {
-  const taskId = String(data.parameter.taskId);
-  const task = TaskCenter.getTask(taskId);
-  protocol.response(ctx, {
-    taskId,
-    status: task.status(),
-    detail: task.toObject()
-  });
+  const taskId = data.parameter.taskId as string | undefined;
+  if (!taskId) {
+    const result = [];
+    for (const task of TaskCenter.tasks) {
+      result.push({
+        taskId: task.taskId,
+        status: task.status(),
+        detail: task.toObject()
+      });
+    }
+    protocol.response(ctx, result);
+  } else {
+    const task = TaskCenter.getTask(String(taskId));
+    if (task)
+      protocol.response(ctx, {
+        taskId: task.taskId,
+        status: task.status(),
+        detail: task.toObject()
+      });
+  }
 });
 
 routerApp.on("instance/process_config/list", (ctx, data) => {
