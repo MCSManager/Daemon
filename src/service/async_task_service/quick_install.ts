@@ -1,3 +1,5 @@
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
+
 import { v4 } from "uuid";
 import axios from "axios";
 import { pipeline, Readable } from "stream";

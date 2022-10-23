@@ -1,3 +1,5 @@
+// Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
+
 import EventEmitter from "events";
 import logger from "../log";
 
