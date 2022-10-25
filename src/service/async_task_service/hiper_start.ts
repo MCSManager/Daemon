@@ -1,4 +1,3 @@
-import { ChildProcess } from "child_process";
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
 import { v4 } from "uuid";
@@ -8,26 +7,35 @@ import InstanceSubsystem from "../system_instance";
 import InstanceConfig from "../../entity/instance/Instance_config";
 import { $t, i18next } from "../../i18n";
 import path from "path";
-
+import { spawn, ChildProcess } from "child_process";
 import { getFileManager } from "../file_router_service";
 import EventEmitter from "events";
-import { IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
+import { AsyncTask, IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
 import logger from "../log";
 import { downloadFileToLocalFile } from "../download";
+import os from "os";
 
 // singleton pattern
+class HiPer {
+  public static hiperProcess: ChildProcess;
+  public static hiperFileName: string = os.platform() === "win32" ? "hiper.exe" : "hiper";
+  public static hiperFilePath: string;
 
-export class HiPer {
-  public static subProcess: ChildProcess;
+  public static openHiPer(keyPath: string) {
+    if (HiPer.hiperProcess) {
+      throw new Error($t("quick_install.hiperError"));
+    }
+    HiPer.hiperFilePath = path.normalize(path.join(process.cwd(), "lib", HiPer.hiperFileName));
+    HiPer.hiperProcess = spawn("hiper", ["-v", keyPath]);
+  }
 
-  public static openHiPer(keyPath: string) {}
-
-  public static stopHiPer() {}
+  public static stopHiPer() {
+    HiPer.hiperProcess = null;
+  }
 }
 
-export class HiPerTask extends EventEmitter implements IAsyncTask {
-  public taskId: string;
-  public instance: Instance;
+export class HiPerTask extends AsyncTask {
+  public static readonly TYPE = "HiPerTask";
 
   public readonly KEY_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "key.yml"));
   public readonly POINT_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "point.yml"));
@@ -35,16 +43,14 @@ export class HiPerTask extends EventEmitter implements IAsyncTask {
 
   private keyYmlPath: string;
   private pointYmlPath: string;
-  private _status = 0; // 0=stop 1=running -1=error 2=downloading
 
-  constructor(public readonly instanceUuid: string, public readonly indexCode: string) {
+  constructor(public readonly indexCode: string) {
     super();
-    this.taskId = `HiPerTask-${instanceUuid}-${v4()}`;
+    this.taskId = `${HiPerTask.TYPE}-${indexCode}-${v4()}`;
+    this.type = HiPerTask.TYPE;
   }
 
-  async start() {
-    this._status = 1;
-    this.emit("started");
+  async onStarted(): Promise<boolean | void> {
     try {
       // Download hiper key.yml
       await downloadFileToLocalFile(`${this.BASE_URL}/${this.indexCode}.yml`, this.KEY_YML);
@@ -52,8 +58,7 @@ export class HiPerTask extends EventEmitter implements IAsyncTask {
       // Download hiper point.yml
       await downloadFileToLocalFile(`${this.BASE_URL}/point.yml`, this.KEY_YML);
 
-      // TODO: The node information in point.yml is overwritten to key.yml
-      // fs.writeFile()
+      // The node information in point.yml is overwritten to key.yml
       let keyFile = fs.readFileSync(this.KEY_YML, "utf-8");
       const pointFile = fs.readFileSync(this.POINT_YML, "utf-8");
       const START_TEXT = ">>> AUTO SYNC AREA";
@@ -73,36 +78,27 @@ export class HiPerTask extends EventEmitter implements IAsyncTask {
       // Start Command: hiper.exe -config .\key.yml
       HiPer.openHiPer(this.keyYmlPath);
     } catch (error) {
-      logger.error("HiPer Task Error:", error);
-      this.emit("failure");
-    } finally {
-      this.stop();
+      this.error(error);
     }
   }
 
-  async stop() {
-    this._status = 0;
-    this.emit("stopped");
+  onStopped(): Promise<boolean | void> {
+    HiPer.stopHiPer();
+    return null;
   }
 
-  failure() {
-    this._status = -1;
-    this.emit("failure");
-  }
-
-  status(): number {
-    return this._status;
-  }
+  onError(): void {}
 
   toObject(): IAsyncTaskJSON {
     return JSON.parse(
       JSON.stringify({
         taskId: this.taskId,
-        status: this.status(),
-        instanceUuid: this.instance.instanceUuid,
-        instanceStatus: this.instance.status(),
-        instanceConfig: this.instance.config
+        status: this.status()
       })
     );
   }
+}
+
+export function openHiPerTask(indexCode: string) {
+  TaskCenter.addTask(new HiPerTask(indexCode));
 }

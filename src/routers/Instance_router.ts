@@ -21,6 +21,8 @@ import { ProcessConfig } from "../entity/instance/process_config";
 import RestartCommand from "../entity/commands/restart";
 import { TaskCenter } from "../service/async_task_service";
 import { createQuickInstallTask } from "../service/async_task_service/quick_install";
+import { HiPerTask, openHiPerTask } from "../service/async_task_service/hiper_start";
+import { QuickInstallTask } from "../service/async_task_service/quick_install";
 
 // Some instances operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
@@ -296,6 +298,11 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
     const task = createQuickInstallTask(targetLink, newInstanceName);
     return protocol.response(ctx, task.toObject());
   }
+  // Start HiPer Network
+  if (taskName === "hiper") {
+    const indexCode = String(parameter.indexCode);
+    openHiPerTask(indexCode);
+  }
   protocol.response(ctx, true);
 });
 
@@ -330,6 +337,7 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
 // Query async task status
 routerApp.on("instance/query_asynchronous", (ctx, data) => {
   const taskId = data.parameter.taskId as string | undefined;
+  // const type = String(data.parameter.type) || QuickInstallTask.TYPE;
   if (!taskId) {
     const result = [];
     for (const task of TaskCenter.tasks) {

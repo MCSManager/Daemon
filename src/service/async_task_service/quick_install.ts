@@ -11,17 +11,17 @@ import { $t, i18next } from "../../i18n";
 import path from "path";
 import { getFileManager } from "../file_router_service";
 import EventEmitter from "events";
-import { IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
+import { IAsyncTask, IAsyncTaskJSON, TaskCenter, AsyncTask } from "./index";
 import logger from "../log";
 
-export class QuickInstallTask extends EventEmitter implements IAsyncTask {
-  public taskId: string;
+export class QuickInstallTask extends AsyncTask {
+  public static TYPE = "QuickInstallTask";
+
   public instance: Instance;
   public readonly TMP_ZIP_NAME = "mcsm_install_package.zip";
   public readonly ZIP_CONFIG_JSON = "mcsmanager-config.json";
   public zipPath = "";
 
-  private _status = 0; // 0=stop 1=running -1=error 2=downloading
   private downloadStream: fs.WriteStream = null;
 
   constructor(public instanceName: string, public targetLink: string) {
@@ -32,7 +32,8 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
     config.stopCommand = "stop";
     config.type = Instance.TYPE_MINECRAFT_JAVA;
     this.instance = InstanceSubsystem.createInstance(config);
-    this.taskId = `QuickInstallTask-${this.instance.instanceUuid}-${v4()}`;
+    this.taskId = `${QuickInstallTask.TYPE}-${this.instance.instanceUuid}-${v4()}`;
+    this.type = QuickInstallTask.TYPE;
   }
 
   private download(): Promise<boolean> {
@@ -53,9 +54,7 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
     });
   }
 
-  async start() {
-    this._status = 1;
-    this.emit("started");
+  async onStarted() {
     const fileManager = getFileManager(this.instance.instanceUuid);
     try {
       let result = await this.download();
@@ -65,29 +64,19 @@ export class QuickInstallTask extends EventEmitter implements IAsyncTask {
       this.instance.parameters(config);
       this.stop();
     } catch (error) {
-      logger.error("QuickInstall Task Error:", error);
-      this.emit("failure");
+      this.error(error);
     } finally {
       fs.remove(fileManager.toAbsolutePath(this.TMP_ZIP_NAME), () => {});
     }
   }
 
-  async stop() {
+  async onStopped(): Promise<boolean | void> {
     try {
       if (this.downloadStream) this.downloadStream.destroy(new Error("STOP TASK"));
     } catch (error) {}
-    this._status = 0;
-    this.emit("stopped");
   }
 
-  failure() {
-    this._status = -1;
-    this.emit("failure");
-  }
-
-  status(): number {
-    return this._status;
-  }
+  onError(): void {}
 
   toObject(): IAsyncTaskJSON {
     return JSON.parse(

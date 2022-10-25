@@ -243,6 +243,7 @@
   },
 
   "quick_install": {
-    "unzipError": "解压文件失败"
+    "unzipError": "解压文件失败",
+    "hiperError": "HiPer 进程已存在，不可重复启动！"
   }
 }
