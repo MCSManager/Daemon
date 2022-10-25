@@ -73,13 +73,14 @@ function archiveUnZip(sourceZip: string, destDir: string, fileCode: string = "ut
 export async function compress(sourceZip: string, files: string[], fileCode?: string) {
   // if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
   // return await nodeCompress(sourceZip, files, fileCode);
+  if (hasGolangProcess()) return golangProcessZip(files, sourceZip, fileCode);
   return await archiveZip(sourceZip, files, fileCode);
 }
 
 export async function decompress(zipPath: string, dest: string, fileCode?: string): Promise<boolean> {
   // if (system === "linux" && haveLinuxUnzip()) return await linuxUnzip(zipPath, dest);
   // return await nodeDecompress(zipPath, dest, fileCode);
-  if (canGolangProcess()) return await golangProcessUnzip(zipPath, dest, fileCode);
+  if (hasGolangProcess()) return await golangProcessUnzip(zipPath, dest, fileCode);
   return await archiveUnZip(zipPath, dest, fileCode);
 }
 
@@ -194,13 +195,20 @@ async function nodeDecompress(sourceZip: string, destDir: string, fileCode: stri
   });
 }
 
-function canGolangProcess() {
+function hasGolangProcess() {
   return fs.existsSync(PTY_PATH);
 }
 
 // ./pty_linux_arm64 -m unzip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996/tmp.zip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996
 async function golangProcessUnzip(zipPath: string, destDir: string, fileCode: string = "utf-8") {
   return await new CommandProcess(PTY_PATH, ["-coder", fileCode, "-m", "unzip", zipPath, destDir], ".", 60 * 30, {}).start();
+}
+
+async function golangProcessZip(files: string[], destZip: string, fileCode: string = "utf-8") {
+  const p = ["-coder", fileCode, "-m", "zip"];
+  p.concat(files);
+  p.push(destZip);
+  return await new CommandProcess(PTY_PATH, p, ".", 60 * 30, {}).start();
 }
 
 // async function test() {
