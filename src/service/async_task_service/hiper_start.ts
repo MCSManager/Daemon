@@ -14,6 +14,7 @@ import { AsyncTask, IAsyncTask, IAsyncTaskJSON, TaskCenter } from "./index";
 import logger from "../log";
 import { downloadFileToLocalFile } from "../download";
 import os from "os";
+import { killProcess } from "../../common/process_tools";
 
 // singleton pattern
 class HiPer {
@@ -30,6 +31,7 @@ class HiPer {
   }
 
   public static stopHiPer() {
+    killProcess(this.hiperProcess.pid, this.hiperProcess);
     HiPer.hiperProcess = null;
   }
 }
