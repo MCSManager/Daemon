@@ -9,20 +9,21 @@ import logger from "./log";
 export function downloadFileToLocalFile(url: string, localFilePath: string): Promise<boolean> {
   logger.info(`Download File: ${url} --> ${path.normalize(localFilePath)}`);
   return new Promise(async (resolve, reject) => {
-    const writeStream = fs.createWriteStream(path.normalize(localFilePath));
-    const response = await axios<Readable>({
-      url,
-      responseType: "stream"
-    });
-    if (response.status > 299 || response.status < 200) {
-      reject(new Error(`Download File: Target File response code is ${response.status} NOT 2XX.`));
+    try {
+      const writeStream = fs.createWriteStream(path.normalize(localFilePath));
+      const response = await axios<Readable>({
+        url,
+        responseType: "stream"
+      });
+      pipeline(response.data, writeStream, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    } catch (error) {
+      reject(error);
     }
-    pipeline(response.data, writeStream, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(true);
-      }
-    });
   });
 }
