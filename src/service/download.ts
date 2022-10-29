@@ -23,7 +23,7 @@ export function downloadFileToLocalFile(url: string, localFilePath: string): Pro
         }
       });
     } catch (error) {
-      reject(error);
+      reject(error.message);
     }
   });
 }

@@ -35,7 +35,7 @@ export abstract class AsyncTask extends EventEmitter implements IAsyncTask {
   }
 
   public stop() {
-    this._status = 0;
+    if (this._status !== -1) this._status = 0;
     const r = this.onStopped();
     this.emit("stopped");
     return r;
