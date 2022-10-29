@@ -24,22 +24,25 @@ export abstract class AsyncTask extends EventEmitter implements IAsyncTask {
   public taskId: string;
   public type: string;
 
-  // 0=stop 1=running -1=error 2=downloading
+  // 0=stop 1=running -1=error
   protected _status = 0;
 
   public start() {
+    this._status = 1;
     const r = this.onStarted();
     this.emit("started");
     return r;
   }
 
   public stop() {
+    this._status = 0;
     const r = this.onStopped();
     this.emit("stopped");
     return r;
   }
 
   public error(err: Error) {
+    this._status = -1;
     logger.error(`AsyncTask - ID: ${this.taskId} TYPE: ${this.type} Error:`, err);
     this.onError(err);
     this.emit("error", err);
@@ -81,13 +84,21 @@ export class TaskCenter {
     }
   }
 
-  public static getTasks(taskId: string, type?: string) {
+  public static getTasks(type?: string) {
     const result: IAsyncTask[] = [];
     for (const iterator of TaskCenter.tasks) {
-      if (iterator.taskId === taskId && (type == null || iterator.type === type)) {
+      if (type == null || iterator.type === type) {
         result.push(iterator);
       }
     }
     return result;
+  }
+
+  public static deleteAllStoppedTask() {
+    TaskCenter.tasks.forEach((v, i, arr) => {
+      if (v.status() !== 1) {
+        arr.splice(i, 1);
+      }
+    });
   }
 }

@@ -245,5 +245,9 @@
   "quick_install": {
     "unzipError": "解压文件失败",
     "hiperError": "HiPer 进程已存在，不可重复启动！"
+  },
+
+  "hiper": {
+    "alreadyExist": "HiPer 已经启动，无法运行多个"
   }
 }

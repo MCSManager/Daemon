@@ -16,40 +16,55 @@ import { downloadFileToLocalFile } from "../download";
 import os from "os";
 import { killProcess } from "../../common/process_tools";
 
+interface IHiPerReactive {
+  stop(): any;
+}
+
 // singleton pattern
 class HiPer {
   public static hiperProcess: ChildProcess;
   public static hiperFileName: string = os.platform() === "win32" ? "hiper.exe" : "hiper";
   public static hiperFilePath: string;
 
-  public static openHiPer(keyPath: string) {
+  public static openHiPer(keyPath: string, task?: IHiPerReactive) {
     if (HiPer.hiperProcess) {
       throw new Error($t("quick_install.hiperError"));
     }
     HiPer.hiperFilePath = path.normalize(path.join(process.cwd(), "lib", "hiper", HiPer.hiperFileName));
-    // HiPer.hiperProcess = spawn("hiper", ["-v", keyPath]);
-    console.log("模拟启动成功");
+    logger.info("Start HiPer:", path.dirname(HiPer.hiperFilePath), HiPer.hiperFileName);
+    HiPer.hiperProcess = spawn(HiPer.hiperFileName, {
+      cwd: path.dirname(HiPer.hiperFilePath),
+      stdio: "pipe",
+      windowsHide: true
+    });
+
+    if (!HiPer.hiperProcess.pid) throw new Error("HiPer program start failed! Pid is null!");
+    process.stdout.on("data", (t) => console.log(t));
+    process.on("exit", () => {
+      if (task) task.stop();
+    });
   }
 
   public static stopHiPer() {
-    killProcess(this.hiperProcess.pid, this.hiperProcess);
-    HiPer.hiperProcess = null;
+    try {
+      if (HiPer.hiperProcess.exitCode == null) {
+        killProcess(HiPer.hiperProcess.pid, HiPer.hiperProcess);
+      }
+      HiPer.hiperProcess = null;
+    } catch (error) {}
   }
 }
 
 export class HiPerTask extends AsyncTask {
   public static readonly TYPE = "HiPerTask";
 
-  public readonly KEY_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "key.yml"));
+  public readonly KEY_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "config.yml"));
   public readonly POINT_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "point.yml"));
   private readonly BASE_URL = "https://cert.mcer.cn";
 
-  private keyYmlPath: string;
-  private pointYmlPath: string;
-
   constructor(public readonly indexCode: string) {
     super();
-    this.taskId = `${HiPerTask.TYPE}-${indexCode}-${v4()}`;
+    this.taskId = `${HiPerTask.TYPE}-${v4()}`;
     this.type = HiPerTask.TYPE;
   }
 
@@ -76,7 +91,7 @@ export class HiPerTask extends AsyncTask {
       fs.writeFileSync(this.KEY_YML, keyFile, "utf-8");
 
       // Start Command: hiper.exe -config .\key.yml
-      HiPer.openHiPer(this.keyYmlPath);
+      HiPer.openHiPer(this.KEY_YML, this);
     } catch (error) {
       this.error(error);
     }

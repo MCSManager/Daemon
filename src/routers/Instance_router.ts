@@ -31,6 +31,7 @@ routerApp.use((event, ctx, data, next) => {
   if (event === "instance/select") return next();
   if (event === "instance/asynchronous") return next();
   if (event === "instance/query_asynchronous") return next();
+  if (event === "instance/stop_asynchronous") return next();
   if (event.startsWith("instance")) {
     // class AOP
     if (data.instanceUuids) return next();
@@ -300,6 +301,9 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   }
   // Start HiPer Network
   if (taskName === "hiper") {
+    TaskCenter.deleteAllStoppedTask();
+    const tasks = TaskCenter.getTasks(HiPerTask.TYPE);
+    if (tasks.length != 0) throw new Error($t("hiper.alreadyExist"));
     const indexCode = String(parameter.indexCode);
     const task = openHiPerTask(indexCode);
     return protocol.response(ctx, task.toObject());
@@ -318,11 +322,11 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
     const task = TaskCenter.getTask(taskId);
     if (!task) throw new Error(`Async Task ID: ${taskId} does not exist`);
     task.stop();
-    return;
+    return protocol.response(ctx, true);
   }
 
   // Singleton async task
-  const task = instance.asynchronousTask;
+  const task = instance?.asynchronousTask;
   if (task && task.stop) {
     task
       .stop(instance)
