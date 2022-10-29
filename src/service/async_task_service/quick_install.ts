@@ -23,6 +23,7 @@ export class QuickInstallTask extends AsyncTask {
   public zipPath = "";
 
   private downloadStream: fs.WriteStream = null;
+  private JAVA_17_PATH = path.normalize(path.join(process.cwd(), "lib", "jre17", "bin", "java.exe"));
 
   constructor(public instanceName: string, public targetLink: string) {
     super();
@@ -54,14 +55,28 @@ export class QuickInstallTask extends AsyncTask {
     });
   }
 
+  private hasJava17() {
+    return fs.existsSync(this.JAVA_17_PATH);
+  }
+
   async onStarted() {
     const fileManager = getFileManager(this.instance.instanceUuid);
     try {
       let result = await this.download();
       result = await fileManager.promiseUnzip(this.TMP_ZIP_NAME, ".", "UTF-8");
       if (!result) throw new Error($t("quick_install.unzipError"));
-      const config = JSON.parse(await fileManager.readFile(this.ZIP_CONFIG_JSON));
+      const config = JSON.parse(await fileManager.readFile(this.ZIP_CONFIG_JSON)) as InstanceConfig;
+
+      if (config.startCommand && config.startCommand.includes("{{java}}")) {
+        if (this.hasJava17()) {
+          config.startCommand = config.startCommand.replace("{{java}}", this.JAVA_17_PATH);
+        } else {
+          config.startCommand = config.startCommand.replace("{{java}}", "java");
+        }
+      }
+
       this.instance.parameters(config);
+
       this.stop();
     } catch (error) {
       this.error(error);
