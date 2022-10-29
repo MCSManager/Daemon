@@ -28,15 +28,22 @@ export abstract class AsyncTask extends EventEmitter implements IAsyncTask {
   protected _status = 0;
 
   public start() {
-    return this.onStarted();
+    const r = this.onStarted();
+    this.emit("started");
+    return r;
   }
+
   public stop() {
+    const r = this.onStopped();
     this.emit("stopped");
-    return this.onStopped();
+    return r;
   }
-  public error(err: any) {
+
+  public error(err: Error) {
     logger.error(`AsyncTask - ID: ${this.taskId} TYPE: ${this.type} Error:`, err);
+    this.onError(err);
     this.emit("error", err);
+
     this.stop();
   }
 
@@ -44,10 +51,10 @@ export abstract class AsyncTask extends EventEmitter implements IAsyncTask {
     return this._status;
   }
 
-  abstract onStarted(): Promise<boolean | void>;
-  abstract onStopped(): Promise<boolean | void>;
-  abstract onError(): void;
-  abstract toObject(): IAsyncTaskJSON;
+  public abstract onStarted(): Promise<boolean | void>;
+  public abstract onStopped(): Promise<boolean | void>;
+  public abstract onError(err: Error): void;
+  public abstract toObject(): IAsyncTaskJSON;
 }
 
 export class TaskCenter {

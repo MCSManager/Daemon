@@ -301,7 +301,8 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   // Start HiPer Network
   if (taskName === "hiper") {
     const indexCode = String(parameter.indexCode);
-    openHiPerTask(indexCode);
+    const task = openHiPerTask(indexCode);
+    return protocol.response(ctx, task.toObject());
   }
   protocol.response(ctx, true);
 });

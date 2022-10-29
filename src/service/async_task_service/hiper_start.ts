@@ -26,8 +26,9 @@ class HiPer {
     if (HiPer.hiperProcess) {
       throw new Error($t("quick_install.hiperError"));
     }
-    HiPer.hiperFilePath = path.normalize(path.join(process.cwd(), "lib", HiPer.hiperFileName));
-    HiPer.hiperProcess = spawn("hiper", ["-v", keyPath]);
+    HiPer.hiperFilePath = path.normalize(path.join(process.cwd(), "lib", "hiper", HiPer.hiperFileName));
+    // HiPer.hiperProcess = spawn("hiper", ["-v", keyPath]);
+    console.log("模拟启动成功");
   }
 
   public static stopHiPer() {
@@ -58,24 +59,21 @@ export class HiPerTask extends AsyncTask {
       await downloadFileToLocalFile(`${this.BASE_URL}/${this.indexCode}.yml`, this.KEY_YML);
 
       // Download hiper point.yml
-      await downloadFileToLocalFile(`${this.BASE_URL}/point.yml`, this.KEY_YML);
+      await downloadFileToLocalFile(`${this.BASE_URL}/point.yml`, this.POINT_YML);
 
       // The node information in point.yml is overwritten to key.yml
       let keyFile = fs.readFileSync(this.KEY_YML, "utf-8");
       const pointFile = fs.readFileSync(this.POINT_YML, "utf-8");
       const START_TEXT = ">>> AUTO SYNC AREA";
       const END_TEXT = "<<< AUTO SYNC AREA";
-      const start = pointFile.indexOf(START_TEXT);
-      const end = pointFile.indexOf(END_TEXT);
-      if (start > -1 && end > -1) {
-        const nodesText = pointFile.slice(start, end);
-        const p1 = keyFile.indexOf(START_TEXT);
-        const p2 = keyFile.indexOf(END_TEXT);
-        if (p1 >= 0 || p2 >= 0) {
-          keyFile = keyFile.replace(keyFile.slice(p1, p2), "");
-        }
-        keyFile += "\n" + nodesText;
+      const p1 = keyFile.indexOf(START_TEXT);
+      const p2 = keyFile.indexOf(END_TEXT);
+      if (p1 >= 0 || p2 >= 0) {
+        keyFile = keyFile.replace(keyFile.slice(p1, p2), "");
       }
+      keyFile += "\n\n" + pointFile;
+
+      fs.writeFileSync(this.KEY_YML, keyFile, "utf-8");
 
       // Start Command: hiper.exe -config .\key.yml
       HiPer.openHiPer(this.keyYmlPath);
@@ -89,7 +87,7 @@ export class HiPerTask extends AsyncTask {
     return null;
   }
 
-  onError(): void {}
+  onError(err: Error): void {}
 
   toObject(): IAsyncTaskJSON {
     return JSON.parse(
@@ -102,5 +100,7 @@ export class HiPerTask extends AsyncTask {
 }
 
 export function openHiPerTask(indexCode: string) {
-  TaskCenter.addTask(new HiPerTask(indexCode));
+  const task = new HiPerTask(indexCode);
+  TaskCenter.addTask(task);
+  return task;
 }

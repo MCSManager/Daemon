@@ -4,8 +4,10 @@ import path from "path";
 import fs from "fs-extra";
 import axios from "axios";
 import { pipeline, Readable } from "stream";
+import logger from "./log";
 
 export function downloadFileToLocalFile(url: string, localFilePath: string): Promise<boolean> {
+  logger.info(`Request file: ${url} --> ${path.normalize(localFilePath)}`);
   return new Promise(async (resolve, reject) => {
     const writeStream = fs.createWriteStream(path.normalize(localFilePath));
     const response = await axios<Readable>({
