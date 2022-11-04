@@ -22,7 +22,7 @@ export default class GeneralStopCommand extends InstanceCommand {
       await instance.exec(new SendCommand(stopCommand));
     }
 
-    instance.println("INFO", $t("general_stop.execCmd"));
+    instance.println("INFO", $t("general_stop.execCmd", { stopCommand }));
     const cacheStartCount = instance.startCount;
 
     // If the instance is still in the stopped state after 10 minutes, restore the state
