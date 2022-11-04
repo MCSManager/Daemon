@@ -9,6 +9,10 @@ export interface IInstanceDetail {
   info?: any;
 }
 
+export interface IJson<T> {
+  [key: string]: T;
+}
+
 // export interface IForwardInstanceIO {
 //   sourceSocket: Socket,
 //   targetUuid: string

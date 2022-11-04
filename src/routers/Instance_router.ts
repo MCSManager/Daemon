@@ -13,7 +13,7 @@ import StartCommand from "../entity/commands/start";
 import StopCommand from "../entity/commands/stop";
 import SendCommand from "../entity/commands/cmd";
 import KillCommand from "../entity/commands/kill";
-import { IInstanceDetail } from "../service/interfaces";
+import { IInstanceDetail, IJson } from "../service/interfaces";
 import { QueryMapWrapper } from "../common/query_wrapper";
 import ProcessInfoCommand from "../entity/commands/process_info";
 import FileManager from "../service/system_file";
@@ -342,10 +342,15 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
 // Query async task status
 routerApp.on("instance/query_asynchronous", (ctx, data) => {
   const taskId = data.parameter.taskId as string | undefined;
-  // const type = String(data.parameter.type) || QuickInstallTask.TYPE;
+  const taskName = data.taskName as string;
+  const taskNameTypeMap: IJson<string> = {
+    hiper: HiPerTask.TYPE,
+    quick_install: QuickInstallTask.TYPE
+  };
+  const type = String(taskNameTypeMap[taskName] || QuickInstallTask.TYPE);
   if (!taskId) {
     const result = [];
-    for (const task of TaskCenter.tasks) {
+    for (const task of TaskCenter.getTasks(type)) {
       result.push({
         taskId: task.taskId,
         status: task.status(),
