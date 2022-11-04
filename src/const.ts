@@ -9,5 +9,6 @@ const PTY_PATH = path.normalize(path.join(process.cwd(), "lib", ptyName));
 
 const FILENAME_BLACKLIST = ["\\", "/", ".", "'", '"', "?", "*", "<", ">"];
 
+const LOCAL_PRESET_LANG_PATH = path.normalize(path.join(process.cwd(), "language"));
 
-export { FILENAME_BLACKLIST, PTY_PATH };
+export { FILENAME_BLACKLIST, PTY_PATH, LOCAL_PRESET_LANG_PATH };

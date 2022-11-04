@@ -10,6 +10,8 @@ import { getVersion } from "../service/version";
 import { globalConfiguration } from "../entity/config";
 import i18next from "i18next";
 import logger from "../service/log";
+import fs from "fs-extra";
+import { LOCAL_PRESET_LANG_PATH } from "../const";
 
 // Get the basic information of the daemon system
 routerApp.on("info/overview", async (ctx) => {
@@ -41,6 +43,7 @@ routerApp.on("info/setting", async (ctx, data) => {
   try {
     logger.warn("Language change:", language);
     i18next.changeLanguage(language);
+    fs.remove(LOCAL_PRESET_LANG_PATH, () => {});
     globalConfiguration.config.language = language;
     globalConfiguration.store();
     protocol.response(ctx, true);

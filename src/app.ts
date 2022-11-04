@@ -1,8 +1,13 @@
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
+import http from "http";
+import fs from "fs-extra";
 import { $t, i18next } from "./i18n";
 import { getVersion, initVersionManager } from "./service/version";
 import { globalConfiguration } from "./entity/config";
+import { Server, Socket } from "socket.io";
+import { LOCAL_PRESET_LANG_PATH } from "./const";
+import logger from "./service/log";
 
 initVersionManager();
 const VERSION = getVersion();
@@ -18,25 +23,22 @@ __ / / / __ / _ \\_ __ __ \\ __ \\_ __ \\
 _ /_/ // /_/ // __/ / / / / / /_/ / / / /
 /_____/ \\__,_/ \\___//_/ /_/ /_/\\____//_/ /_/
 
- + Copyright 2022 MCSManager Dev <mcsmanager-dev@outlook.com>
+ + Copyright 2022 MCSManager Dev <https://github.com/mcsmanager>
  + Version ${VERSION}
 `);
-
-import http from "http";
-
-import { Server, Socket } from "socket.io";
-
-import logger from "./service/log";
 
 // Initialize the global configuration service
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// If language is not configured, get the system language
-const lang = config.language || "en_us";
-logger.info(`LANGUAGE: ${lang}`);
-i18next.changeLanguage(lang);
-
+// set language
+if (fs.existsSync(LOCAL_PRESET_LANG_PATH)) {
+  i18next.changeLanguage(fs.readFileSync(LOCAL_PRESET_LANG_PATH, "utf-8"));
+} else {
+  const lang = config.language || "en_us";
+  logger.info(`LANGUAGE: ${lang}`);
+  i18next.changeLanguage(lang);
+}
 logger.info($t("app.welcome"));
 
 import * as router from "./service/router";
@@ -55,7 +57,7 @@ const koaApp = koa.initKoa();
 
 // Listen for Koa errors
 koaApp.on("error", (error) => {
-  // Block all Koa framework level events
+  // Block all Koa framework error
   // When Koa is attacked by a short connection flood, it is easy for error messages to swipe the screen, which may indirectly affect the operation of some applications
 });
 
