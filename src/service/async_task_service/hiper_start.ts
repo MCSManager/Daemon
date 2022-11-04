@@ -39,8 +39,8 @@ class HiPer {
     });
 
     if (!HiPer.hiperProcess.pid) throw new Error("HiPer program start failed! Pid is null!");
-    process.stdout.on("data", (t) => console.log(t));
-    process.on("exit", () => {
+    // HiPer.hiperProcess.stdout.on("data", (text: Buffer) => {});
+    HiPer.hiperProcess.on("exit", (code) => {
       if (task) task.stop();
     });
   }
@@ -57,6 +57,7 @@ class HiPer {
 
 export class HiPerTask extends AsyncTask {
   public static readonly TYPE = "HiPerTask";
+  public static ip: string = null;
 
   public readonly KEY_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "config.yml"));
   public readonly POINT_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "point.yml"));
@@ -78,6 +79,7 @@ export class HiPerTask extends AsyncTask {
 
       // The node information in point.yml is overwritten to key.yml
       let keyFile = fs.readFileSync(this.KEY_YML, "utf-8");
+      const firstLine = keyFile.split("\n")[0];
       const pointFile = fs.readFileSync(this.POINT_YML, "utf-8");
       const START_TEXT = ">>> AUTO SYNC AREA";
       const END_TEXT = "<<< AUTO SYNC AREA";
@@ -89,6 +91,14 @@ export class HiPerTask extends AsyncTask {
       keyFile += "\n\n" + pointFile;
 
       fs.writeFileSync(this.KEY_YML, keyFile, "utf-8");
+
+      // parse ip
+      // TEXT: # This is the hiper minimization configuration file. - (6.0.0.28/7)
+      const pattern = /(\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})/g;
+      const ip = firstLine.match(pattern);
+      if (ip && ip.length > 0) {
+        HiPerTask.ip = ip[0];
+      }
 
       // Start Command: hiper.exe -config .\key.yml
       HiPer.openHiPer(this.KEY_YML, this);
@@ -108,7 +118,8 @@ export class HiPerTask extends AsyncTask {
     return JSON.parse(
       JSON.stringify({
         taskId: this.taskId,
-        status: this.status()
+        status: this.status(),
+        ip: HiPerTask.ip
       })
     );
   }
