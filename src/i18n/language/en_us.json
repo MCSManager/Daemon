@@ -9,8 +9,8 @@
     "doc": "Documentation：https://docs.mcsmanager.com/",
     "addr": "Access URL：http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
     "configPathTip": "Configuration file：data/Config/global.json",
-    "password": "Access key：{{key}}",
-    "passwordTip": "The access key served as the only access credential，please use the MCSManager WebPanel to connect.",
+    "password": "Access token：{{key}}",
+    "passwordTip": "The access token served as the only access credential，please use the MCSManager WebPanel to connect.",
     "exitTip": "Use Ctrl+C to close this program."
   },
   "common": {
@@ -176,7 +176,7 @@
   },
 
   "passport_router": {
-    "registerErr": "Invalid task name or empty key."
+    "registerErr": "Invalid task name or empty token."
   },
 
   "stream_router": {
