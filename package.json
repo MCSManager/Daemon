@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "start": "ts-node ./src/app.ts",
-    "build": "tsc && webpack --config webpack.config.js"
+    "build": "tsc && webpack --config webpack.config.js",
+    "dev": "nodemon --watch ./src/**/*.ts --exec ts-node ./src/app.ts"
   },
   "homepage": "https://mcsmanager.com/",
   "author": "https://github.com/unitwk",
@@ -34,8 +35,8 @@
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/archiver": "^5.3.1",
+    "@types/axios": "^0.14.0",
     "@types/dockerode": "^3.2.7",
     "@types/fs-extra": "^9.0.11",
     "@types/iconv-lite": "0.0.1",
@@ -49,6 +50,7 @@
     "@types/pidusage": "^2.0.1",
     "@types/uuid": "^8.3.0",
     "eslint": "^7.13.0",
+    "nodemon": "^2.0.20",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4",
     "webpack": "^5.73.0",

@@ -201,13 +201,15 @@ function hasGolangProcess() {
 
 // ./pty_linux_arm64 -m unzip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996/tmp.zip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996
 async function golangProcessUnzip(zipPath: string, destDir: string, fileCode: string = "utf-8") {
+  console.log("GO Zip Params", zipPath, destDir, fileCode);
   return await new CommandProcess(PTY_PATH, ["-coder", fileCode, "-m", "unzip", zipPath, destDir], ".", 60 * 30, {}).start();
 }
 
 async function golangProcessZip(files: string[], destZip: string, fileCode: string = "utf-8") {
-  const p = ["-coder", fileCode, "-m", "zip"];
-  p.concat(files);
+  let p = ["-coder", fileCode, "-m", "zip"];
+  p = p.concat(files);
   p.push(destZip);
+  console.log("GO Unzip Params", p);
   return await new CommandProcess(PTY_PATH, p, ".", 60 * 30, {}).start();
 }
 
