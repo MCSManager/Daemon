@@ -23,7 +23,7 @@ function checkFileName(fileName: string) {
   return true;
 }
 
-function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8") {
+function archiveZip(zipPath: string, files: string[], fileCode: string = "utf-8"): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const output = fs.createWriteStream(zipPath);
     const archive = archiver("zip", {
@@ -70,7 +70,7 @@ function archiveUnZip(sourceZip: string, destDir: string, fileCode: string = "ut
   });
 }
 
-export async function compress(sourceZip: string, files: string[], fileCode?: string) {
+export async function compress(sourceZip: string, files: string[], fileCode?: string): Promise<boolean> {
   // if (system === "linux" && haveLinuxZip()) return await linuxZip(sourceZip, files);
   // return await nodeCompress(sourceZip, files, fileCode);
   if (hasGolangProcess()) return golangProcessZip(files, sourceZip, fileCode);

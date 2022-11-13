@@ -140,15 +140,16 @@ routerApp.on("file/compress", async (ctx, data) => {
       globalEnv.fileTaskCount--;
     }
 
+    protocol.response(ctx, true);
+
     // start decompressing or compressing the file
     fileTaskStart();
     try {
       if (type === 1) {
-        fileManager.zip(source, targets, code);
+        await fileManager.promiseZip(source, targets, code);
       } else {
-        fileManager.unzip(source, targets, code);
+        await fileManager.promiseUnzip(source, targets, code);
       }
-      protocol.response(ctx, true);
     } catch (error) {
       throw error;
     } finally {

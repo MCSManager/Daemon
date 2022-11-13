@@ -10,7 +10,7 @@
   },
   "homepage": "https://mcsmanager.com/",
   "author": "https://github.com/unitwk",
-  "license": " Apache-2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@koa/router": "^10.0.0",

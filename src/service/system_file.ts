@@ -156,14 +156,7 @@ export default class FileManager {
       .catch(() => {});
   }
 
-  async promiseUnzip(sourceZip: string, destDir: string, code?: string): Promise<boolean> {
-    if (!code) code = this.fileCode;
-    if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
-    this.zipFileCheck(this.toAbsolutePath(sourceZip));
-    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
-  }
-
-  zip(sourceZip: string, files: string[], code?: string) {
+  zip(sourceZip: string, files: string[], code?: string, callback = (err: any, v?: boolean) => {}) {
     if (!code) code = this.fileCode;
     if (!this.checkPath(sourceZip)) throw new Error(ERROR_MSG_01);
     const MAX_ZIP_GB = globalConfiguration.config.maxZipFileSize;
@@ -181,8 +174,28 @@ export default class FileManager {
     }
     if (totalSize > MAX_TOTAL_FIELS_SIZE) throw new Error($t("system_file.unzipLimit", { max: MAX_ZIP_GB }));
     compress(sourceZipPath, filesPath, code)
-      .then(() => {})
-      .catch(() => {});
+      .then((v) => {
+        callback(null, v);
+      })
+      .catch((err) => {
+        callback(err);
+      });
+  }
+
+  async promiseUnzip(sourceZip: string, destDir: string, code?: string): Promise<boolean> {
+    if (!code) code = this.fileCode;
+    if (!this.check(sourceZip) || !this.checkPath(destDir)) throw new Error(ERROR_MSG_01);
+    this.zipFileCheck(this.toAbsolutePath(sourceZip));
+    return await decompress(this.toAbsolutePath(sourceZip), this.toAbsolutePath(destDir), code);
+  }
+
+  async promiseZip(sourceZip: string, files: string[], code?: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.zip(sourceZip, files, code, (err, v) => {
+        if (err) return reject(err);
+        resolve(v);
+      });
+    });
   }
 
   async edit(target: string, data?: string) {
