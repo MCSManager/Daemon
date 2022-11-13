@@ -12,7 +12,7 @@ const router = new Router();
 
 // Define the HTTP home page display route
 router.all("/", async (ctx) => {
-  ctx.body = "[MCSManager Daemon] Status: online | reference: https://docs.mcsmanager.com/";
+  ctx.body = "[MCSManager Daemon] Status: OK | reference: https://mcsmanager.com/";
   ctx.status = 200;
 });
 
