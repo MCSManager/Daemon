@@ -55,8 +55,8 @@ class HiPer {
   }
 }
 
-export class HiPerTask extends AsyncTask {
-  public static readonly TYPE = "HiPerTask";
+export class OpenFrpTask extends AsyncTask {
+  public static readonly TYPE = "OpenFrpTask";
   public static ip: string = null;
 
   public readonly KEY_YML = path.normalize(path.join(process.cwd(), "lib", "hiper", "config.yml"));
@@ -65,8 +65,8 @@ export class HiPerTask extends AsyncTask {
 
   constructor(public readonly indexCode: string) {
     super();
-    this.taskId = `${HiPerTask.TYPE}-${v4()}`;
-    this.type = HiPerTask.TYPE;
+    this.taskId = `${OpenFrpTask.TYPE}-${v4()}`;
+    this.type = OpenFrpTask.TYPE;
   }
 
   async onStarted(): Promise<boolean | void> {
@@ -97,7 +97,7 @@ export class HiPerTask extends AsyncTask {
       const pattern = /(\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})/g;
       const ip = firstLine.match(pattern);
       if (ip && ip.length > 0) {
-        HiPerTask.ip = ip[0];
+        OpenFrpTask.ip = ip[0];
       }
 
       // Start Command: hiper.exe -config .\key.yml
@@ -119,14 +119,14 @@ export class HiPerTask extends AsyncTask {
       JSON.stringify({
         taskId: this.taskId,
         status: this.status(),
-        ip: HiPerTask.ip
+        ip: OpenFrpTask.ip
       })
     );
   }
 }
 
-export function openHiPerTask(indexCode: string) {
-  const task = new HiPerTask(indexCode);
+export function openOpenFrpTask(indexCode: string) {
+  const task = new OpenFrpTask(indexCode);
   TaskCenter.addTask(task);
   return task;
 }
