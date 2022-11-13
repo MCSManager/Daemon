@@ -5,7 +5,6 @@ import os from "os";
 import Instance from "../../instance/instance";
 import logger from "../../../service/log";
 import fs from "fs-extra";
-
 import InstanceCommand from "../base/command";
 import EventEmitter from "events";
 import { IInstanceProcess } from "../../instance/interface";
