@@ -2,6 +2,7 @@
 
 import { $t } from "../../i18n";
 import yaml from "yaml";
+import toml from "@iarna/toml";
 import properties from "properties";
 import path from "path";
 import fs from "fs-extra";
@@ -29,6 +30,9 @@ export class ProcessConfig {
     if (this.iProcessConfig.type === "yml") {
       return yaml.parse(text);
     }
+    if (this.iProcessConfig.type == "toml") {
+      return toml.parse(text);
+    }
     if (this.iProcessConfig.type === "properties") {
       return properties.parse(text);
     }
@@ -41,10 +45,13 @@ export class ProcessConfig {
   }
 
   // Automatically save to the local configuration file according to the parameter object
-  write(object: Object) {
+  write(object: Object | toml.JsonMap) {
     let text = "";
     if (this.iProcessConfig.type === "yml") {
       text = yaml.stringify(object);
+    }
+    if (this.iProcessConfig.type === "toml") {
+      text = toml.stringify(<toml.JsonMap>object);
     }
     if (this.iProcessConfig.type === "properties") {
       text = properties.stringify(object);

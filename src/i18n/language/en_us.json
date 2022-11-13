@@ -1,241 +1,253 @@
 {
   "app": {
     "welcome": "Welcome to the MCSManager daemon",
-    "instanceLoad": "All application instances loaded, total {{n}}",
-    "instanceLoadError": "Failed to read local instance file:",
+    "instanceLoad": "Loaded {{n}} instances.",
+    "instanceLoadError": "Failed to load local instance file:",
     "sessionConnect": "Session {{ip}} {{uuid}} connected",
-    "sessionDisconnect": "Session {{ip}} {{uuid}} disconnected",
-    "started": "The daemon has now been successfully started",
-    "doc": "Reference documentation: https://docs.mcsmanager.com/",
-    "addr": "Access address: http://<IP address>:{{port}}/ or ws://<IP address>:{{port}}",
-    "configPathTip": "Configuration file: data/Config/global.json",
-    "password": "Access key: {{key}}",
-    "passwordTip": "Key as the only authentication method, please use the node function connection program of the MCSManager panel",
-    "exitTip": "You can use the Ctrl+C shortcut to close the program"
+    "sessionDisconnect": "session {{ip}} {{uuid}} disconnected",
+    "started": "Daemon ",
+    "doc": "Documentation：https://docs.mcsmanager.com/",
+    "addr": "Access URL：http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
+    "configPathTip": "Configuration file：data/Config/global.json",
+    "password": "Access token：{{key}}",
+    "passwordTip": "The access token served as the only access credential，please use the MCSManager WebPanel to connect.",
+    "exitTip": "Use Ctrl+C to close this program."
   },
   "common": {
     "title": "Title",
     "_7zip": "[7zip compression task]",
-    "_7unzip": "[7zip unzip task]",
-    "killProcess": "The process {{pid}} has been force-killed using a system command",
-    "uuidIrregular": "UUID {{uuid}} does not conform to the specification"
+    "_7unzip": "[7zip decompression task]",
+    "killProcess": "Forced kill process {{pid}}",
+    "uuidIrregular": "Invalid UUID {{uuid}}."
   },
 
   "command": {
-    "quotes": "Incorrect command double quotes, can't find pairs of double quotes, if you want to use a single double quote please use the {quotes} symbol",
-    "errLen": "Wrong command length, please make sure the command format is correct",
-    "instanceNotOpen": "The command execution failed because the actual process of the instance does not exist"
+    "quotes": "Unpaired quotes，use {quotes} to bypass the limit.",
+    "errLen": "Incorrect command length, please double check your command format.",
+    "instanceNotOpen": "Failed to execute command, could not find the instance process."
   },
+
   "instance": {
-    "dirEmpty": "Start command, I/O encoding or working directory is empty",
-    "dirNoE": "Working directory does not exist",
+    "dirEmpty": "start command, I/O encoding, or working directory is empty.",
+    "dirNoE": "The working directory does not exist.",
     "invalidCpu": "Illegal CPU core specification {{v}}",
     "invalidContainerName": "Invalid container name {{v}}",
     "successful": "Instance {{v}} started successfully"
   },
+
   "start": {
-    "instanceNotDown": "The instance is not in a shutdown state and cannot be started again",
-    "instanceMaturity": "The instance usage expiration time has expired, and the instance cannot be started again",
-    "startInstance": "Starting instance..."
+    "instanceNotDown": "Could not start instance: already running.",
+    "instanceMaturity": "Could not start instance: instance expired.",
+    "startInstance": "starting instance..."
   },
+
   "restart": {
-    "start": "Restart the instance plan to start executing",
-    "error1": "The state of restarting the instance is incorrect, the instance has already been started, and the restart plan of the last state is canceled",
-    "error2": "The status of the restarting instance is incorrect. The status of the instance should be in the stopped state, and now it is running. The restart plan is canceled",
-    "restarting": "Detected server stopped, restarting instance..."
+    "start": "Executing scheduled restart.",
+    "error1": "Error restarting instance: instance has already been restarted. Restart of last state cancelled.",
+    "error2": "Error restarting instance: incorrect instance status (expected: stopping, actual: running), restart cancelled.",
+    "restarting": "Detected an unexpected server stop, restarting..."
   },
 
   "general_start": {
-    "instanceConfigErr": "Start command, I/O code or working directory is empty",
-    "cwdPathNotExist": "The working directory does not exist",
-    "cmdEmpty": "Unable to start instance, start command is empty",
+    "instanceConfigErr": "Start command，I/O encoding, or working directory is empty.",
+    "cwdPathNotExist": "The working directory does not exist.",
+    "cmdEmpty": "Unable to start instance: empty start command.",
     "startInstance": "Session {{source}}: Request to start instance.",
     "instanceUuid": "Instance identifier: [{{uuid}}]",
     "startCmd": "Start command: {{cmdList}}",
     "cwd": "Working directory: {{cwd}}",
-    "pidErr": "Detected instance process/container startup failure (PID is empty), the possible reasons are:\n1. The instance startup command is written incorrectly. Please go to the instance setting interface to check the startup command and parameters.\n2. The system host environment is incorrect or missing, such as the Java environment.\n\nNative startup command:\n{{startCommand}}\n\nStart command parsing body:\nProgram: {{commandExeFile}}\nParameters: {{commandParameters}}\n\nPlease report this information to an administrator, technician, or troubleshoot yourself. ",
-    "startErr": "The instance failed to start, please check the startup command, host environment and configuration file, etc.",
-    "startSuccess": "Instance {{instanceUuid}} successfully started PID: {{pid}}.",
-    "startOrdinaryTerminal": "The application instance is running, and the terminal is in normal terminal mode. You can send commands in the command input box at the bottom. Function keys such as Ctrl and Tab are not supported."
+    "pidErr": "Failed to start instance/container (empty PID)，Possible cause:\n1. Incorrect start command，please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command：\n{{startCommand}}\n\nStart command parsing body:\nProgram：{{commandExeFile}}\nParameter(s)：{{commandParameters}}\n\nPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.",
+    "startErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
+    "startSuccess": "Instance {{instanceUuid}} started, PID: {{pid}}",
+    "startOrdinaryTerminal": "Instance running. You can use command at the input box located at the bottom. If you need to use function keys like CTRL or TAB, please enable the emulation mode  in terminal settings."
   },
 
   "general_stop": {
-    "notRunning": "The instance is not running and cannot be stopped.",
-    "execCmd": "The default shutdown command has been executed: {{stopCommand}}\nIf the instance cannot be shut down, please go to the instance settings to change the correct command to shut down the instance, such as ^C, stop, end, etc.",
-    "stopErr": "The shutdown command has been issued but the instance has not been shut down for a long time. It may be caused by an error in the instance shutdown command or the suspended process of the instance. Now it will return to the running state. You can use the forced termination command to end the process."
+    "notRunning": "Failed to stop instance: not running.",
+    "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
+    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
 
   "general_update": {
-    "statusErr_notStop": "The instance status is incorrect, the update task cannot be performed, and the instance must be stopped",
-    "statusErr_otherProgress": "Instance status is incorrect, other tasks are running",
-    "readyUpdate": "Instance {{instanceUuid}} is preparing for an update operation...",
-    "updateCmd": "The instance {{instanceUuid}} executes the update command as follows:",
-    "cmdFormatErr": "Update command format error, please contact administrator",
+    "statusErr_notStop": "Unable to update: incorrect instance status, it has to be stopped first.",
+    "statusErr_otherProgress": "Incorrect instance status: other task(s) running.",
+    "readyUpdate": "Instance {{instanceUuid}} is preparing an update...",
+    "updateCmd": "Instance {{instanceUuid}} execute the following update command(s):",
+    "cmdFormatErr": "pdate command format error, please contact system administrator",
     "err": "Error",
-    "updateFailed": "The update failed, the update command failed to start, please contact the administrator",
+    "updateFailed": "Update failed: the update command failed to start, please contact system administrator.",
     "update": "Update",
-    "updateSuccess": "Update succeeded!",
-    "updateErr": "The update process is over, but the result is incorrect, maybe the file update is damaged or the network is not smooth",
+    "updateSuccess": "Successfully updated！",
+    "updateErr": "Update finished with incorrect result. Possibly due to damaged file(s) or network status.",
     "error": "Update error: {{err}}",
-    "terminateUpdate": "The user requested to terminate the update asynchronous task of instance {{instanceUuid}}",
-    "killProcess": "Force killing the task process..."
+    "terminateUpdate": "User request to stop the async update task for instance: {{instanceUuid}}",
+    "killProcess": "Killing task process..."
   },
 
   "pty_start": {
-    "cmdErr": "Start command, I/O encoding or working directory is empty",
-    "cwdNotExist": "Working directory does not exist",
-    "startPty": "Session {{source}}: request to start an instance, the mode is an emulated terminal",
-    "startErr": "Failed to emulate terminal mode, maybe the dependent program does not exist, it has been automatically downgraded to normal terminal mode...",
-    "notSupportPty": "Failed to emulate terminal mode, the unsupported architecture or system has been automatically downgraded to normal terminal mode...",
-    "cmdEmpty": "Unable to start instance, start command is empty",
-    "sourceRequest": "Session {{source}}: Request to open instance.",
-    "instanceUuid": "Instance identifier: [{{instanceUuid}}]",
+    "cmdErr": "Start command，I/O encoding, or working directory is empty.",
+    "cwdNotExist": "The working directory does not exist.",
+    "startPty": "Session {{source}}: request to start instance in emulation terminal.",
+    "startErr": "Failed to start emulation terminal: Lack of dependencies. Fall back to general terminal.",
+    "notSupportPty": "Failed to start emulation terminal: Unsupported system or architecture. Fall back to general terminal.",
+    "cmdEmpty": "Unable to start instance，empty startup command.",
+    "sourceRequest": "Session {{source}}: request to start instance.",
+    "instanceUuid": "Instance Identifier: [{{instanceUuid}}]",
     "startCmd": "Start command: {{cmd}}",
-    "ptyPath": "PTY path: {{path}}",
-    "ptyParams": "PTY parameters: {{param}}",
+    "ptyPath": "PTY Path: {{path}}",
+    "ptyParams": "PTY parameter: {{param}}",
     "ptyCwd": "Working directory: {{cwd}}",
-    "pidErr": "Detected instance process/container startup failure (PID is empty), the possible reasons are:\n1. The instance startup command is written incorrectly. Please go to the instance setting interface to check the startup command and parameters.\n2. The system host environment is incorrect or missing, such as the Java environment.\n\nNative startup command:\n{{startCommand}}\n\nEmulated terminal transfer command:\nProgram: {{path}}\nParameters: {{params}}\n\nPlease report this information to an administrator, technician, or troubleshoot yourself.\nIf you think the problem is caused by the panel emulation terminal, please turn off the \"emulate terminal\" option in the terminal settings on the left, and we will use the original input and output stream to monitor the program. ",
-    "instanceStartErr": "The instance failed to start, please check the startup command, host environment and configuration file, etc.",
-    "startSuccess": "Instance {{instanceUuid}} successfully started PID: {{pid}}.",
-    "startEmulatedTerminal": "Full emulated terminal mode has taken effect. You can directly input content in the terminal and use function keys such as Ctrl and Tab.",
-    "mustAbsolutePath": "The working directory of the emulation terminal must use the absolute path. Please go to the instance setting interface to reset the working path to the absolute path."
+    "pidErr": "Failed to start instance/container (empty PID)，Possible cause:\n1. Incorrect start command，please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command：\n{{startCommand}}\n\nEmulation terminal tranPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.\nIf you think this is a panel issue, please switch back to general terminal mode by disabling the emulation mode.",
+    "instanceStartErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
+    "startSuccess": "Instance {{instanceUuid}} Successfullly started PID: {{pid}}",
+    "startEmulatedTerminal": "Active emulation terminal, you can use function keys (like CTRL, TAB) directly.",
+    "mustAbsolutePath": "In order to use the emulation terminal, you must use absolute path for your instance."
   },
 
   "pty_stop": {
-    "notRunning": "The instance is not running and cannot be stopped.",
-    "execCmd": "The default shutdown command has been executed: {{stopCommand}}\nIf the instance cannot be shut down, please go to the instance settings to change the correct command to shut down the instance, such as exit, stop, end, etc.",
-    "stopErr": "The shutdown command has been issued but the instance has not been shut down for a long time. It may be caused by an error in the instance shutdown command or the suspended process of the instance. Now it will return to the running state. You can use the forced termination command to end the process."
+    "notRunning": "Failed to stop: not running.",
+    "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
+    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
 
   "instanceConf": {
-    "initInstanceErr": "Failed to initialize instance, unique identifier or configuration parameter is empty",
-    "cantModifyInstanceType": "This instance type cannot be modified while running",
-    "cantModifyProcessType": "This instance process type cannot be modified while it is running",
-    "cantModifyPtyModel": "Can't modify PTY model while running",
-    "ptyNotExist": "Unable to enable terminal emulation because the {{path}} attached program does not exist, you can contact the administrator to restart the Daemon program to reinstall (Linux only)",
-    "instanceLock": "This {{info}} operation cannot be performed because the instance is locked, please try again later.",
-    "instanceBusy": "The current instance is busy and cannot perform any operations.",
-    "info": "Information",
+    "initInstanceErr": "Failed to initialize instance: empty identifier or configuration.",
+    "cantModifyInstanceType": "Unable change instance type: instance running.",
+    "cantModifyProcessType": "Unable to change instance process type: instance running.",
+    "cantModifyPtyModel": "Unable to change PTY mode: instance running.",
+    "ptyNotExist": "Unable to use emulation terminal: {{path}}  dependencies not exist. Youcan contact system administrator to install it by restarting the Daemon under Linux environment.",
+    "instanceLock": "Failed to execute operation {{info}} : instance locked, please try again later.",
+    "instanceBusy": "Instance busy, unable to perform any actions.",
+    "info": "Info",
     "error": "Error",
-    "autoRestart": "Detected instance shutdown, according to the active event mechanism, the automatic restart command has been issued...",
-    "autoRestartErr": "Auto restart error: {{err}}",
-    "instantExit": "Detected that the instance exited within a very short period of time after starting. The reason may be that your start command is wrong or the configuration file is wrong."
+    "autoRestart": "Unexpected stop detected, restarting...",
+    "autoRestartErr": "Failed to auto restart: {{err}}",
+    "instantExit": "Instance exited short after started, might be due to a wrong start command or configuration."
   },
 
   "preset": {
-    "actionErr": "The default command {{action}} is not available"
+    "actionErr": "Pre-defined command {{action}} unavailable."
   },
 
   "process_config": {
-    "writeEmpty": "The write content is empty, maybe the configuration file type is not supported"
+    "writEmpty": "Empty write content: might be due to unsupported file type."
   },
 
   "mc_update": {
-    "updateInstance": "Update instance..."
+    "updateInstance": "Update instance....."
   },
 
   "auth_router": {
-    "notAccess": "The session {{id}}({{address}}) attempted to access {{event}} without permission and is now blocked.",
-    "illegalAccess": "Insufficient permissions, illegal access",
-    "access": "Session {{id}}({{address}}) authenticated successfully",
-    "disconnect": "Session {{id}}({{address}}) disconnected due to long unauthenticated identity"
+    "notAccess": "Blocked an un authorized access from session {{id}}({{address}}) to {{event}}.",
+    "illegalAccess": "Insufficient permission, illegal access.",
+    "access": "Session {{id}}({{address}}) authenticated.",
+    "disconnect": "Session {{id}}({{address}}) disconnected due to authentication timed out."
   },
 
   "environment_router": {
-    "dockerInfoErr": "Unable to get image information, please make sure you have installed the Docker environment correctly",
-    "crateImage": "The daemon is creating the image {{name}}:{{tag}} DockerFile as follows:\n{{dockerFileText}}\n",
-    "crateSuccess": "Creating image {{name}}:{{tag}} completed",
-    "crateErr": "Create image {{name}}:{{tag}} error:{{error}}",
-    "delImage": "The daemon is deleting the image {{imageId}}"
+    "dockerInfoErr": "Unable to get image information, please make sure docker was correctly installed.",
+    "crateImage": "Daemon is creating image {{name}}:{{tag}} DockerFile as:\n{{dockerFileText}}\n",
+    "crateSuccess": "Image creation {{name}}:{{tag}} success",
+    "crateErr": "Image creation {{name}}:{{tag}} error:{{error}}",
+    "delImage": "Daemon is deleting image {{imageId}}"
   },
 
   "file_router": {
-    "instanceNotExist": "Instance {{instanceUuid}} does not exist",
-    "unzipLimit": "Exceeded the maximum number of simultaneous decompression tasks, the maximum allowed {{maxFileTask}}, there are currently {{fileLock}} tasks in progress, please be patient"
+    "instanceNotExist": "Instance {{instanceUuid}} does not exist.",
+    "unzipLimit": "Exceeded the maximum allowed decompresson tasks. Limit: {{maxFileTask}}，currently running: {{fileLock}}. Please wait patiently."
   },
 
   "http_router": {
-    "instanceNotExist": "Instance does not exist",
-    "fileNameNotSpec": "User file download name does not conform to the specification",
+    "instanceNotExist": "Instance doesn't exist.",
+    "fileNameNotSpec": "File requested by user does not conform to hte specification.",
     "downloadErr": "Download error: {{error}}",
-    "updateErr": "Unknown reason: upload failed"
+    "updateErr": "Unkonwn reason: Upload error"
   },
 
   "Instance_router": {
-    "requestIO": "Session {{id}} requests forwarding instance {{targetInstanceUuid}} IO stream",
-    "cancelIO": "Session {{id}} requests to cancel forwarding instance {{targetInstanceUuid}} IO stream",
-    "openInstanceErr": "Error starting instance {{instanceUuid}}: ",
-    "performTasks": "Session {{id}} asks instance {{uuid}} to perform async {{taskName}} async tasks",
-    "performTasksErr": "Instance {{uuid}} {{taskName}} asynchronous task execution exception: {{err}}",
-    "taskEmpty": "No asynchronous tasks are running",
-    "accessFileErr": "File does not exist or path is wrong, file access is denied",
-    "terminalLogNotExist": "The terminal log file does not exist"
+    "requestIO": "Session {{id}} Request to redirect I/O stream of instance {{targetInstanceUuid}}",
+    "cancelIO": "Session {{id}} Request to stop redirect I/O stream of instance {{targetInstanceUuid}}",
+    "openInstanceErr": "Error starting instance {{instanceUuid}} : ",
+    "performTasks": "Session {{id}} asks instance {{uuid}} to execute async task:  {{taskName}}",
+    "performTasksErr": "instance {{uuid}} reported an error while executing async task {{taskName}} error: {{err}}",
+    "taskEmpty": "No async task running",
+    "accessFileErr": "Access denied due to path error or non-existent file.",
+    "terminalLogNotExist": "terminal log file does not exist."
   },
 
   "passport_router": {
-    "registerErr": "undefinable task name or key is empty"
+    "registerErr": "Invalid task name or empty token."
   },
 
   "stream_router": {
-    "unauthorizedAccess": "Insufficient permissions, illegal access",
-    "taskNotExist": "Task does not exist",
-    "instanceNotExist": "Instance does not exist",
-    "authSuccess": "Session {{id}} {{address}} dataflow channel authentication succeeded",
-    "establishConnection": "Session {{id}} {{address}} has established a data channel with {{uuid}}",
-    "disconnect": "Session {{id}} {{address}} has disconnected data channel from {{instanceUuid}}"
+    "unauthorizedAccess": "Insufficient perission, Illegal access.",
+    "taskNotExist": "Task not exist.",
+    "instanceNotExist": "Instance does not exist.",
+    "authSuccess": "Session {{id}} {{address}} I/O channel authenticated.",
+    "establishConnection": "Established data channel between session {{id}} {{address}} and {{uuid}}",
+    "disconnect": "Session {{id}} {{address}} disconnected from {{uuid}}"
   },
 
   "file_router_service": {
-    "instanceNotExit": "Instance {{uuid}} does not exist"
+    "instanceNotExit": "Instance {{uuid}} does not exist."
   },
 
   "install": {
-    "ptyNotSupportSystem": "The emulated terminal can only support the Windows/Linux x86_64 architecture and has been automatically downgraded to a normal terminal",
-    "ptySupport": "Identified optional dependency library installation, emulated terminal function is available",
-    "skipInstall": "Detected that the system is not a Linux system, and automatically skips the installation of dependent libraries",
-    "installed": "Optional dependencies have been installed automatically, terminal emulation and some advanced functions have been automatically enabled",
-    "guide": "Dependency program reference: https://github.com/mcsmanager/pty",
-    "changeModeErr": "Failed to modify the permission of the file {{path}}, please manually set it to above chmod 755",
-    "installErr": "Failed to install the optional dependency library, the full emulated terminal and some optional functions will not be available, which will not affect normal functions, and will try to install it at the next startup"
+    "ptyNotSupportSystem": "Emulation terminal can only support Windows/Linux x86_64 architecture, fall back to general terminal.",
+    "ptySupport": "Found installed dependencies, emulation terminal is available now.",
+    "skipInstall": "Non-Linux environment, skipping dependencies installation.",
+    "installed": "Optional depencies installed, emulation terminal and some advanced features are now available.",
+    "guide": "Dependency reference: https://github.com/mcsmanager/pty",
+    "changeModeErr": "Failed to change permission of {{path}} .Please set it to chmod 755 or above manually.",
+    "installErr": "Dependencies installation failed. Emulation terminal and some advancced features are not available. The installation task will be retried on next start."
   },
 
   "protocol": {
-    "socketErr": "Exception in session {{id}}({{address}})/{{event}} response data:\n"
+    "socketErr": "Invalid response from session {{id}}({{address}})/{{event}} :\n"
   },
 
   "router": {
-    "initComplete": "All functional modules and permission firewalls have been initialized"
+    "initComplete": "Initialization complete."
   },
 
   "system_file": {
-    "illegalAccess": "Illegal access path",
-    "unzipLimit": "File decompression only supports decompression of files with a maximum size of {{max}}GB. To change the upper limit, please go to the data/Config/global.json file",
-    "execLimit": "Maximum file edit limit exceeded"
+    "illegalAccess": "Illegal access directory.",
+    "unzipLimit": "File decompression only support file size up to {{max}}GB . You can change this limit in data/Config/global.json",
+    "execLimit": "Exceeded the maximum file edit size limit."
   },
 
   "system_instance_control": {
-    "execLimit": "Cannot continue to create scheduled tasks to reach the limit",
-    "existRepeatTask": "A repeating task already exists",
-    "illegalName": "Illegal program name, only supports underscores, numbers, letters and some local languages",
+    "execLimit": "Unable to create scheduled task: limit reached.",
+    "existRepeatTask": "A duplicate task already exists",
+    "illegalName": "Illegal task name. Only underscore, digit, and letters are supported.",
     "crateTask": "Create scheduled task {{name}}:\n{{task}}",
-    "crateTaskErr": "Scheduled task creation error, incorrect time expression: \n{{name}}: {{timeArray}}\nPlease try to delete the data/TaskConfig/{{name}}.json file to resolve this issue",
-    "crateSuccess": "Creating scheduled task {{name}} completed",
-    "execCmdErr": "Instance {{uuid}} scheduled task {{name}} executed error: \n {{error}}"
+    "crateTaskErr": "Error on creating scheduled task: incorrect time expression: \n{{name}}: {{timeArray}}\nPlease try remove file data/TaskConfig/{{name}}.json",
+    "crateSuccess": "Successfully created schedule task: {{name}}",
+    "execCmdErr": "Error on executing scheduled task {{name}} for instance {{uuid}}. Error: \n {{error}}"
   },
 
   "system_instance": {
-    "autoStart": "Instance {{name}} {{uuid}} autostart command has been issued",
-    "autoStartErr": "Instance {{name}} {{uuid}} autostart error: {{reason}}",
-    "readInstanceFailed": "Failed to read {{uuid}} application instance: {{error}}",
-    "checkConf": "Please check or delete the file: data/InstanceConfig/{{uuid}}.json",
-    "uuidEmpty": "Cannot add an instance because the instance UUID is empty"
+    "autoStart": "Sent an auto start command to instance {{name}} {{uuid}} ",
+    "autoStartErr": "Error while auto starting instance: {{name}} {{uuid}} Reason: {{reason}}",
+    "readInstanceFailed": "Failed to read application instance {{uuid}} Error: {{error}}",
+    "checkConf": "Please verify or delete file：data/InstanceConfig/{{uuid}}.json",
+    "uuidEmpty": "Unable to create new instance: empty UUID."
   },
 
   "ui": {
-    "help": "[terminal] The daemon has basic interactive functions, please type \"help\" for more information"
+    "help": "[Terminal] MCSManager Daemon is able to perform operations. Use \"help\" for more information."
   },
 
   "version": {
-    "versionDetectErr": "Version check failed"
+    "versionDetectErr": "Version check failed."
+  },
+
+  "quick_install": {
+    "unzipError": "Failed decompress file.",
+    "hiperError": "Unable to start another HiPer process: HiPer is running.！"
+  },
+
+  "hiper": {
+    "alreadyExist": "Unable to start multiple HiPer process: HiPer is running."
   }
 }
