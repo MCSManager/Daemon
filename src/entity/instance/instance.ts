@@ -27,38 +27,28 @@ interface IInstanceInfo {
 
 // instance class
 export default class Instance extends EventEmitter {
-  // instance class state constants
   public static readonly STATUS_BUSY = -1;
   public static readonly STATUS_STOP = 0;
   public static readonly STATUS_STOPPING = 1;
   public static readonly STATUS_STARTING = 2;
   public static readonly STATUS_RUNNING = 3;
 
-  // instance type constant
-  public static readonly TYPE_UNIVERSAL = "universal"; // Universal input and output program
+  public static readonly TYPE_UNIVERSAL = "universal";
+  public static readonly TYPE_MINECRAFT_JAVA = "minecraft/java";
+  public static readonly TYPE_MINECRAFT_BEDROCK = "minecraft/bedrock";
 
-  // Minecraft server type
-  public static readonly TYPE_MINECRAFT_JAVA = "minecraft/java"; // Universal server for Minecraft PC version
-  public static readonly TYPE_MINECRAFT_BEDROCK = "minecraft/bedrock"; // Minecraft Bedrock Edition
-
-  // Instance basic properties, no need to persist
   public instanceStatus: number;
   public instanceUuid: string;
   public lock: boolean;
   public startCount: number;
   public startTimestamp: number = 0;
-  // ongoing asynchronous task
   public asynchronousTask: IExecutable = null;
 
-  // Life cycle tasks, timed task manager
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);
-  // default command manager
   public readonly presetCommandManager = new PresetCommandManager(this);
 
-  // The instance needs to be persisted and used as the configured entity class
   public config: InstanceConfig;
 
-  // The instance does not need to persist the specific information saved
   public info: IInstanceInfo = {
     currentPlayers: -1,
     maxPlayers: -1,
@@ -67,7 +57,6 @@ export default class Instance extends EventEmitter {
     playersChart: []
   };
 
-  // the real process of the instance
   public process: IInstanceProcess;
 
   // When initializing an instance, the instance must be initialized through uuid and configuration class, otherwise the instance will be unavailable

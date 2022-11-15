@@ -34,7 +34,7 @@ _  /_/ // /_/ //  __/  / / / / / /_/ /  / / /
 globalConfiguration.load();
 const config = globalConfiguration.config;
 
-// set language
+// Set language
 if (fs.existsSync(LOCAL_PRESET_LANG_PATH)) {
   i18next.changeLanguage(fs.readFileSync(LOCAL_PRESET_LANG_PATH, "utf-8"));
 } else {
@@ -52,7 +52,7 @@ import { initDependent } from "./service/install";
 import "./service/async_task_service";
 import "./service/async_task_service/quick_install";
 
-// initialize optional dependencies asynchronously
+// Initialize optional dependencies
 initDependent();
 
 // Initialize HTTP service
@@ -80,7 +80,7 @@ const io = new Server(httpServer, {
   }
 });
 
-// Initialize application instance system & load application instance
+// Initialize application instance system
 try {
   InstanceSubsystem.loadInstances();
   logger.info($t("app.instanceLoad", { n: InstanceSubsystem.instances.size }));
@@ -89,18 +89,13 @@ try {
   process.exit(-1);
 }
 
-// Register for Websocket connection events
+// Initialize Websocket server
 io.on("connection", (socket: Socket) => {
   logger.info($t("app.sessionConnect", { ip: socket.handshake.address, uuid: socket.id }));
 
-  // Join the global Socket object
   protocol.addGlobalSocket(socket);
-
-  // Socket.io request is forwarded to the custom routing controller
   router.navigation(socket);
 
-  // Disconnect event
-  // Remove from the global Socket object
   socket.on("disconnect", () => {
     protocol.delGlobalSocket(socket);
     for (const name of socket.eventNames()) socket.removeAllListeners(name);
@@ -126,9 +121,6 @@ logger.info($t("app.passwordTip"));
 logger.info($t("app.exitTip"));
 logger.info("----------------------------");
 console.log("");
-
-// Load the terminal interface UI
-// import "./service/ui";
 
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
   process.on(sig, async function () {
