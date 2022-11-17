@@ -16,6 +16,8 @@ import { IInstanceProcess } from "./interface";
 import StartCommand from "../commands/start";
 import { configureEntityParams } from "../../common/typecheck";
 import { PTY_PATH } from "../../const";
+import { OpenFrp } from "../commands/task/openfrp";
+
 // The instance does not need to store additional information persistently
 interface IInstanceInfo {
   currentPlayers: number;
@@ -23,6 +25,7 @@ interface IInstanceInfo {
   version: string;
   fileLock: number;
   playersChart: Array<{ value: string }>;
+  openFrpStatus: boolean;
 }
 
 // instance class
@@ -43,6 +46,7 @@ export default class Instance extends EventEmitter {
   public startCount: number;
   public startTimestamp: number = 0;
   public asynchronousTask: IExecutable = null;
+  public openFrp: OpenFrp;
 
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);
   public readonly presetCommandManager = new PresetCommandManager(this);
@@ -54,7 +58,8 @@ export default class Instance extends EventEmitter {
     maxPlayers: -1,
     version: "",
     fileLock: 0,
-    playersChart: []
+    playersChart: [],
+    openFrpStatus: false
   };
 
   public process: IInstanceProcess;

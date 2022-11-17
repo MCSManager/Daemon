@@ -6,15 +6,18 @@ import os from "os";
 import child_process from "child_process";
 import path from "path";
 import EventEmitter from "events";
+import iconv from "iconv-lite";
 
-export class CommandProcess extends EventEmitter {
+export class processWrapper extends EventEmitter {
   public process: ChildProcess;
+  public pid: number;
 
   constructor(
     public readonly file: string,
     public readonly args: string[],
     public readonly cwd: string,
-    public readonly timeout = 60 * 10,
+    public readonly timeout: number = null,
+    public readonly code = "utf-8",
     public readonly option: SpawnOptionsWithoutStdio = {}
   ) {
     super();
@@ -30,10 +33,13 @@ export class CommandProcess extends EventEmitter {
         ...this.option
       });
       this.process = process;
+      this.pid = process.pid;
+
+      process.emit("start", process.pid);
       if (!process || !process.pid) return reject(false);
 
-      process.stdout.on("data", (text) => this.emit("data", text));
-      process.stderr.on("data", (text) => this.emit("data", text));
+      process.stdout.on("data", (text) => this.emit("data", iconv.decode(text, this.code)));
+      process.stderr.on("data", (text) => this.emit("data", iconv.decode(text, this.code)));
       process.on("exit", (code) => {
         try {
           this.emit("exit", code);
@@ -45,15 +51,33 @@ export class CommandProcess extends EventEmitter {
       });
 
       // timeout, terminate the task
-      timeTask = setTimeout(() => {
-        killProcess(process.pid, process);
-        reject(false);
-      }, 1000 * this.timeout);
+      if (this.timeout) {
+        timeTask = setTimeout(() => {
+          killProcess(process.pid, process);
+          reject(false);
+        }, 1000 * this.timeout);
+      }
     });
+  }
+
+  public getPid() {
+    return this.process.pid;
+  }
+
+  public write(data?: string) {
+    return this.process.stdin.write(iconv.encode(data, this.code));
   }
 
   public kill() {
     killProcess(this.process.pid, this.process);
+  }
+
+  public status() {
+    return this.process.exitCode == null;
+  }
+
+  public exitCode() {
+    return this.process.exitCode;
   }
 
   private async destroy() {
@@ -61,7 +85,7 @@ export class CommandProcess extends EventEmitter {
       for (const n of this.eventNames()) this.removeAllListeners(n);
       if (this.process.stdout) for (const eventName of this.process.stdout.eventNames()) this.process.stdout.removeAllListeners(eventName);
       if (this.process.stderr) for (const eventName of this.process.stderr.eventNames()) this.process.stderr.removeAllListeners(eventName);
-      if (this.process) for (const eventName of this.process.eventNames()) this.process.stdout.removeAllListeners(eventName);
+      if (this.process) for (const eventName of this.process.eventNames()) this.process.removeAllListeners(eventName);
       this.process?.stdout?.destroy();
       this.process?.stderr?.destroy();
       if (this.process?.exitCode === null) {
@@ -69,7 +93,7 @@ export class CommandProcess extends EventEmitter {
         this.process.kill("SIGKILL");
       }
     } catch (error) {
-      console.log("[CommandProcess destroy() Error]", error);
+      console.log("[ProcessWrapper destroy() Error]", error);
     } finally {
       this.process = null;
     }

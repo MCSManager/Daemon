@@ -8,7 +8,7 @@ import child_process from "child_process";
 import os from "os";
 import archiver from "archiver";
 import StreamZip, { async } from "node-stream-zip";
-import { CommandProcess } from "./process_tools";
+import { processWrapper } from "./process_tools";
 import { PTY_PATH } from "../const";
 // const StreamZip = require('node-stream-zip');
 
@@ -202,7 +202,7 @@ function hasGolangProcess() {
 // ./pty_linux_arm64 -m unzip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996/tmp.zip /Users/wangkun/Documents/OtherWork/MCSM-Daemon/data/InstanceData/3832159255b042da8cb3fd2012b0a996
 async function golangProcessUnzip(zipPath: string, destDir: string, fileCode: string = "utf-8") {
   console.log("GO Zip Params", zipPath, destDir, fileCode);
-  return await new CommandProcess(PTY_PATH, ["-coder", fileCode, "-m", "unzip", zipPath, destDir], ".", 60 * 30, {}).start();
+  return await new processWrapper(PTY_PATH, ["-coder", fileCode, "-m", "unzip", zipPath, destDir], ".", 60 * 30).start();
 }
 
 async function golangProcessZip(files: string[], destZip: string, fileCode: string = "utf-8") {
@@ -210,7 +210,7 @@ async function golangProcessZip(files: string[], destZip: string, fileCode: stri
   p = p.concat(files);
   p.push(destZip);
   console.log("GO Unzip Params", p);
-  return await new CommandProcess(PTY_PATH, p, ".", 60 * 30, {}).start();
+  return await new processWrapper(PTY_PATH, p, ".", 60 * 30).start();
 }
 
 // async function test() {

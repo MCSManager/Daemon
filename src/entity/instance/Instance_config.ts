@@ -65,4 +65,10 @@ export default class InstanceConfig {
     port: 25565,
     type: 1
   };
+
+  public extraServiceConfig = {
+    isOpenFrp: false,
+    openFrpTunnelId: "",
+    openFrpToken: ""
+  };
 }
