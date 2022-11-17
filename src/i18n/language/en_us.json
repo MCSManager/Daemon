@@ -11,7 +11,8 @@
     "configPathTip": "Configuration file：data/Config/global.json",
     "password": "Access token：{{key}}",
     "passwordTip": "The access token served as the only access credential，please use the MCSManager WebPanel to connect.",
-    "exitTip": "Use Ctrl+C to close this program."
+    "exitTip": "Use Ctrl+C to close this program.",
+    "sysinfo": "SysInfo"
   },
   "common": {
     "title": "Title",
