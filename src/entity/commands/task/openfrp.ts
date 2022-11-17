@@ -18,17 +18,15 @@ export class OpenFrp {
   public fileName: string = os.platform() === "win32" ? "openfrp.exe" : "openfrp";
   public filePath: string;
 
-  constructor(public readonly token: string, public readonly tunnelId: string) {}
-
-  public open() {
-    if (this.processWrapper) {
-      throw new Error($t("quick_install.openfrpError"));
-    }
+  constructor(public readonly token: string, public readonly tunnelId: string) {
     this.filePath = path.normalize(path.join(process.cwd(), "lib", "openfrp", this.fileName));
-    logger.info("Start openfrp:", this.filePath);
 
     // ./frpc -u 用户密钥 -p 隧道ID
     this.processWrapper = new processWrapper(this.fileName, ["-u", this.token, "-p", this.tunnelId], path.dirname(this.filePath));
+  }
+
+  public open() {
+    logger.info("Start openfrp:", this.fileName);
     this.processWrapper.start();
   }
 
