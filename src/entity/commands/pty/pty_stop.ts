@@ -12,14 +12,13 @@ export default class PtyStopCommand extends InstanceCommand {
 
   async exec(instance: Instance) {
     let stopCommand = instance.config.stopCommand;
-    if (stopCommand.toLocaleLowerCase() == "^c") stopCommand = "\x03";
 
     if (instance.status() === Instance.STATUS_STOP || !instance.process) return instance.failure(new Error($t("pty_stop.notRunning")));
     instance.status(Instance.STATUS_STOPPING);
 
-    await instance.exec(new SendCommand(stopCommand));
-
     instance.println("INFO", $t("pty_stop.execCmd", { stopCommand: stopCommand }));
+    if (stopCommand.toLowerCase() == "^c") stopCommand = "\x03";
+    await instance.exec(new SendCommand(stopCommand));
 
     // If the instance is still in the stopped state after 10 minutes, restore the state
     const cacheStartCount = instance.startCount;
