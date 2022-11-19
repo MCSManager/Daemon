@@ -35,7 +35,7 @@ export class processWrapper extends EventEmitter {
       this.process = process;
       this.pid = process.pid;
 
-      process.emit("start", process.pid);
+      this.emit("start", process.pid);
       if (!process || !process.pid) return reject(false);
 
       process.stdout.on("data", (text) => this.emit("data", iconv.decode(text, this.code)));

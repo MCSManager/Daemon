@@ -20,6 +20,7 @@ import GeneralUpdateCommand from "./general/general_update";
 import PtyStartCommand from "./pty/pty_start";
 import PtyStopCommand from "./pty/pty_stop";
 import { PTY_PATH } from "../../const";
+import OpenFrpTask from "./task/openfrp";
 
 // instance function scheduler
 // Dispatch and assign different functions according to different types
@@ -35,6 +36,7 @@ export default class FunctionDispatcher extends InstanceCommand {
 
     // the component that the instance must mount
     instance.lifeCycleTaskManager.registerLifeCycleTask(new TimeCheck());
+    instance.lifeCycleTaskManager.registerLifeCycleTask(new OpenFrpTask());
 
     // Instance general preset capabilities
     instance.setPreset("command", new GeneralSendCommand());

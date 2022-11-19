@@ -21,7 +21,6 @@ import { ProcessConfig } from "../entity/instance/process_config";
 import RestartCommand from "../entity/commands/restart";
 import { TaskCenter } from "../service/async_task_service";
 import { createQuickInstallTask } from "../service/async_task_service/quick_install";
-import { OpenFrpTask, openOpenFrpTask } from "../service/async_task_service/openfrp_start";
 import { QuickInstallTask } from "../service/async_task_service/quick_install";
 
 // Some instances operate router authentication middleware
@@ -299,15 +298,6 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
     const task = createQuickInstallTask(targetLink, newInstanceName);
     return protocol.response(ctx, task.toObject());
   }
-  // Start HiPer Network
-  if (taskName === "hiper") {
-    TaskCenter.deleteAllStoppedTask();
-    const tasks = TaskCenter.getTasks(OpenFrpTask.TYPE);
-    if (tasks.length != 0) throw new Error($t("hiper.alreadyExist"));
-    const indexCode = String(parameter.indexCode);
-    const task = openOpenFrpTask(indexCode);
-    return protocol.response(ctx, task.toObject());
-  }
   protocol.response(ctx, true);
 });
 
@@ -344,7 +334,6 @@ routerApp.on("instance/query_asynchronous", (ctx, data) => {
   const taskId = data.parameter.taskId as string | undefined;
   const taskName = data.taskName as string;
   const taskNameTypeMap: IJson<string> = {
-    hiper: OpenFrpTask.TYPE,
     quick_install: QuickInstallTask.TYPE
   };
   const type = String(taskNameTypeMap[taskName] || QuickInstallTask.TYPE);

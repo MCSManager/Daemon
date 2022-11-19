@@ -110,6 +110,12 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "ptyWindowRow", Number);
     }
 
+    if (cfg?.extraServiceConfig) {
+      configureEntityParams(this.config.extraServiceConfig, cfg.extraServiceConfig, "isOpenFrp", Boolean);
+      configureEntityParams(this.config.extraServiceConfig, cfg.extraServiceConfig, "openFrpToken", String);
+      configureEntityParams(this.config.extraServiceConfig, cfg.extraServiceConfig, "openFrpTunnelId", String);
+    }
+
     configureEntityParams(this.config, cfg, "nickname", String);
     configureEntityParams(this.config, cfg, "startCommand", String);
     configureEntityParams(this.config, cfg, "stopCommand", String);

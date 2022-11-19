@@ -12,22 +12,21 @@ import KillCommand from "../kill";
 import logger from "../../../service/log";
 import { $t } from "../../../i18n";
 import { processWrapper } from "../../../common/process_tools";
-
+import { FRPC_PATH } from "../../../const";
 export class OpenFrp {
   public processWrapper: processWrapper;
-  public fileName: string = os.platform() === "win32" ? "openfrp.exe" : "openfrp";
-  public filePath: string;
 
   constructor(public readonly token: string, public readonly tunnelId: string) {
-    this.filePath = path.normalize(path.join(process.cwd(), "lib", "openfrp", this.fileName));
-
     // ./frpc -u 用户密钥 -p 隧道ID
-    this.processWrapper = new processWrapper(this.fileName, ["-u", this.token, "-p", this.tunnelId], path.dirname(this.filePath));
+    this.processWrapper = new processWrapper(FRPC_PATH, ["-u", this.token, "-p", this.tunnelId], path.dirname(FRPC_PATH));
   }
 
   public open() {
-    logger.info("Start openfrp:", this.fileName);
+    logger.info("Start openfrp:", FRPC_PATH);
     this.processWrapper.start();
+    if (!this.processWrapper.getPid()) {
+      throw new Error("pid is null");
+    }
   }
 
   public stop() {
@@ -46,17 +45,26 @@ export default class OpenFrpTask implements ILifeCycleTask {
 
   async start(instance: Instance) {
     const { openFrpToken, openFrpTunnelId, isOpenFrp } = instance.config?.extraServiceConfig;
-    if (openFrpToken && openFrpTunnelId && isOpenFrp) {
+    if (openFrpToken && openFrpTunnelId) {
       const frpProcess = new OpenFrp(openFrpToken, openFrpTunnelId);
-      frpProcess.processWrapper.on("start", () => {
+      frpProcess.processWrapper.on("start", (pid) => {
+        logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) ${pid} Frp task started!`);
+        logger.info(`Params: ${openFrpTunnelId} | ${openFrpToken}`);
         instance.openFrp = frpProcess;
         instance.info.openFrpStatus = true;
       });
       frpProcess.processWrapper.on("exit", () => {
+        logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task stopped!`);
         instance.info.openFrpStatus = false;
         instance.openFrp = null;
       });
-      frpProcess.open();
+
+      try {
+        frpProcess.open();
+      } catch (error) {
+        logger.warn(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task Start failure! ERR:`);
+        logger.warn(error);
+      }
     }
   }
 
