@@ -140,7 +140,7 @@
 
   "auth_router": {
     "notAccess": "会话 {{id}}({{address}}) 试图无权限访问 {{event}} 现已阻止.",
-    "illegalAccess": "权限不足，非法访问",
+    "illegalAccess": "非法访问",
     "access": "会话 {{id}}({{address}}) 验证身份成功",
     "disconnect": "会话 {{id}}({{address}}) 因长时间未验证身份而断开连接"
   },
@@ -181,7 +181,7 @@
   },
 
   "stream_router": {
-    "unauthorizedAccess": "权限不足，非法访问",
+    "IGNOREAccess": "非法访问",
     "taskNotExist": "任务不存在",
     "instanceNotExist": "实例不存在",
     "authSuccess": "会话 {{id}} {{address}} 数据流通道身份验证成功",

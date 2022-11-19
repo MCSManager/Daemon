@@ -8,6 +8,7 @@ import InstanceSubsystem from "../service/system_instance";
 import logger from "../service/log";
 import SendCommand from "../entity/commands/cmd";
 import SendInput from "../entity/commands/input";
+import { IGNORE } from "../const";
 
 // Authorization authentication middleware
 routerApp.use(async (event, ctx, data, next) => {
@@ -18,7 +19,7 @@ routerApp.use(async (event, ctx, data, next) => {
     if (ctx.session.stream && ctx.session.stream.check === true && ctx.session.type === "STREAM") {
       return await next();
     }
-    return protocol.error(ctx, "error", $t("stream_router.unauthorizedAccess"));
+    return protocol.error(ctx, "error", IGNORE);
   }
   return await next();
 });

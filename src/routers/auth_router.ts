@@ -6,6 +6,7 @@ import * as protocol from "../service/protocol";
 import { globalConfiguration } from "../entity/config";
 import logger from "../service/log";
 import RouterContext from "../entity/ctx";
+import { IGNORE } from "../const";
 
 // latest verification time
 const AUTH_TIMEOUT = 6000;
@@ -24,7 +25,7 @@ routerApp.use(async (event, ctx, _, next) => {
     return await next();
   }
   logger.warn($t("auth_router.notAccess", { id: socket.id, address: socket.handshake.address, event: event }));
-  return protocol.error(ctx, "error", $t("auth_router.illegalAccess"));
+  return protocol.error(ctx, "error", IGNORE);
 });
 
 // log output middleware

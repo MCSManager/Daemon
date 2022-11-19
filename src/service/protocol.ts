@@ -4,6 +4,7 @@ import { $t } from "../i18n";
 import { Socket } from "socket.io";
 import RouterContext from "../entity/ctx";
 import logger from "./log";
+import { IGNORE } from "../const";
 
 // Define network protocols and common send/broadcast/parse functions, the client should also have this file
 
@@ -39,8 +40,9 @@ export function responseError(ctx: RouterContext, err: Error | string, config?: 
   if (err) errinfo = err.toString();
   else errinfo = err;
   const packet = new Packet(ctx.uuid, STATUS_ERR, ctx.event, errinfo);
-  // Ignore insufficient permission errors because restarting the daemon did not refresh the page
-  if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
+  // Ignore
+  if (err.toString().includes(IGNORE)) return ctx.socket.emit(ctx.event, packet);
+
   if (!config?.notPrintErr)
     logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
   ctx.socket.emit(ctx.event, packet);
@@ -53,8 +55,9 @@ export function msg(ctx: RouterContext, event: string, data: any) {
 
 export function error(ctx: RouterContext, event: string, err: any) {
   const packet = new Packet(ctx.uuid, STATUS_ERR, event, err);
-  // Ignore insufficient permission errors because restarting the daemon did not refresh the page
-  if (err.toString().includes("[Unauthorized Access]")) return ctx.socket.emit(ctx.event, packet);
+  // Ignore
+  if (err.toString().includes(IGNORE)) return ctx.socket.emit(ctx.event, packet);
+
   logger.warn($t("protocol.socketErr", { id: ctx.socket.id, address: ctx.socket.handshake.address, event: ctx.event }), err);
   ctx.socket.emit(event, packet);
 }

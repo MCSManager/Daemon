@@ -15,4 +15,6 @@ const FILENAME_BLACKLIST = ["\\", "/", ".", "'", '"', "?", "*", "<", ">"];
 
 const LOCAL_PRESET_LANG_PATH = path.normalize(path.join(process.cwd(), "language"));
 
-export { FILENAME_BLACKLIST, PTY_PATH, LOCAL_PRESET_LANG_PATH, FRPC_PATH };
+const IGNORE = "[IGNORE_LOG]";
+
+export { FILENAME_BLACKLIST, PTY_PATH, LOCAL_PRESET_LANG_PATH, FRPC_PATH, IGNORE };
