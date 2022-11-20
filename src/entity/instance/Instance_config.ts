@@ -67,7 +67,6 @@ export default class InstanceConfig {
   };
 
   public extraServiceConfig = {
-    isOpenFrp: false,
     openFrpTunnelId: "",
     openFrpToken: ""
   };

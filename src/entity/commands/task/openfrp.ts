@@ -44,7 +44,7 @@ export default class OpenFrpTask implements ILifeCycleTask {
   public name: string = "openfrp";
 
   async start(instance: Instance) {
-    const { openFrpToken, openFrpTunnelId, isOpenFrp } = instance.config?.extraServiceConfig;
+    const { openFrpToken, openFrpTunnelId } = instance.config?.extraServiceConfig;
     if (openFrpToken && openFrpTunnelId) {
       const frpProcess = new OpenFrp(openFrpToken, openFrpTunnelId);
       frpProcess.processWrapper.on("start", (pid) => {

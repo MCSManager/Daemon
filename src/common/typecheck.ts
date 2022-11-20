@@ -44,3 +44,28 @@ export function configureEntityParams(self: any, args: any, key: string, typeFn?
     self[key] = v;
   }
 }
+
+export function toText(v: any) {
+  if (isEmpty(v)) return null;
+  return String(v);
+}
+
+export function toNumber(v: any) {
+  if (isEmpty(v)) return null;
+  if (isNaN(Number(v))) return null;
+  return Number(v);
+}
+
+export function toBoolean(v: any) {
+  if (isEmpty(v)) return null;
+  return Boolean(v);
+}
+
+export function isEmpty(v: any) {
+  return v === null || v === undefined;
+}
+
+export function supposeValue(v: any, def: any = null) {
+  if (isEmpty(v)) return def;
+  return v;
+}
