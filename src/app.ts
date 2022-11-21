@@ -122,17 +122,27 @@ logger.info($t("app.exitTip"));
 logger.info("----------------------------");
 console.log("");
 
+async function processExit() {
+  try {
+    console.log("");
+    logger.warn("Program received EXIT command.");
+    await InstanceSubsystem.exit();
+    logger.info("Exit.");
+  } catch (err) {
+    logger.error("ERROR:", err);
+  } finally {
+    process.exit(0);
+  }
+}
+
 ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(function (sig) {
-  process.on(sig, async function () {
-    try {
-      console.log("\n\n\n\n");
-      logger.warn(`${sig} close process signal detected.`);
-      await InstanceSubsystem.exit();
-      logger.info("Exit...");
-    } catch (err) {
-      logger.error("ERROR:", err);
-    } finally {
-      process.exit(0);
-    }
+  process.on(sig, () => {
+    logger.warn(`${sig} close process signal detected.`);
+    processExit();
   });
+});
+
+process.stdin.on("data", (v) => {
+  const command = v.toString().replace("\n", "").replace("\r", "").trim().toLowerCase();
+  if (command === "exit") processExit();
 });
