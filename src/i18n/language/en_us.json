@@ -21,13 +21,11 @@
     "killProcess": "Forced kill process {{pid}}",
     "uuidIrregular": "Invalid UUID {{uuid}}."
   },
-
   "command": {
     "quotes": "Unpaired quotes，use {quotes} to bypass the limit.",
     "errLen": "Incorrect command length, please double check your command format.",
     "instanceNotOpen": "Failed to execute command, could not find the instance process."
   },
-
   "instance": {
     "dirEmpty": "start command, I/O encoding, or working directory is empty.",
     "dirNoE": "The working directory does not exist.",
@@ -35,20 +33,17 @@
     "invalidContainerName": "Invalid container name {{v}}",
     "successful": "Instance {{v}} started successfully"
   },
-
   "start": {
     "instanceNotDown": "Could not start instance: already running.",
     "instanceMaturity": "Could not start instance: instance expired.",
     "startInstance": "starting instance..."
   },
-
   "restart": {
     "start": "Executing scheduled restart.",
     "error1": "Error restarting instance: instance has already been restarted. Restart of last state cancelled.",
     "error2": "Error restarting instance: incorrect instance status (expected: stopping, actual: running), restart cancelled.",
     "restarting": "Detected an unexpected server stop, restarting..."
   },
-
   "general_start": {
     "instanceConfigErr": "Start command，I/O encoding, or working directory is empty.",
     "cwdPathNotExist": "The working directory does not exist.",
@@ -62,13 +57,11 @@
     "startSuccess": "Instance {{instanceUuid}} started, PID: {{pid}}",
     "startOrdinaryTerminal": "Instance running. You can use command at the input box located at the bottom. If you need to use function keys like CTRL or TAB, please enable the emulation mode  in terminal settings."
   },
-
   "general_stop": {
     "notRunning": "Failed to stop instance: not running.",
     "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
     "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
-
   "general_update": {
     "statusErr_notStop": "Unable to update: incorrect instance status, it has to be stopped first.",
     "statusErr_otherProgress": "Incorrect instance status: other task(s) running.",
@@ -84,7 +77,6 @@
     "terminateUpdate": "User request to stop the async update task for instance: {{instanceUuid}}",
     "killProcess": "Killing task process..."
   },
-
   "pty_start": {
     "cmdErr": "Start command，I/O encoding, or working directory is empty.",
     "cwdNotExist": "The working directory does not exist.",
@@ -104,13 +96,11 @@
     "startEmulatedTerminal": "Active emulation terminal, you can use function keys (like CTRL, TAB) directly.",
     "mustAbsolutePath": "In order to use the emulation terminal, you must use absolute path for your instance."
   },
-
   "pty_stop": {
     "notRunning": "Failed to stop: not running.",
     "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
     "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
-
   "instanceConf": {
     "initInstanceErr": "Failed to initialize instance: empty identifier or configuration.",
     "cantModifyInstanceType": "Unable change instance type: instance running.",
@@ -125,26 +115,21 @@
     "autoRestartErr": "Failed to auto restart: {{err}}",
     "instantExit": "Instance exited short after started, might be due to a wrong start command or configuration."
   },
-
   "preset": {
     "actionErr": "Pre-defined command {{action}} unavailable."
   },
-
   "process_config": {
     "writEmpty": "Empty write content: might be due to unsupported file type."
   },
-
   "mc_update": {
     "updateInstance": "Update instance....."
   },
-
   "auth_router": {
     "notAccess": "Blocked an un authorized access from session {{id}}({{address}}) to {{event}}.",
     "illegalAccess": "Insufficient permission, illegal access.",
     "access": "Session {{id}}({{address}}) authenticated.",
     "disconnect": "Session {{id}}({{address}}) disconnected due to authentication timed out."
   },
-
   "environment_router": {
     "dockerInfoErr": "Unable to get image information, please make sure docker was correctly installed.",
     "crateImage": "Daemon is creating image {{name}}:{{tag}} DockerFile as:\n{{dockerFileText}}\n",
@@ -152,19 +137,16 @@
     "crateErr": "Image creation {{name}}:{{tag}} error:{{error}}",
     "delImage": "Daemon is deleting image {{imageId}}"
   },
-
   "file_router": {
     "instanceNotExist": "Instance {{instanceUuid}} does not exist.",
     "unzipLimit": "Exceeded the maximum allowed decompresson tasks. Limit: {{maxFileTask}}，currently running: {{fileLock}}. Please wait patiently."
   },
-
   "http_router": {
     "instanceNotExist": "Instance doesn't exist.",
     "fileNameNotSpec": "File requested by user does not conform to hte specification.",
     "downloadErr": "Download error: {{error}}",
     "updateErr": "Unkonwn reason: Upload error"
   },
-
   "Instance_router": {
     "requestIO": "Session {{id}} Request to redirect I/O stream of instance {{targetInstanceUuid}}",
     "cancelIO": "Session {{id}} Request to stop redirect I/O stream of instance {{targetInstanceUuid}}",
@@ -175,24 +157,21 @@
     "accessFileErr": "Access denied due to path error or non-existent file.",
     "terminalLogNotExist": "terminal log file does not exist."
   },
-
   "passport_router": {
     "registerErr": "Invalid task name or empty token."
   },
-
   "stream_router": {
     "unauthorizedAccess": "Insufficient perission, Illegal access.",
     "taskNotExist": "Task not exist.",
     "instanceNotExist": "Instance does not exist.",
     "authSuccess": "Session {{id}} {{address}} I/O channel authenticated.",
     "establishConnection": "Established data channel between session {{id}} {{address}} and {{uuid}}",
-    "disconnect": "Session {{id}} {{address}} disconnected from {{uuid}}"
+    "disconnect": "Session {{id}} {{address}} disconnected from {{uuid}}",
+    "IGNOREAccess": "illegal access"
   },
-
   "file_router_service": {
     "instanceNotExit": "Instance {{uuid}} does not exist."
   },
-
   "install": {
     "ptyNotSupportSystem": "Emulation terminal can only support Windows/Linux x86_64 architecture, fall back to general terminal.",
     "ptySupport": "Found installed dependencies, emulation terminal is available now.",
@@ -202,21 +181,17 @@
     "changeModeErr": "Failed to change permission of {{path}} .Please set it to chmod 755 or above manually.",
     "installErr": "Dependencies installation failed. Emulation terminal and some advancced features are not available. The installation task will be retried on next start."
   },
-
   "protocol": {
     "socketErr": "Invalid response from session {{id}}({{address}})/{{event}} :\n"
   },
-
   "router": {
     "initComplete": "Initialization complete."
   },
-
   "system_file": {
     "illegalAccess": "Illegal access directory.",
     "unzipLimit": "File decompression only support file size up to {{max}}GB . You can change this limit in data/Config/global.json",
     "execLimit": "Exceeded the maximum file edit size limit."
   },
-
   "system_instance_control": {
     "execLimit": "Unable to create scheduled task: limit reached.",
     "existRepeatTask": "A duplicate task already exists",
@@ -226,7 +201,6 @@
     "crateSuccess": "Successfully created schedule task: {{name}}",
     "execCmdErr": "Error on executing scheduled task {{name}} for instance {{uuid}}. Error: \n {{error}}"
   },
-
   "system_instance": {
     "autoStart": "Sent an auto start command to instance {{name}} {{uuid}} ",
     "autoStartErr": "Error while auto starting instance: {{name}} {{uuid}} Reason: {{reason}}",
@@ -234,20 +208,16 @@
     "checkConf": "Please verify or delete file：data/InstanceConfig/{{uuid}}.json",
     "uuidEmpty": "Unable to create new instance: empty UUID."
   },
-
   "ui": {
     "help": "[Terminal] MCSManager Daemon is able to perform operations. Use \"help\" for more information."
   },
-
   "version": {
     "versionDetectErr": "Version check failed."
   },
-
   "quick_install": {
     "unzipError": "Failed decompress file.",
     "hiperError": "Unable to start another HiPer process: HiPer is running.！"
   },
-
   "hiper": {
     "alreadyExist": "Unable to start multiple HiPer process: HiPer is running."
   }
