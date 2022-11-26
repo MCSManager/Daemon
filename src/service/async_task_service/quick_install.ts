@@ -39,19 +39,23 @@ export class QuickInstallTask extends AsyncTask {
 
   private download(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
-      this.zipPath = path.normalize(path.join(this.instance.config.cwd, this.TMP_ZIP_NAME));
-      const writeStream = fs.createWriteStream(this.zipPath);
-      const response = await axios<Readable>({
-        url: this.targetLink,
-        responseType: "stream"
-      });
-      this.downloadStream = pipeline(response.data, writeStream, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
-      });
+      try {
+        this.zipPath = path.normalize(path.join(this.instance.config.cwd, this.TMP_ZIP_NAME));
+        const writeStream = fs.createWriteStream(this.zipPath);
+        const response = await axios<Readable>({
+          url: this.targetLink,
+          responseType: "stream"
+        });
+        this.downloadStream = pipeline(response.data, writeStream, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(true);
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
