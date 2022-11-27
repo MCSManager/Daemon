@@ -46,4 +46,9 @@ If you need to run in the background for a long time, please use the `Screen` so
 <br />
 
 
+## License
+
+https://github.com/MCSManager/MCSManager#license
+
+
 
