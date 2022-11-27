@@ -31,7 +31,7 @@ export default class InstanceConfig {
 
   // terminal option
   public terminalOption = {
-    haveColor: true,
+    haveColor: false,
     pty: true,
     ptyWindowCol: 140,
     ptyWindowRow: 40
