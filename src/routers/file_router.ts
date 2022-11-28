@@ -47,6 +47,18 @@ routerApp.on("file/status", (ctx, data) => {
   }
 });
 
+// Create a new file
+routerApp.on("file/touch", (ctx, data) => {
+  try {
+    const target = data.target;
+    const fileManager = getFileManager(data.instanceUuid);
+    fileManager.newFile(target);
+    protocol.response(ctx, true);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
 // Create a directory
 routerApp.on("file/mkdir", (ctx, data) => {
   try {

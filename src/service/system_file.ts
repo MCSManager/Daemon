@@ -109,6 +109,12 @@ export default class FileManager {
     return await fs.writeFile(absPath, buf);
   }
 
+  async newFile(fileName: string){
+    const target = this.toAbsolutePath(fileName)
+    console.log(target)
+    fs.createFile(target)
+  }
+
   async copy(target1: string, target2: string) {
     if (!this.checkPath(target2) || !this.check(target1)) throw new Error(ERROR_MSG_01);
     const targetPath = this.toAbsolutePath(target1);
