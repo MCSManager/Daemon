@@ -40,7 +40,7 @@ function installPtyForLinux(url: string) {
 // Reference: https://github.com/MCSManager/pty
 export function initDependent() {
   // if (os.platform() !== "linux") return logger.info($t("install.skipInstall"));
-  const ptyUrls = [`https://mcsmanager.com/download/pty_windows_x64.exe`, `https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/${PTY_NAME}`];
+  const ptyUrls = [`https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/${PTY_NAME}`];
   function setup(index = 0) {
     installPtyForLinux(ptyUrls[index])
       .then(() => {
