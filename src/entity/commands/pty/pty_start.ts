@@ -125,7 +125,14 @@ export default class PtyStartCommand extends InstanceCommand {
     instance.startCount++;
 
     // command parsing
-    const commandList = commandStringToArray(instance.config.startCommand);
+    let commandList: string[] = [];
+    if (os.platform() === "win32") {
+      // windows: cmd.exe  /c {{startCommand}}
+      commandList = [instance.config.startCommand];
+    } else {
+      commandList = commandStringToArray(instance.config.startCommand);
+    }
+
     if (commandList.length === 0) return instance.failure(new StartupError($t("pty_start.cmdEmpty")));
     const ptyParameter = [
       "-dir",
