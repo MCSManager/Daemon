@@ -12,7 +12,8 @@
     "password": "访问密钥：{{key}}",
     "passwordTip": "密钥作为唯一认证方式，请使用 MCSManager 面板的节点功能连接程序",
     "exitTip": "你可以使用 Ctrl+C 快捷键即可关闭程序",
-    "sysinfo": "资源报告"
+    "sysinfo": "资源报告",
+    "httpSetupError": "HTTP/Socket 服务启动错误，可能是端口被占用，权限不足或网卡设备不可用。"
   },
   "common": {
     "title": "标题",

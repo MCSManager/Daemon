@@ -50,11 +50,11 @@ export function initDependent() {
           if (err) logger.warn($t("install.changeModeErr", { path: PTY_PATH }));
         });
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         fs.remove(PTY_PATH, () => {});
         if (index === ptyUrls.length - 1) {
           logger.warn($t("install.installErr"));
-          logger.warn(err);
+          logger.warn(err.message);
           return;
         }
         return setup(index + 1);

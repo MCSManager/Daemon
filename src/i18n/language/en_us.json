@@ -12,7 +12,8 @@
     "password": "Access token：{{key}}",
     "passwordTip": "The access token served as the only access credential，please use the MCSManager WebPanel to connect.",
     "exitTip": "Use Ctrl+C to close this program.",
-    "sysinfo": "SysInfo"
+    "sysinfo": "SysInfo",
+    "httpSetupError": "The port may already be in use or the network device is unavailable."
   },
   "common": {
     "title": "Title",

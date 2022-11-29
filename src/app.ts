@@ -52,9 +52,6 @@ import { initDependent } from "./service/install";
 import "./service/async_task_service";
 import "./service/async_task_service/quick_install";
 
-// Initialize optional dependencies
-initDependent();
-
 // Initialize HTTP service
 const koaApp = koa.initKoa();
 
@@ -65,6 +62,11 @@ koaApp.on("error", (error) => {
 });
 
 const httpServer = http.createServer(koaApp.callback());
+httpServer.on("error", (err) => {
+  logger.error($t("app.httpSetupError"));
+  logger.error(err);
+  process.exit(1);
+});
 httpServer.listen(config.port, config.ip);
 
 // Initialize Websocket service to HTTP service
@@ -79,6 +81,9 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
+
+// Initialize optional dependencies
+initDependent();
 
 // Initialize application instance system
 try {
