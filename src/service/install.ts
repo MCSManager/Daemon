@@ -21,7 +21,7 @@ function installPtyForLinux(url: string) {
     const file = fs.createWriteStream(PTY_PATH);
     https.get(url, (res) => {
       if (res.statusCode !== 200) {
-        return reject(new Error("code!=200"));
+        return reject(new Error(`Try download: ${url} failed.`));
       }
       res.on("error", (err) => {
         if (fs.existsSync(PTY_PATH)) fs.removeSync(PTY_PATH);

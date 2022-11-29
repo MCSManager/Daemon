@@ -60,7 +60,7 @@ export function navigation(socket: Socket) {
   }
   // Register all events with Socket
   for (const event of routerApp.eventNames()) {
-    socket.on(event, (protocol: IPacket) => {
+    socket.on(event as string, (protocol: IPacket) => {
       if (!protocol) return logger.info(`session ${socket.id} request data protocol format is incorrect`);
       const ctx = new RouterContext(protocol.uuid, socket, session, event.toString());
       routerApp.emitRouter(event as string, ctx, protocol.data);
