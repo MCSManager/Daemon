@@ -19,6 +19,7 @@ class Config {
   public maxFileTask = 2;
   public maxZipFileSize = 60;
   public language = "en_us";
+  public defaultInstancePath = "";
 }
 
 // daemon configuration class

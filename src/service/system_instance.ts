@@ -19,8 +19,14 @@ import { QueryMapWrapper } from "../common/query_wrapper";
 import FunctionDispatcher from "../entity/commands/dispatcher";
 import InstanceControl from "./system_instance_control";
 import StartCommand from "../entity/commands/start";
+import { globalConfiguration } from "../entity/config";
 
-const INSTANCE_DATA_DIR = path.join(process.cwd(), "data/InstanceData");
+// init instance default install path
+let INSTANCE_DATA_DIR = path.join(process.cwd(), "data/InstanceData");
+if (globalConfiguration.config.defaultInstancePath) {
+  INSTANCE_DATA_DIR = path.normalize(globalConfiguration.config.defaultInstancePath);
+}
+
 if (!fs.existsSync(INSTANCE_DATA_DIR)) {
   fs.mkdirsSync(INSTANCE_DATA_DIR);
 }
@@ -45,9 +51,7 @@ class InstanceSubsystem extends EventEmitter {
             logger.info($t("system_instance.autoStart", { name: instance.config.nickname, uuid: instance.instanceUuid }));
           })
           .catch((reason) => {
-            logger.error(
-              $t("system_instance.autoStartErr", { name: instance.config.nickname, uuid: instance.instanceUuid, reason: reason })
-            );
+            logger.error($t("system_instance.autoStartErr", { name: instance.config.nickname, uuid: instance.instanceUuid, reason: reason }));
           });
       }
     });
