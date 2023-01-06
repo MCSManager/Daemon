@@ -9,6 +9,9 @@ import InstanceCommand from "./base/command";
 import * as childProcess from "child_process";
 import FunctionDispatcher from "./dispatcher";
 import { start } from "repl";
+import InstanceSubsystem from "../../service/system_instance";
+import StopCommand from "./stop";
+import * as protocol from "../../service/protocol";
 
 class StartupError extends Error {
   constructor(msg: string) {
@@ -54,7 +57,19 @@ export default class StartCommand extends InstanceCommand {
       // prevent the dead-loop from starting
       await this.sleep();
 
-      return await instance.execPreset("start", this.source);
+      return await instance.execPreset("start", this.source)
+        .then(async function() {
+          if (instance.config.eventTask.childInstanceStart && instance.config.eventTask.childInstance != "") {
+            const childInstanceList = instance.config.eventTask.childInstance.split(",");
+            for (const instanceUuid of childInstanceList) {
+              const childInstance = InstanceSubsystem.getInstance(instanceUuid);
+              if (childInstance.status() == Instance.STATUS_STOP) {
+                instance.childInstance[instance.childInstance.length] = instanceUuid;
+                await childInstance.exec(new StartCommand());
+              }
+            }
+          }
+        });
     } catch (error) {
       instance.releaseResources();
       instance.status(Instance.STATUS_STOP);

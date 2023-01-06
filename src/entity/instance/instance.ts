@@ -17,6 +17,7 @@ import StartCommand from "../commands/start";
 import { configureEntityParams } from "../../common/typecheck";
 import { PTY_PATH } from "../../const";
 import { OpenFrp } from "../commands/task/openfrp";
+import List = Mocha.reporters.List;
 
 // The instance does not need to store additional information persistently
 interface IInstanceInfo {
@@ -47,6 +48,8 @@ export default class Instance extends EventEmitter {
   public startTimestamp: number = 0;
   public asynchronousTask: IExecutable = null;
   public openFrp: OpenFrp;
+
+  public childInstance: string[] = [];
 
   public readonly lifeCycleTaskManager = new LifeCycleTaskManager(this);
   public readonly presetCommandManager = new PresetCommandManager(this);
@@ -149,6 +152,10 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean);
       configureEntityParams(this.config.eventTask, cfg.eventTask, "autoRestart", Boolean);
       configureEntityParams(this.config.eventTask, cfg.eventTask, "ignore", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "childInstance", String);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "childInstanceStart", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "childInstanceStop", Boolean);
+      configureEntityParams(this.config.eventTask, cfg.eventTask, "childInstanceRestart", Boolean);
     }
     if (cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);

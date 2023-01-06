@@ -41,7 +41,11 @@ export default class InstanceConfig {
   public eventTask = {
     autoStart: false,
     autoRestart: false,
-    ignore: false
+    ignore: false,
+    childInstance: "",
+    childInstanceStart: false,
+    childInstanceStop: false,
+    childInstanceRestart: false
   };
 
   // Extend
