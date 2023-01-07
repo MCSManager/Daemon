@@ -192,7 +192,7 @@ routerApp.on("instance/open", async (ctx, data) => {
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
-      await instance.exec(new StartCommand(ctx.socket.id));
+      await instance.exec(new StartCommand(ctx.socket.id, data.userInstances, data.isTopPermission));
       if (!disableResponse) protocol.msg(ctx, "instance/open", { instanceUuid });
     } catch (err) {
       if (!disableResponse) {
@@ -209,7 +209,7 @@ routerApp.on("instance/stop", async (ctx, data) => {
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
-      await instance.exec(new StopCommand());
+      await instance.exec(new StopCommand(data.userInstances, data.isTopPermission));
       //Note: Removing this reply will cause the front-end response to be slow, because the front-end will wait for the panel-side message to be forwarded
       if (!disableResponse) protocol.msg(ctx, "instance/stop", { instanceUuid });
     } catch (err) {
@@ -224,7 +224,7 @@ routerApp.on("instance/restart", async (ctx, data) => {
   for (const instanceUuid of data.instanceUuids) {
     const instance = InstanceSubsystem.getInstance(instanceUuid);
     try {
-      await instance.exec(new RestartCommand());
+      await instance.exec(new RestartCommand(data.userInstances, data.isTopPermission));
       if (!disableResponse) protocol.msg(ctx, "instance/restart", { instanceUuid });
     } catch (err) {
       if (!disableResponse) protocol.error(ctx, "instance/restart", { instanceUuid: instanceUuid, err: err.message });
@@ -268,7 +268,8 @@ routerApp.on("instance/delete", (ctx, data) => {
   for (const instanceUuid of instanceUuids) {
     try {
       InstanceSubsystem.removeInstance(instanceUuid, deleteFile);
-    } catch (err) {}
+    } catch (err) {
+    }
   }
   protocol.msg(ctx, "instance/delete", instanceUuids);
 });
@@ -285,9 +286,14 @@ routerApp.on("instance/asynchronous", (ctx, data) => {
   if (taskName === "update" && instance) {
     instance
       .execPreset("update", parameter)
-      .then(() => {})
+      .then(() => {
+      })
       .catch((err) => {
-        logger.error($t("Instance_router.performTasksErr", { uuid: instance.instanceUuid, taskName: taskName, err: err }));
+        logger.error($t("Instance_router.performTasksErr", {
+          uuid: instance.instanceUuid,
+          taskName: taskName,
+          err: err
+        }));
       });
   }
   // Quick install Minecraft server task
@@ -320,8 +326,10 @@ routerApp.on("instance/stop_asynchronous", (ctx, data) => {
   if (task && task.stop) {
     task
       .stop(instance)
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => {
+      })
+      .catch((err) => {
+      });
   } else {
     return protocol.error(ctx, "instance/stop_asynchronous", $t("Instance_router.taskEmpty"));
   }

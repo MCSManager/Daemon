@@ -21,10 +21,14 @@ class StartupError extends Error {
 
 export default class StartCommand extends InstanceCommand {
   public source: string;
+  private readonly userInstances: string[];
+  private readonly isTopPermission: boolean;
 
-  constructor(source = "Unknown") {
+  constructor(source = "Unknown", userInstances: string[] = [], isTopPermission: boolean = false) {
     super("StartCommand");
     this.source = source;
+    this.userInstances = userInstances;
+    this.isTopPermission = isTopPermission;
   }
 
   private async sleep() {
@@ -57,15 +61,20 @@ export default class StartCommand extends InstanceCommand {
       // prevent the dead-loop from starting
       await this.sleep();
 
+      const source = this.source;
+      const userInstances = this.userInstances;
+      const isTopPermission = this.isTopPermission;
       return await instance.execPreset("start", this.source)
         .then(async function() {
           if (instance.config.eventTask.childInstanceStart && instance.config.eventTask.childInstance != "") {
             const childInstanceList = instance.config.eventTask.childInstance.split(",");
             for (const instanceUuid of childInstanceList) {
-              const childInstance = InstanceSubsystem.getInstance(instanceUuid);
-              if (childInstance.status() == Instance.STATUS_STOP) {
-                instance.childInstance[instance.childInstance.length] = instanceUuid;
-                await childInstance.exec(new StartCommand());
+              if (isTopPermission || userInstances.includes(instanceUuid)) {
+                const childInstance = InstanceSubsystem.getInstance(instanceUuid);
+                if (childInstance.status() == Instance.STATUS_STOP) {
+                  instance.childInstance[instance.childInstance.length] = instanceUuid;
+                  await childInstance.exec(new StartCommand(source, userInstances, isTopPermission));
+                }
               }
             }
           }

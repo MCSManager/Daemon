@@ -2,18 +2,24 @@
 
 import Instance from "../instance/instance";
 import InstanceCommand from "./base/command";
-import SendCommand from "./cmd";
 import InstanceSubsystem from "../../service/system_instance";
 
 export default class StopCommand extends InstanceCommand {
-  constructor() {
+  private readonly userInstances: string[];
+  private readonly isTopPermission: boolean;
+
+  constructor(userInstances: string[] = [], isTopPermission: boolean = false) {
     super("StopCommand");
+    this.userInstances = userInstances;
+    this.isTopPermission = isTopPermission;
   }
 
   async exec(instance: Instance) {
     // If the automatic restart function is enabled, the setting is ignored once
     if (instance.config.eventTask && instance.config.eventTask.autoRestart) instance.config.eventTask.ignore = true;
 
+    const userInstances = this.userInstances;
+    const isTopPermission = this.isTopPermission;
     // send stop command
     return await instance.execPreset("stop")
       .then(async function() {
@@ -21,8 +27,10 @@ export default class StopCommand extends InstanceCommand {
           const childInstanceList = instance.childInstance;
           instance.childInstance = [];
           for (const instanceUuid of childInstanceList) {
-            const instance = InstanceSubsystem.getInstance(instanceUuid);
-            await instance.exec(new StopCommand());
+            if (isTopPermission || userInstances.includes(instanceUuid)) {
+              const instance = InstanceSubsystem.getInstance(instanceUuid);
+              await instance.exec(new StopCommand(userInstances, isTopPermission));
+            }
           }
         }
       });
