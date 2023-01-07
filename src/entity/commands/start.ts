@@ -2,16 +2,9 @@
 
 import { $t } from "../../i18n";
 import Instance from "../instance/instance";
-import logger from "../../service/log";
-import fs from "fs-extra";
 
 import InstanceCommand from "./base/command";
-import * as childProcess from "child_process";
-import FunctionDispatcher from "./dispatcher";
-import { start } from "repl";
 import InstanceSubsystem from "../../service/system_instance";
-import StopCommand from "./stop";
-import * as protocol from "../../service/protocol";
 
 class StartupError extends Error {
   constructor(msg: string) {
