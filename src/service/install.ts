@@ -13,7 +13,7 @@ const PTY_DIR_PATH = path.join(process.cwd(), "lib");
 
 function ptyChmod() {
   try {
-    fs.chmodSync(PTY_PATH, 0o777);
+    fs.chmodSync(PTY_PATH, 0o755);
     return true;
   } catch (error) {
     logger.warn($t("install.changeModeErr", { path: PTY_PATH }));
@@ -25,7 +25,7 @@ function ptyChmod() {
 function installPty(url: string) {
   return new Promise<number>((resolve, reject) => {
     if (!fs.existsSync(PTY_DIR_PATH)) fs.mkdirsSync(PTY_DIR_PATH);
-    if (fs.existsSync(PTY_PATH) && fs.statSync(PTY_PATH)?.size > 1024) {
+    if (fs.existsSync(PTY_PATH) && fs.statSync(PTY_PATH)?.size > 1) {
       if (!ptyChmod()) return reject(new Error("ptyChmod error"));
       logger.info($t("install.ptySupport"));
       return resolve(1);
