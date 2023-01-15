@@ -13,6 +13,7 @@ import logger from "../../../service/log";
 import { $t } from "../../../i18n";
 import { processWrapper } from "../../../common/process_tools";
 import { FRPC_PATH } from "../../../const";
+import { downloadFileToLocalFile } from "../../../service/download";
 export class OpenFrp {
   public processWrapper: processWrapper;
 
@@ -42,29 +43,42 @@ export class OpenFrp {
 export default class OpenFrpTask implements ILifeCycleTask {
   public status: number = 0;
   public name: string = "openfrp";
+  public static readonly FRP_EXE_NAME = `frpc_${os.platform()}_${os.arch()}${os.platform() === "win32" ? ".exe" : ""}`;
+  public static readonly FRP_EXE_PATH = path.normalize(path.join(process.cwd(), "lib", OpenFrpTask.FRP_EXE_NAME));
+  public static readonly FRP_DOWNLOAD_ADDR = "https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/";
 
   async start(instance: Instance) {
     const { openFrpToken, openFrpTunnelId } = instance.config?.extraServiceConfig;
-    if (openFrpToken && openFrpTunnelId) {
-      const frpProcess = new OpenFrp(openFrpToken, openFrpTunnelId);
-      frpProcess.processWrapper.on("start", (pid) => {
-        logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) ${pid} Frp task started!`);
-        logger.info(`Params: ${openFrpTunnelId} | ${openFrpToken}`);
-        instance.openFrp = frpProcess;
-        instance.info.openFrpStatus = true;
-      });
-      frpProcess.processWrapper.on("exit", () => {
-        logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task stopped!`);
-        instance.info.openFrpStatus = false;
-        instance.openFrp = null;
-      });
+    if (!openFrpToken || !openFrpTunnelId) return;
 
+    if (!fs.existsSync(OpenFrpTask.FRP_EXE_PATH)) {
       try {
-        frpProcess.open();
+        await downloadFileToLocalFile(OpenFrpTask.FRP_DOWNLOAD_ADDR + OpenFrpTask.FRP_EXE_NAME, OpenFrpTask.FRP_EXE_PATH);
       } catch (error) {
-        logger.warn(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task Start failure! ERR:`);
-        logger.warn(error);
+        logger.error($t("frp.downloadErr"), error);
+        fs.remove(OpenFrpTask.FRP_EXE_PATH, () => {});
+        return;
       }
+    }
+
+    const frpProcess = new OpenFrp(openFrpToken, openFrpTunnelId);
+    frpProcess.processWrapper.on("start", (pid) => {
+      logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) ${pid} Frp task started!`);
+      logger.info(`Params: ${openFrpTunnelId} | ${openFrpToken}`);
+      instance.openFrp = frpProcess;
+      instance.info.openFrpStatus = true;
+    });
+    frpProcess.processWrapper.on("exit", () => {
+      logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task stopped!`);
+      instance.info.openFrpStatus = false;
+      instance.openFrp = null;
+    });
+
+    try {
+      frpProcess.open();
+    } catch (error) {
+      logger.warn(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task Start failure! ERR:`);
+      logger.warn(error);
     }
   }
 
