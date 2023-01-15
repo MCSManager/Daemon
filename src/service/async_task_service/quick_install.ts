@@ -73,14 +73,13 @@ export class QuickInstallTask extends AsyncTask {
 
       if (config.startCommand && config.startCommand.includes("{{java}}")) {
         if (this.hasJava17()) {
-          config.startCommand = config.startCommand.replace("{{java}}", this.JAVA_17_PATH);
+          config.startCommand = config.startCommand.replace("{{java}}", `"${this.JAVA_17_PATH}"`);
         } else {
           config.startCommand = config.startCommand.replace("{{java}}", "java");
         }
       }
 
       this.instance.parameters(config);
-
       this.stop();
     } catch (error) {
       this.error(error);
