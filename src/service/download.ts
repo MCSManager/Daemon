@@ -11,15 +11,18 @@ export function downloadFileToLocalFile(url: string, localFilePath: string): Pro
   return new Promise(async (resolve, reject) => {
     try {
       if (fs.existsSync(localFilePath)) fs.removeSync(localFilePath);
-      const writeStream = fs.createWriteStream(path.normalize(localFilePath));
       const response = await axios<Readable>({
         url,
-        responseType: "stream"
+        responseType: "stream",
+        timeout: 1000 * 10
       });
+      const writeStream = fs.createWriteStream(path.normalize(localFilePath));
       pipeline(response.data, writeStream, (err) => {
         if (err) {
+          fs.remove(localFilePath, () => {});
           reject(err);
         } else {
+          fs.chmodSync(localFilePath, 0o777);
           resolve(true);
         }
       });
