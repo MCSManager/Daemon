@@ -51,7 +51,6 @@ function installPty(url: string) {
 // Emulate terminal-dependent programs, PTY programs based on Go/C++
 // Reference: https://github.com/MCSManager/pty
 export function initDependent() {
-  // if (os.platform() !== "linux") return logger.info($t("install.skipInstall"));
   const ptyUrls = [`https://mcsmanager.oss-cn-guangzhou.aliyuncs.com/${PTY_NAME}`];
   function setup(index = 0) {
     installPty(ptyUrls[index])
