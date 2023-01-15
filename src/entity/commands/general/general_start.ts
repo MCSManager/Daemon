@@ -62,7 +62,12 @@ export default class GeneralStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+    if (
+      (!instance.config.startCommand && instance.config.processType === "general") ||
+      !instance.config.cwd ||
+      !instance.config.ie ||
+      !instance.config.oe
+    )
       return instance.failure(new StartupError($t("general_start.instanceConfigErr")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupError($t("general_start.cwdPathNotExist")));
 

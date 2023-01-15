@@ -8,6 +8,8 @@ interface IActionCommand {
   command: string;
 }
 
+type ProcessType = "general" | "docker";
+
 // @Entity
 export default class InstanceConfig {
   public nickname = "Undefined";
@@ -22,7 +24,7 @@ export default class InstanceConfig {
   public tag: string[] = [];
   public endTime: string = "";
   public fileCode: string = "utf-8";
-  public processType: string = "general";
+  public processType: ProcessType = "general";
   public updateCommand: string = "";
   public crlf = os.platform() === "win32" ? 2 : 1; // 1: \n  2: \r\n
 

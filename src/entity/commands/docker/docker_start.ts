@@ -92,7 +92,7 @@ export default class DockerStartCommand extends InstanceCommand {
   }
 
   async exec(instance: Instance, source = "Unknown") {
-    if (!instance.config.startCommand || !instance.config.cwd || !instance.config.ie || !instance.config.oe)
+    if (!instance.config.cwd || !instance.config.ie || !instance.config.oe)
       return instance.failure(new StartupDockerProcessError($t("instance.dirEmpty")));
     if (!fs.existsSync(instance.absoluteCwdPath())) return instance.failure(new StartupDockerProcessError($t("instance.dirNoE")));
 

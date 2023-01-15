@@ -48,7 +48,7 @@ export function commandStringToArray(cmd: string) {
   _analyze();
 
   if (cmdArray.length == 0) {
-    throw new Error($t("command.errLen"));
+    return [];
   }
 
   for (const index in cmdArray) {
