@@ -219,7 +219,9 @@
     "unzipError": "Failed decompress file.",
     "hiperError": "Unable to start another HiPer process: HiPer is running.！"
   },
-  "hiper": {
-    "alreadyExist": "Unable to start multiple HiPer process: HiPer is running."
+  "frp": {
+    "downloadErr": "Downloading the FRP application failed, and the FRP intranet mapping program cannot be started normally.",
+    "installing": "Downloading and installing the FRP intranet mapping program at the same time, we will automatically start the mapping function later...",
+    "done": "The FRP intranet mapping program is installed. You can check the mapping status from the upper left corner. If it is not displayed, it may be blocked by antivirus software, file permissions are insufficient, or the FRP key is wrong."
   }
 }
