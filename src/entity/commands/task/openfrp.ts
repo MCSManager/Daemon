@@ -69,11 +69,15 @@ export default class OpenFrpTask implements ILifeCycleTask {
     }
 
     const frpProcess = new OpenFrp(openFrpToken, openFrpTunnelId);
-    frpProcess.processWrapper.on("start", (pid) => {
-      logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) ${pid} Frp task started!`);
-      logger.info(`Params: ${openFrpTunnelId} | ${openFrpToken}`);
-      instance.openFrp = frpProcess;
-      instance.info.openFrpStatus = true;
+    frpProcess.processWrapper.on("start", (pid: number) => {
+      if (pid) {
+        logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) ${pid} Frp task started!`);
+        logger.info(`Params: ${openFrpTunnelId} | ${openFrpToken}`);
+        instance.openFrp = frpProcess;
+        instance.info.openFrpStatus = true;
+      } else {
+        logger.warn(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task start failed! Process ID is ${pid}`);
+      }
     });
     frpProcess.processWrapper.on("exit", () => {
       logger.info(`Instance ${instance.config.nickname}(${instance.instanceUuid}) Frp task stopped!`);
