@@ -89,8 +89,8 @@ class InstanceSubsystem extends EventEmitter {
     // Instance working directory verification and automatic creation
     if (!cfg.cwd || cfg.cwd === ".") {
       cfg.cwd = path.normalize(`${INSTANCE_DATA_DIR}/${instance.instanceUuid}`);
-      if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     }
+    if (!fs.existsSync(cfg.cwd)) fs.mkdirsSync(cfg.cwd);
     // Set the default input and output encoding
     cfg.ie = cfg.oe = cfg.fileCode = "utf8";
     // Build and initialize the type from the parameters
