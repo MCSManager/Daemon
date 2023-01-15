@@ -52,12 +52,17 @@ export default class OpenFrpTask implements ILifeCycleTask {
     if (!openFrpToken || !openFrpTunnelId) return;
 
     if (!fs.existsSync(OpenFrpTask.FRP_EXE_PATH)) {
+      const tmpTask = setInterval(() => {
+        instance.println("FRP", $t("frp.installing"));
+      }, 1000);
       try {
         await downloadFileToLocalFile(OpenFrpTask.FRP_DOWNLOAD_ADDR + OpenFrpTask.FRP_EXE_NAME, OpenFrpTask.FRP_EXE_PATH);
       } catch (error) {
         logger.error($t("frp.downloadErr"), error);
         fs.remove(OpenFrpTask.FRP_EXE_PATH, () => {});
         return;
+      } finally {
+        clearInterval(tmpTask);
       }
     }
 

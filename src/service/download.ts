@@ -10,6 +10,7 @@ export function downloadFileToLocalFile(url: string, localFilePath: string): Pro
   logger.info(`Download File: ${url} --> ${path.normalize(localFilePath)}`);
   return new Promise(async (resolve, reject) => {
     try {
+      if (fs.existsSync(localFilePath)) fs.removeSync(localFilePath);
       const writeStream = fs.createWriteStream(path.normalize(localFilePath));
       const response = await axios<Readable>({
         url,

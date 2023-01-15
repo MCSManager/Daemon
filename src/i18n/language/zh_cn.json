@@ -220,6 +220,7 @@
     "hiperError": "网络映射进程已存在，不可重复启动！"
   },
   "frp": {
-    "downloadErr": "下载 FRP 应用程序失败，无法正常启动 FRP 内网映射程序。"
+    "downloadErr": "下载 FRP 应用程序失败，无法正常启动 FRP 内网映射程序。",
+    "installing": "正在同时下载并安装 FRP 内网映射程序，稍后我们将自动启动映射功能"
   }
 }
