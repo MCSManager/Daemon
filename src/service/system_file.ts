@@ -110,6 +110,8 @@ export default class FileManager {
   }
 
   async newFile(fileName: string) {
+    if (!FileManager.checkFileName(fileName)) throw new Error(ERROR_MSG_01);
+    if (!this.checkPath(fileName)) throw new Error(ERROR_MSG_01);
     const target = this.toAbsolutePath(fileName);
     fs.createFile(target);
   }
