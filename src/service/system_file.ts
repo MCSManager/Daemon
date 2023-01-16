@@ -4,7 +4,6 @@ import { $t, i18next } from "../i18n";
 import path from "path";
 import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
-import os from "os";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
 
@@ -198,6 +197,7 @@ export default class FileManager {
 
   async promiseZip(sourceZip: string, files: string[], code?: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
+      // The path is checked in the function.
       this.zip(sourceZip, files, code, (err, v) => {
         if (err) return reject(err);
         resolve(v);
