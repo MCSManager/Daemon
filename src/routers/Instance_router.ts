@@ -54,7 +54,7 @@ routerApp.on("instance/select", (ctx, data) => {
   // keyword condition query
   const queryWrapper = InstanceSubsystem.getQueryMapWrapper();
   let result = queryWrapper.select<Instance>((v) => {
-    if (!v.config.nickname.includes(condition.instanceName)) return false;
+    if (!v.config.nickname.toLowerCase().includes(condition.instanceName.toLowerCase())) return false;
     return true;
   });
   // paging function
