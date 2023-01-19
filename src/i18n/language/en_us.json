@@ -5,7 +5,7 @@
     "instanceLoadError": "Failed to load local instance file:",
     "sessionConnect": "Session {{ip}} {{uuid}} connected",
     "sessionDisconnect": "session {{ip}} {{uuid}} disconnected",
-    "started": "Daemon ",
+    "started": "Daemon initialized!",
     "doc": "Documentation：https://docs.mcsmanager.com/",
     "addr": "Access URL：http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
     "configPathTip": "Configuration file：data/Config/global.json",
