@@ -6,11 +6,11 @@
     "sessionConnect": "Session {{ip}} {{uuid}} connected",
     "sessionDisconnect": "session {{ip}} {{uuid}} disconnected",
     "started": "Daemon initialized!",
-    "doc": "Documentation：https://docs.mcsmanager.com/",
-    "addr": "Access URL：http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
-    "configPathTip": "Configuration file：data/Config/global.json",
-    "password": "Access token：{{key}}",
-    "passwordTip": "The access token served as the only access credential，please use the MCSManager WebPanel to connect.",
+    "doc": "Documentation: https://docs.mcsmanager.com/",
+    "addr": "Access URL: http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
+    "configPathTip": "Configuration file: data/Config/global.json",
+    "password": "Access token: {{key}}",
+    "passwordTip": "The access token served as the only access credential, please use the MCSManager WebPanel to connect.",
     "exitTip": "Use Ctrl+C to close this program.",
     "sysinfo": "SysInfo",
     "httpSetupError": "The port may already be in use or the network device is unavailable."
@@ -23,7 +23,7 @@
     "uuidIrregular": "Invalid UUID {{uuid}}."
   },
   "command": {
-    "quotes": "Unpaired quotes，use {quotes} to bypass the limit.",
+    "quotes": "Unpaired quotes, use {quotes} to bypass the limit.",
     "errLen": "Incorrect command length, please double check your command format.",
     "instanceNotOpen": "Failed to execute command, could not find the instance process."
   },
@@ -46,21 +46,21 @@
     "restarting": "Detected an unexpected server stop, restarting..."
   },
   "general_start": {
-    "instanceConfigErr": "Start command，I/O encoding, or working directory is empty.",
+    "instanceConfigErr": "Start command, I/O encoding, or working directory is empty.",
     "cwdPathNotExist": "The working directory does not exist.",
     "cmdEmpty": "Unable to start instance: empty start command.",
     "startInstance": "Session {{source}}: Request to start instance.",
     "instanceUuid": "Instance identifier: [{{uuid}}]",
     "startCmd": "Start command: {{cmdList}}",
     "cwd": "Working directory: {{cwd}}",
-    "pidErr": "Failed to start instance/container (empty PID)，Possible cause:\n1. Incorrect start command，please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command：\n{{startCommand}}\n\nStart command parsing body:\nProgram：{{commandExeFile}}\nParameter(s)：{{commandParameters}}\n\nPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.",
+    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nStart command parsing body:\nProgram: {{commandExeFile}}\nParameter(s): {{commandParameters}}\n\nPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.",
     "startErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
     "startSuccess": "Instance {{instanceUuid}} started, PID: {{pid}}",
     "startOrdinaryTerminal": "Instance running. You can use command at the input box located at the bottom. If you need to use function keys like CTRL or TAB, please enable the emulation mode  in terminal settings."
   },
   "general_stop": {
     "notRunning": "Failed to stop instance: not running.",
-    "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
+    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
     "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
   "general_update": {
@@ -72,26 +72,26 @@
     "err": "Error",
     "updateFailed": "Update failed: the update command failed to start, please contact system administrator.",
     "update": "Update",
-    "updateSuccess": "Successfully updated！",
+    "updateSuccess": "Successfully updated!",
     "updateErr": "Update finished with incorrect result. Possibly due to damaged file(s) or network status.",
     "error": "Update error: {{err}}",
     "terminateUpdate": "User request to stop the async update task for instance: {{instanceUuid}}",
     "killProcess": "Killing task process..."
   },
   "pty_start": {
-    "cmdErr": "Start command，I/O encoding, or working directory is empty.",
+    "cmdErr": "Start command, I/O encoding, or working directory is empty.",
     "cwdNotExist": "The working directory does not exist.",
     "startPty": "Session {{source}}: request to start instance in emulation terminal.",
     "startErr": "Failed to start emulation terminal: Lack of dependencies. Fall back to general terminal.",
     "notSupportPty": "Failed to start emulation terminal: Unsupported system or architecture. Fall back to general terminal.",
-    "cmdEmpty": "Unable to start instance，empty startup command.",
+    "cmdEmpty": "Unable to start instance, empty startup command.",
     "sourceRequest": "Session {{source}}: request to start instance.",
     "instanceUuid": "Instance Identifier: [{{instanceUuid}}]",
     "startCmd": "Start command: {{cmd}}",
     "ptyPath": "PTY Path: {{path}}",
     "ptyParams": "PTY parameter: {{param}}",
     "ptyCwd": "Working directory: {{cwd}}",
-    "pidErr": "Failed to start instance/container (empty PID)，Possible cause:\n1. Incorrect start command，please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command：\n{{startCommand}}\n\nEmulation terminal tranPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.\nIf you think this is a panel issue, please switch back to general terminal mode by disabling the emulation mode.",
+    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nEmulation terminal tranPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.\nIf you think this is a panel issue, please switch back to general terminal mode by disabling the emulation mode.",
     "instanceStartErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
     "startSuccess": "Instance {{instanceUuid}} Successfullly started PID: {{pid}}",
     "startEmulatedTerminal": "Active emulation terminal, you can use function keys (like CTRL, TAB) directly.",
@@ -99,7 +99,7 @@
   },
   "pty_stop": {
     "notRunning": "Failed to stop: not running.",
-    "execCmd": "Executed pre-defined stop command：{{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
+    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
     "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
   "instanceConf": {
@@ -140,7 +140,7 @@
   },
   "file_router": {
     "instanceNotExist": "Instance {{instanceUuid}} does not exist.",
-    "unzipLimit": "Exceeded the maximum allowed decompresson tasks. Limit: {{maxFileTask}}，currently running: {{fileLock}}. Please wait patiently."
+    "unzipLimit": "Exceeded the maximum allowed decompresson tasks. Limit: {{maxFileTask}}, currently running: {{fileLock}}. Please wait patiently."
   },
   "http_router": {
     "instanceNotExist": "Instance doesn't exist.",
@@ -206,7 +206,7 @@
     "autoStart": "Sent an auto start command to instance {{name}} {{uuid}} ",
     "autoStartErr": "Error while auto starting instance: {{name}} {{uuid}} Reason: {{reason}}",
     "readInstanceFailed": "Failed to read application instance {{uuid}} Error: {{error}}",
-    "checkConf": "Please verify or delete file：data/InstanceConfig/{{uuid}}.json",
+    "checkConf": "Please verify or delete file: data/InstanceConfig/{{uuid}}.json",
     "uuidEmpty": "Unable to create new instance: empty UUID."
   },
   "ui": {
@@ -217,7 +217,7 @@
   },
   "quick_install": {
     "unzipError": "Failed decompress file.",
-    "hiperError": "Unable to start another HiPer process: HiPer is running.！"
+    "hiperError": "Unable to start another HiPer process: HiPer is running!"
   },
   "frp": {
     "downloadErr": "Downloading the FRP application failed, and the FRP intranet mapping program cannot be started normally.",
