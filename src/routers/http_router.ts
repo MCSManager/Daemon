@@ -23,7 +23,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
   try {
     // Get the task from the task center
     const mission = missionPassport.getMission(key, "download");
-    if (!mission) throw new Error((ctx.body = "No task, Access denied"));
+    if (!mission) throw new Error((ctx.body = "Access denied: No task found"));
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
     if (!instance) throw new Error($t("http_router.instanceNotExist"));
     if (!FileManager.checkFileName(paramsFileName)) throw new Error($t("http_router.fileNameNotSpec"));
@@ -33,7 +33,7 @@ router.get("/download/:key/:fileName", async (ctx) => {
     const ext = path.extname(fileRelativePath);
     // Check for file cross-directory security risks
     const fileManager = new FileManager(cwd);
-    if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied,incorrect param"));
+    if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied: Invalid destination"));
 
     // start downloading the file to the user
     ctx.response.set("Content-Disposition", `attachment; filename="${encodeURIComponent(paramsFileName)}"`);
@@ -57,9 +57,9 @@ router.post("/upload/:key", async (ctx) => {
   try {
     // Get the task & check the task & check if the instance exists
     const mission = missionPassport.getMission(key, "upload");
-    if (!mission) throw new Error("Access denied 0x061");
+    if (!mission) throw new Error("Access denied: No task found");
     const instance = InstanceSubsystem.getInstance(mission.parameter.instanceUuid);
-    if (!instance) throw new Error("Access denied 0x062");
+    if (!instance) throw new Error("Access denied: No instance found");
     const uploadDir = mission.parameter.uploadDir;
     const cwd = instance.config.cwd;
 
@@ -70,11 +70,11 @@ router.post("/upload/:key", async (ctx) => {
       const fileSaveRelativePath = path.normalize(path.join(uploadDir, fullFileName));
 
       // File name special character filtering (to prevent any cross-directory intrusion)
-      if (!FileManager.checkFileName(fullFileName)) throw new Error("Access denied 0x063");
+      if (!FileManager.checkFileName(fullFileName)) throw new Error("Access denied: Malformed file name");
 
       // Check for file cross-directory security risks
       const fileManager = new FileManager(cwd);
-      if (!fileManager.checkPath(fileSaveRelativePath)) throw new Error("Access denied 0x064");
+      if (!fileManager.checkPath(fileSaveRelativePath)) throw new Error("Access denied: Invalid destination");
       const fileSaveAbsolutePath = fileManager.toAbsolutePath(fileSaveRelativePath);
 
       // prohibit overwriting the original file
