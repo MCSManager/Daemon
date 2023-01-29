@@ -32,6 +32,9 @@ if (!fs.existsSync(INSTANCE_DATA_DIR)) {
 }
 
 class InstanceSubsystem extends EventEmitter {
+  public static readonly GLOBAL_INSTANCE = "__MCSM_GLOBAL_INSTANCE__";
+  public static readonly GLOBAL_INSTANCE_UUID = "global0001";
+
   public readonly LOG_DIR = "data/InstanceLog/";
 
   public readonly instances = new Map<string, Instance>();
@@ -79,12 +82,28 @@ class InstanceSubsystem extends EventEmitter {
         logger.error($t("system_instance.checkConf", { uuid: uuid }));
       }
     });
+
+    this.createInstance(
+      {
+        nickname: InstanceSubsystem.GLOBAL_INSTANCE,
+        cwd: "/",
+        startCommand: "bash",
+        stopCommand: "^c",
+        ie: "utf-8",
+        oe: "utf-8",
+        type: Instance.TYPE_UNIVERSAL,
+        processType: "general"
+      },
+      false,
+      InstanceSubsystem.GLOBAL_INSTANCE_UUID
+    );
+
     // handle autostart
     this.autoStart();
   }
 
-  createInstance(cfg: any) {
-    const newUuid = v4().replace(/-/gim, "");
+  createInstance(cfg: any, persistence = true, uuid?: string) {
+    const newUuid = uuid || v4().replace(/-/gim, "");
     const instance = new Instance(newUuid, new InstanceConfig());
     // Instance working directory verification and automatic creation
     if (!cfg.cwd || cfg.cwd === ".") {
@@ -94,7 +113,8 @@ class InstanceSubsystem extends EventEmitter {
     // Set the default input and output encoding
     cfg.ie = cfg.oe = cfg.fileCode = "utf8";
     // Build and initialize the type from the parameters
-    instance.parameters(cfg);
+
+    instance.parameters(cfg, persistence);
     instance.forceExec(new FunctionDispatcher());
     this.addInstance(instance);
     return instance;
@@ -196,7 +216,8 @@ class InstanceSubsystem extends EventEmitter {
         logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) is running or busy, and is being forced to end.`);
         promises.push(
           instance.execCommand(new KillCommand()).then(() => {
-            StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
+            if (instance.config.nickname !== InstanceSubsystem.GLOBAL_INSTANCE)
+              StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
             logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) saved successfully.`);
           })
         );
