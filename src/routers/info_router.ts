@@ -18,7 +18,7 @@ routerApp.on("info/overview", async (ctx) => {
   const daemonVersion = getVersion();
   let total = 0;
   let running = 0;
-  InstanceSubsystem.instances.forEach((v) => {
+  InstanceSubsystem.getInstances().forEach((v) => {
     total++;
     if (v.status() == Instance.STATUS_RUNNING) running++;
   });

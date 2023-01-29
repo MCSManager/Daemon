@@ -216,14 +216,26 @@ class InstanceSubsystem extends EventEmitter {
         logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) is running or busy, and is being forced to end.`);
         promises.push(
           instance.execCommand(new KillCommand()).then(() => {
-            if (instance.config.nickname !== InstanceSubsystem.GLOBAL_INSTANCE)
-              StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
+            if (!this.isGlobalInstance(instance)) StorageSubsystem.store("InstanceConfig", instance.instanceUuid, instance.config);
             logger.info(`Instance ${instance.config.nickname} (${instance.instanceUuid}) saved successfully.`);
           })
         );
       }
     }
     await Promise.all(promises);
+  }
+
+  getInstances() {
+    let newArr = new Array<Instance>();
+    this.instances.forEach((instance) => {
+      if (!this.isGlobalInstance(instance)) newArr.push(instance);
+    });
+    newArr = newArr.sort((a, b) => (a.config.nickname > a.config.nickname ? 1 : -1));
+    return newArr;
+  }
+
+  isGlobalInstance(instance: Instance) {
+    return instance.instanceUuid === InstanceSubsystem.GLOBAL_INSTANCE_UUID || instance.config.nickname === InstanceSubsystem.GLOBAL_INSTANCE;
   }
 }
 

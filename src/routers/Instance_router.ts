@@ -54,9 +54,11 @@ routerApp.on("instance/select", (ctx, data) => {
   // keyword condition query
   const queryWrapper = InstanceSubsystem.getQueryMapWrapper();
   let result = queryWrapper.select<Instance>((v) => {
+    if (InstanceSubsystem.isGlobalInstance(v)) return false;
     if (!v.config.nickname.toLowerCase().includes(condition.instanceName.toLowerCase())) return false;
     return true;
   });
+  result = result.sort((a, b) => (a.config.nickname > b.config.nickname ? 1 : -1));
   // paging function
   const pageResult = queryWrapper.page<Instance>(result, page, pageSize);
   // filter unwanted data
@@ -85,7 +87,7 @@ routerApp.on("instance/select", (ctx, data) => {
 // Get an overview of this daemon instance
 routerApp.on("instance/overview", (ctx) => {
   const overview: IInstanceDetail[] = [];
-  InstanceSubsystem.instances.forEach((instance) => {
+  InstanceSubsystem.getInstances().forEach((instance) => {
     overview.push({
       instanceUuid: instance.instanceUuid,
       started: instance.startCount,
@@ -102,7 +104,7 @@ routerApp.on("instance/overview", (ctx) => {
 routerApp.on("instance/section", (ctx, data) => {
   const instanceUuids = data.instanceUuids as string[];
   const overview: IInstanceDetail[] = [];
-  InstanceSubsystem.instances.forEach((instance) => {
+  InstanceSubsystem.getInstances().forEach((instance) => {
     instanceUuids.forEach((targetUuid) => {
       if (targetUuid === instance.instanceUuid) {
         overview.push({
