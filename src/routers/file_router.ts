@@ -6,7 +6,7 @@ import { routerApp } from "../service/router";
 import InstanceSubsystem from "../service/system_instance";
 import { getFileManager } from "../service/file_router_service";
 import { globalConfiguration, globalEnv } from "../entity/config";
-
+import os from "os";
 // Some routers operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
   if (event.startsWith("file/")) {
@@ -40,7 +40,9 @@ routerApp.on("file/status", (ctx, data) => {
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
     protocol.response(ctx, {
       instanceFileTask: instance.info.fileLock ?? 0,
-      globalFileTask: globalEnv.fileTaskCount ?? 0
+      globalFileTask: globalEnv.fileTaskCount ?? 0,
+      platform: os.platform(),
+      isGlobalInstance: data.instanceUuid === InstanceSubsystem.GLOBAL_INSTANCE_UUID
     });
   } catch (error) {
     protocol.responseError(ctx, error);

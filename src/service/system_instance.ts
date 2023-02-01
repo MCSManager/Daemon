@@ -32,8 +32,8 @@ if (!fs.existsSync(INSTANCE_DATA_DIR)) {
 }
 
 class InstanceSubsystem extends EventEmitter {
-  public static readonly GLOBAL_INSTANCE = "__MCSM_GLOBAL_INSTANCE__";
-  public static readonly GLOBAL_INSTANCE_UUID = "global0001";
+  public readonly GLOBAL_INSTANCE = "__MCSM_GLOBAL_INSTANCE__";
+  public readonly GLOBAL_INSTANCE_UUID = "global0001";
 
   public readonly LOG_DIR = "data/InstanceLog/";
 
@@ -85,7 +85,7 @@ class InstanceSubsystem extends EventEmitter {
 
     this.createInstance(
       {
-        nickname: InstanceSubsystem.GLOBAL_INSTANCE,
+        nickname: this.GLOBAL_INSTANCE,
         cwd: "/",
         startCommand: "bash",
         stopCommand: "^c",
@@ -95,7 +95,7 @@ class InstanceSubsystem extends EventEmitter {
         processType: "general"
       },
       false,
-      InstanceSubsystem.GLOBAL_INSTANCE_UUID
+      this.GLOBAL_INSTANCE_UUID
     );
 
     // handle autostart
@@ -235,7 +235,7 @@ class InstanceSubsystem extends EventEmitter {
   }
 
   isGlobalInstance(instance: Instance) {
-    return instance.instanceUuid === InstanceSubsystem.GLOBAL_INSTANCE_UUID || instance.config.nickname === InstanceSubsystem.GLOBAL_INSTANCE;
+    return instance.instanceUuid === this.GLOBAL_INSTANCE_UUID || instance.config.nickname === this.GLOBAL_INSTANCE;
   }
 }
 
