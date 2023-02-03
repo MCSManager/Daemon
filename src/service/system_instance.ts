@@ -64,6 +64,7 @@ class InstanceSubsystem extends EventEmitter {
   loadInstances() {
     const instanceConfigs = StorageSubsystem.list("InstanceConfig");
     instanceConfigs.forEach((uuid) => {
+      if (uuid === this.GLOBAL_INSTANCE_UUID) return;
       try {
         const instanceConfig = StorageSubsystem.load("InstanceConfig", InstanceConfig, uuid);
         const instance = new Instance(uuid, instanceConfig);
