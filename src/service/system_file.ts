@@ -95,12 +95,14 @@ export default class FileManager {
 
   async chmod(fileName: string, chmodValue: number, deep: boolean) {
     if (!this.check(fileName) || isNaN(parseInt(chmodValue as any))) throw new Error(ERROR_MSG_01);
+    const absPath = this.toAbsolutePath(fileName);
     const defaultPath = "/bin/chmod";
     let file = "chmod";
     if (fs.existsSync(defaultPath)) file = defaultPath;
     const params: string[] = [];
     if (deep) params.push("-R");
     params.push(String(chmodValue));
+    params.push(absPath);
     return await new processWrapper(file, params, ".", 60 * 10).start();
   }
 

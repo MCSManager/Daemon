@@ -39,8 +39,8 @@ routerApp.on("file/list", (ctx, data) => {
 routerApp.on("file/chmod", async (ctx, data) => {
   try {
     const fileManager = getFileManager(data.instanceUuid);
-    const { chmod, target, isDeep } = data;
-    await fileManager.chmod(target, chmod, isDeep);
+    const { chmod, target, deep } = data;
+    await fileManager.chmod(target, chmod, deep);
     protocol.response(ctx, true);
   } catch (error) {
     protocol.responseError(ctx, error);
