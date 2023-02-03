@@ -7,6 +7,7 @@ import InstanceSubsystem from "../service/system_instance";
 import { getFileManager } from "../service/file_router_service";
 import { globalConfiguration, globalEnv } from "../entity/config";
 import os from "os";
+
 // Some routers operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
   if (event.startsWith("file/")) {
@@ -29,6 +30,18 @@ routerApp.on("file/list", (ctx, data) => {
     fileManager.cd(target);
     const overview = fileManager.list(page, pageSize);
     protocol.response(ctx, overview);
+  } catch (error) {
+    protocol.responseError(ctx, error);
+  }
+});
+
+// File chmod (only Linux)
+routerApp.on("file/chmod", async (ctx, data) => {
+  try {
+    const fileManager = getFileManager(data.instanceUuid);
+    const { chmod, target, isDeep } = data;
+    await fileManager.chmod(target, chmod, isDeep);
+    protocol.response(ctx, true);
   } catch (error) {
     protocol.responseError(ctx, error);
   }

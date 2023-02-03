@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
+import { processWrapper } from "../common/process_tools";
 
 const ERROR_MSG_01 = $t("system_file.illegalAccess");
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
@@ -90,6 +91,17 @@ export default class FileManager {
       pageSize,
       total
     };
+  }
+
+  async chmod(fileName: string, chmodValue: number, deep: boolean) {
+    if (!this.check(fileName) || isNaN(parseInt(chmodValue as any))) throw new Error(ERROR_MSG_01);
+    const defaultPath = "/bin/chmod";
+    let file = "chmod";
+    if (fs.existsSync(defaultPath)) file = defaultPath;
+    const params: string[] = [];
+    if (deep) params.push("-R");
+    params.push(String(chmodValue));
+    return await new processWrapper(file, params, ".", 60 * 10).start();
   }
 
   async readFile(fileName: string) {
