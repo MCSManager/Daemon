@@ -15,6 +15,7 @@ interface IFile {
   size: number;
   time: string;
   type: number;
+  mode: number;
 }
 
 export default class FileManager {
@@ -62,20 +63,18 @@ export default class FileManager {
     fileNames.forEach((name) => {
       try {
         const info = fs.statSync(this.toAbsolutePath(name));
+        const mode = parseInt(String(parseInt(info.mode?.toString(8), 10)).slice(-3));
+        const commonInfo = {
+          name: name,
+          size: info.size,
+          time: info.atime.toString(),
+          mode,
+          type: info.isFile() ? 1 : 0
+        };
         if (info.isFile()) {
-          files.push({
-            name: name,
-            type: 1,
-            size: info.size,
-            time: info.atime.toString()
-          });
+          files.push(commonInfo);
         } else {
-          dirs.push({
-            name: name,
-            type: 0,
-            size: info.size,
-            time: info.atime.toString()
-          });
+          dirs.push(commonInfo);
         }
       } catch (error) {
         // Ignore a file information retrieval error to prevent an overall error
@@ -109,7 +108,7 @@ export default class FileManager {
   }
 
   async newFile(fileName: string) {
-    if (!FileManager.checkFileName(fileName)) throw new Error(ERROR_MSG_01);
+    // if (!FileManager.checkFileName(fileName)) throw new Error(ERROR_MSG_01);
     if (!this.checkPath(fileName)) throw new Error(ERROR_MSG_01);
     const target = this.toAbsolutePath(fileName);
     fs.createFile(target);
