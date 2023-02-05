@@ -7,6 +7,7 @@ import { compress, decompress } from "../common/compress";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
 import { processWrapper } from "../common/process_tools";
+import os from "os";
 
 const ERROR_MSG_01 = $t("system_file.illegalAccess");
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
@@ -34,17 +35,32 @@ export default class FileManager {
     }
   }
 
+  isRootTopRath() {
+    return this.topPath === "/" || this.topPath === "\\";
+  }
+
   toAbsolutePath(fileName: string = "") {
+    if (os.platform() === "win32") {
+      const reg = new RegExp("^[A-Za-z]{1}:[\\\\/]{1}");
+      if (reg.test(this.cwd)) {
+        return path.normalize(path.join(this.cwd, fileName));
+      }
+      if (reg.test(fileName)) {
+        return path.normalize(fileName);
+      }
+    }
     return path.normalize(path.join(this.topPath, this.cwd, fileName));
   }
 
   checkPath(fileNameOrPath: string) {
+    if (this.isRootTopRath()) return true;
     const destAbsolutePath = this.toAbsolutePath(fileNameOrPath);
     const topAbsolutePath = this.topPath;
     return destAbsolutePath.indexOf(topAbsolutePath) === 0;
   }
 
   check(destPath: string) {
+    if (this.isRootTopRath()) return true;
     return this.checkPath(destPath) && fs.existsSync(this.toAbsolutePath(destPath));
   }
 
@@ -89,7 +105,8 @@ export default class FileManager {
       items: resultList,
       page,
       pageSize,
-      total
+      total,
+      absolutePath: this.toAbsolutePath()
     };
   }
 

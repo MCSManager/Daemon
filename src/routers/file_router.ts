@@ -7,6 +7,12 @@ import InstanceSubsystem from "../service/system_instance";
 import { getFileManager } from "../service/file_router_service";
 import { globalConfiguration, globalEnv } from "../entity/config";
 import os from "os";
+import * as nodeDiskInfo from "node-disk-info";
+
+let diskInfos: any[] = [];
+if (os.platform() === "win32") {
+  diskInfos = nodeDiskInfo.getDiskInfoSync();
+}
 
 // Some routers operate router authentication middleware
 routerApp.use((event, ctx, data, next) => {
@@ -48,14 +54,18 @@ routerApp.on("file/chmod", async (ctx, data) => {
 });
 
 // Query the status of the file management system
-routerApp.on("file/status", (ctx, data) => {
+routerApp.on("file/status", async (ctx, data) => {
   try {
     const instance = InstanceSubsystem.getInstance(data.instanceUuid);
+
     protocol.response(ctx, {
       instanceFileTask: instance.info.fileLock ?? 0,
       globalFileTask: globalEnv.fileTaskCount ?? 0,
       platform: os.platform(),
-      isGlobalInstance: data.instanceUuid === InstanceSubsystem.GLOBAL_INSTANCE_UUID
+      isGlobalInstance: data.instanceUuid === InstanceSubsystem.GLOBAL_INSTANCE_UUID,
+      disks: diskInfos.map((v) => {
+        return String(v._mounted).replace(":", "");
+      })
     });
   } catch (error) {
     protocol.responseError(ctx, error);
