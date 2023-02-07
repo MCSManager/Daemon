@@ -84,7 +84,7 @@ export default class Instance extends EventEmitter {
   }
 
   // Pass in instance configuration, loosely and dynamically set configuration items for instance parameters
-  parameters(cfg: any) {
+  parameters(cfg: any, persistence = true) {
     // If the instance type changes, default commands and lifecycle events must be reset
     if (cfg?.type && cfg?.type != this.config.type) {
       if (this.status() != Instance.STATUS_STOP) throw new Error($t("instanceConf.cantModifyInstanceType"));
@@ -153,7 +153,8 @@ export default class Instance extends EventEmitter {
     if (cfg.terminalOption) {
       configureEntityParams(this.config.terminalOption, cfg.terminalOption, "haveColor", Boolean);
     }
-    StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
+
+    if (persistence) StorageSubsystem.store("InstanceConfig", this.instanceUuid, this.config);
   }
 
   setLock(bool: boolean) {

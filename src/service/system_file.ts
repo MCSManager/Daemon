@@ -6,6 +6,8 @@ import fs from "fs-extra";
 import { compress, decompress } from "../common/compress";
 import iconv from "iconv-lite";
 import { globalConfiguration } from "../entity/config";
+import { processWrapper } from "../common/process_tools";
+import os from "os";
 
 const ERROR_MSG_01 = $t("system_file.illegalAccess");
 const MAX_EDIT_SIZE = 1024 * 1024 * 4;
@@ -15,6 +17,7 @@ interface IFile {
   size: number;
   time: string;
   type: number;
+  mode: number;
 }
 
 export default class FileManager {
@@ -32,17 +35,32 @@ export default class FileManager {
     }
   }
 
+  isRootTopRath() {
+    return this.topPath === "/" || this.topPath === "\\";
+  }
+
   toAbsolutePath(fileName: string = "") {
+    if (os.platform() === "win32") {
+      const reg = new RegExp("^[A-Za-z]{1}:[\\\\/]{1}");
+      if (reg.test(this.cwd)) {
+        return path.normalize(path.join(this.cwd, fileName));
+      }
+      if (reg.test(fileName)) {
+        return path.normalize(fileName);
+      }
+    }
     return path.normalize(path.join(this.topPath, this.cwd, fileName));
   }
 
   checkPath(fileNameOrPath: string) {
+    if (this.isRootTopRath()) return true;
     const destAbsolutePath = this.toAbsolutePath(fileNameOrPath);
     const topAbsolutePath = this.topPath;
     return destAbsolutePath.indexOf(topAbsolutePath) === 0;
   }
 
   check(destPath: string) {
+    if (this.isRootTopRath()) return true;
     return this.checkPath(destPath) && fs.existsSync(this.toAbsolutePath(destPath));
   }
 
@@ -62,20 +80,18 @@ export default class FileManager {
     fileNames.forEach((name) => {
       try {
         const info = fs.statSync(this.toAbsolutePath(name));
+        const mode = parseInt(String(parseInt(info.mode?.toString(8), 10)).slice(-3));
+        const commonInfo = {
+          name: name,
+          size: info.size,
+          time: info.atime.toString(),
+          mode,
+          type: info.isFile() ? 1 : 0
+        };
         if (info.isFile()) {
-          files.push({
-            name: name,
-            type: 1,
-            size: info.size,
-            time: info.atime.toString()
-          });
+          files.push(commonInfo);
         } else {
-          dirs.push({
-            name: name,
-            type: 0,
-            size: info.size,
-            time: info.atime.toString()
-          });
+          dirs.push(commonInfo);
         }
       } catch (error) {
         // Ignore a file information retrieval error to prevent an overall error
@@ -89,8 +105,22 @@ export default class FileManager {
       items: resultList,
       page,
       pageSize,
-      total
+      total,
+      absolutePath: this.toAbsolutePath()
     };
+  }
+
+  async chmod(fileName: string, chmodValue: number, deep: boolean) {
+    if (!this.check(fileName) || isNaN(parseInt(chmodValue as any))) throw new Error(ERROR_MSG_01);
+    const absPath = this.toAbsolutePath(fileName);
+    const defaultPath = "/bin/chmod";
+    let file = "chmod";
+    if (fs.existsSync(defaultPath)) file = defaultPath;
+    const params: string[] = [];
+    if (deep) params.push("-R");
+    params.push(String(chmodValue));
+    params.push(absPath);
+    return await new processWrapper(file, params, ".", 60 * 10).start();
   }
 
   async readFile(fileName: string) {
@@ -109,7 +139,7 @@ export default class FileManager {
   }
 
   async newFile(fileName: string) {
-    if (!FileManager.checkFileName(fileName)) throw new Error(ERROR_MSG_01);
+    // if (!FileManager.checkFileName(fileName)) throw new Error(ERROR_MSG_01);
     if (!this.checkPath(fileName)) throw new Error(ERROR_MSG_01);
     const target = this.toAbsolutePath(fileName);
     fs.createFile(target);

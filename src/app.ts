@@ -88,7 +88,7 @@ initDependent();
 // Initialize application instance system
 try {
   InstanceSubsystem.loadInstances();
-  logger.info($t("app.instanceLoad", { n: InstanceSubsystem.instances.size }));
+  logger.info($t("app.instanceLoad", { n: InstanceSubsystem.getInstances().length }));
 } catch (err) {
   logger.error($t("app.instanceLoadError"), err);
   process.exit(-1);
