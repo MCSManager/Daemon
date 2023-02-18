@@ -88,7 +88,7 @@ class InstanceSubsystem extends EventEmitter {
       {
         nickname: this.GLOBAL_INSTANCE,
         cwd: "/",
-        startCommand: "bash",
+        startCommand: os.platform() === "win32" ? "cmd.exe" : "bash",
         stopCommand: "^c",
         ie: "utf-8",
         oe: "utf-8",
