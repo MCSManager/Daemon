@@ -18,7 +18,7 @@ export class OpenFrp {
   public processWrapper: processWrapper;
 
   constructor(public readonly token: string, public readonly tunnelId: string) {
-    // ./frpc -u 用户密钥 -p 隧道ID
+    // ./frpc -u <passowrd> -p <channel id>
     this.processWrapper = new processWrapper(FRPC_PATH, ["-u", this.token, "-p", this.tunnelId], path.dirname(FRPC_PATH));
   }
 
