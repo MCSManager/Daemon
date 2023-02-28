@@ -48,7 +48,7 @@ If you need to run in the background for a long time, please use the `Screen` so
 
 ## License
 
-https://github.com/MCSManager/MCSManager#license
+Copyright 2023 [MCSManager Dev](https://github.com/mcsmanager), Apache-2.0 license.
 
 
 
