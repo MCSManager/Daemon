@@ -39,6 +39,7 @@ export default class Instance extends EventEmitter {
   public static readonly TYPE_UNIVERSAL = "universal";
   public static readonly TYPE_MINECRAFT_JAVA = "minecraft/java";
   public static readonly TYPE_MINECRAFT_BEDROCK = "minecraft/bedrock";
+  public static readonly TYPE_STEAM = "steam/universal";
 
   public instanceStatus: number;
   public instanceUuid: string;
@@ -144,6 +145,7 @@ export default class Instance extends EventEmitter {
       configureEntityParams(this.config.pingConfig, cfg.pingConfig, "ip", String);
       configureEntityParams(this.config.pingConfig, cfg.pingConfig, "port", Number);
       configureEntityParams(this.config.pingConfig, cfg.pingConfig, "type", Number);
+      configureEntityParams(this.config.pingConfig, cfg.pingConfig, "password", String);
     }
     if (cfg.eventTask) {
       configureEntityParams(this.config.eventTask, cfg.eventTask, "autoStart", Boolean);

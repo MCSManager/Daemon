@@ -21,6 +21,7 @@ import PtyStartCommand from "./pty/pty_start";
 import PtyStopCommand from "./pty/pty_stop";
 import { PTY_PATH } from "../../const";
 import OpenFrpTask from "./task/openfrp";
+import RconCommand from "./general/rcon_command";
 
 // instance function scheduler
 // Dispatch and assign different functions according to different types
@@ -67,8 +68,13 @@ export default class FunctionDispatcher extends InstanceCommand {
       instance.setPreset("start", new DockerStartCommand());
     }
 
-    // Set different preset functions and functions according to different types
+    // Use RCON
+    if (instance.config.type.includes(Instance.TYPE_STEAM) && instance.config.pingConfig.password) {
+      instance.setPreset("command", new RconCommand());
+    }
+
     if (instance.config.type.includes(Instance.TYPE_UNIVERSAL)) {
+      // Set different preset functions and functions according to different types
       instance.setPreset("getPlayer", new NullCommand());
     }
     if (instance.config.type.includes(Instance.TYPE_MINECRAFT_JAVA)) {

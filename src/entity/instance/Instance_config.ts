@@ -65,7 +65,8 @@ export default class InstanceConfig {
   public pingConfig = {
     ip: "",
     port: 25565,
-    type: 1
+    type: 1,
+    password: ""
   };
 
   public extraServiceConfig = {
