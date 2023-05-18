@@ -1,6 +1,6 @@
 {
   "name": "mcsmanager-daemon",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Provides remote control capability for MCSManager to manage processes, scheduled tasks, I/O streams, and more",
   "main": "src/app.js",
   "scripts": {
