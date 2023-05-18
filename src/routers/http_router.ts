@@ -63,10 +63,10 @@ router.post("/upload/:key", async (ctx) => {
     const uploadDir = mission.parameter.uploadDir;
     const cwd = instance.config.cwd;
 
-    const file = ctx.request.files.file as any;
-    if (file) {
+    const file = ctx.request.files.file;
+    if (file && !(file instanceof Array)) {
       // Confirm storage location
-      const fullFileName = file.name as string;
+      const fullFileName = file.name;
       const fileSaveRelativePath = path.normalize(path.join(uploadDir, fullFileName));
 
       // File name special character filtering (to prevent any cross-directory intrusion)
