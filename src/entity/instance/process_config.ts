@@ -54,7 +54,9 @@ export class ProcessConfig {
       text = toml.stringify(<toml.JsonMap>object);
     }
     if (this.iProcessConfig.type === "properties") {
-      text = properties.stringify(object);
+      text = properties.stringify(object, {
+        unicode: true
+      });
       text = text.replace(/ = /gim, "=");
       if (this.iProcessConfig.fileName == "server.properties") {
         text = text.replace(/\\\\u/gim, "\\u");
