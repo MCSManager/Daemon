@@ -2,6 +2,7 @@
 
 import { $t } from "../i18n";
 import Router from "@koa/router";
+import send from "koa-send";
 import fs from "fs-extra";
 import path from "path";
 import { missionPassport } from "../service/mission_passport";
@@ -30,17 +31,16 @@ router.get("/download/:key/:fileName", async (ctx) => {
 
     const cwd = instance.config.cwd;
     const fileRelativePath = mission.parameter.fileName;
-    const ext = path.extname(fileRelativePath);
+
     // Check for file cross-directory security risks
     const fileManager = new FileManager(cwd);
     if (!fileManager.check(fileRelativePath)) throw new Error((ctx.body = "Access denied: Invalid destination"));
 
-    // start downloading the file to the user
-    ctx.response.set("Content-Disposition", `attachment; filename="${encodeURIComponent(paramsFileName)}"`);
-    ctx.type = ext;
-    ctx.body = fs.createReadStream(fileManager.toAbsolutePath(fileRelativePath));
-    // The task has been executed, destroy the passport
-    missionPassport.deleteMission(key);
+    // send File
+    const fileAbsPath = fileManager.toAbsolutePath(fileRelativePath);
+    const fileDir = path.dirname(fileAbsPath);
+    const fileName = path.basename(fileAbsPath);
+    await send(ctx, fileName, { root: fileDir + "/" });
   } catch (error) {
     ctx.body = $t("http_router.downloadErr", { error: error.message });
     ctx.status = 500;
