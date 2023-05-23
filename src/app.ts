@@ -51,6 +51,7 @@ import InstanceSubsystem from "./service/system_instance";
 import { initDependent } from "./service/install";
 import "./service/async_task_service";
 import "./service/async_task_service/quick_install";
+import "./service/system_visual_data";
 
 // Initialize HTTP service
 const koaApp = koa.initKoa();

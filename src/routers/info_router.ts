@@ -12,6 +12,7 @@ import i18next from "i18next";
 import logger from "../service/log";
 import fs from "fs-extra";
 import { LOCAL_PRESET_LANG_PATH } from "../const";
+import VisualDataSubsystem from "../service/system_visual_data";
 
 // Get the basic information of the daemon system
 routerApp.on("info/overview", async (ctx) => {
@@ -33,7 +34,8 @@ routerApp.on("info/overview", async (ctx) => {
       running,
       total
     },
-    system: systemInfo()
+    system: systemInfo(),
+    cpuMemChart: VisualDataSubsystem.getSystemChartArray()
   };
   protocol.response(ctx, info);
 });
