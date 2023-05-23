@@ -72,7 +72,7 @@ export default class FileManager {
   list(page: 0, pageSize = 40, searchFileName?: string) {
     if (pageSize > 100 || pageSize <= 0 || page < 0) throw new Error("Beyond the value limit");
     let fileNames = fs.readdirSync(this.toAbsolutePath());
-    if (searchFileName) fileNames = fileNames.filter((name) => name.includes(searchFileName));
+    if (searchFileName) fileNames = fileNames.filter((name) => name.toLowerCase().includes(searchFileName.toLowerCase()));
 
     const total = fileNames.length;
     const sliceStart = page * pageSize;
