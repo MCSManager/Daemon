@@ -34,7 +34,7 @@ interface ISystemChartInfo {
 class VisualDataSubsystem {
   public readonly countMap: Map<string, number> = new Map<string, number>();
 
-  public readonly systemChart = new LineQueue<ISystemChartInfo>(60, { cpu: 0, mem: 0 });
+  public readonly systemChart = new LineQueue<ISystemChartInfo>(200, { cpu: 0, mem: 0 });
 
   private requestCount = 0;
 
@@ -52,7 +52,7 @@ class VisualDataSubsystem {
           mem: 0
         });
       }
-    }, 1000 * 10);
+    }, 1000 * 3);
   }
 
   addRequestCount() {
