@@ -16,6 +16,10 @@ class Config {
   public ip = "";
   public port = 24444;
   public key = builderPassword();
+  public ssl = false;
+  public sslKeyfile = "./data/ssl/privkey.key";
+  public sslCertfile = "./data/ssl/fullchain.pem";
+  public httpsPort = 24443;
   public maxFileTask = 2;
   public maxZipFileSize = 60;
   public language = "en_us";
@@ -48,4 +52,5 @@ class GlobalEnv {
 const globalConfiguration = new GlobalConfiguration();
 const globalEnv = new GlobalEnv();
 
-export { globalConfiguration, Config, globalEnv };
+export { Config, globalConfiguration, globalEnv };
+

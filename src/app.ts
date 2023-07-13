@@ -1,13 +1,14 @@
 // Copyright (C) 2022 MCSManager <mcsmanager-dev@outlook.com>
 
-import http from "http";
 import fs from "fs-extra";
-import { $t, i18next } from "./i18n";
-import { getVersion, initVersionManager } from "./service/version";
-import { globalConfiguration } from "./entity/config";
+import http from "http";
+import https from 'https';
 import { Server, Socket } from "socket.io";
 import { LOCAL_PRESET_LANG_PATH } from "./const";
+import { globalConfiguration } from "./entity/config";
+import { $t, i18next } from "./i18n";
 import logger from "./service/log";
+import { getVersion, initVersionManager } from "./service/version";
 
 initVersionManager();
 const VERSION = getVersion();
@@ -44,13 +45,13 @@ if (fs.existsSync(LOCAL_PRESET_LANG_PATH)) {
 }
 logger.info($t("app.welcome"));
 
-import * as router from "./service/router";
-import * as koa from "./service/http";
-import * as protocol from "./service/protocol";
-import InstanceSubsystem from "./service/system_instance";
-import { initDependent } from "./service/install";
 import "./service/async_task_service";
 import "./service/async_task_service/quick_install";
+import * as koa from "./service/http";
+import { initDependent } from "./service/install";
+import * as protocol from "./service/protocol";
+import * as router from "./service/router";
+import InstanceSubsystem from "./service/system_instance";
 import "./service/system_visual_data";
 
 // Initialize HTTP service
@@ -69,7 +70,21 @@ httpServer.on("error", (err) => {
   process.exit(1);
 });
 httpServer.listen(config.port, config.ip);
+const options = {
+  key: fs.readFileSync(config.sslKeyfile),
+  cert: fs.readFileSync(config.sslCertfile)
+};
 
+const httpsServer = https.createServer(options, koaApp.callback());
+httpsServer.on("error", (err) => {
+  logger.error($t("app.httpsSetupError"));
+  logger.error(err);
+  process.exit(1);
+});
+// 如果 config 中 ssl 为 true 则启用 https
+if (config.ssl) {
+httpsServer.listen(config.httpsPort, config.ip);
+}
 // Initialize Websocket service to HTTP service
 const io = new Server(httpServer, {
   serveClient: false,
@@ -82,7 +97,6 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
-
 // Initialize optional dependencies
 initDependent();
 
