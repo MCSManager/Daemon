@@ -41,7 +41,6 @@ router.get("/download/:key/:fileName", async (ctx) => {
     const fileDir = path.dirname(fileAbsPath);
     const fileName = path.basename(fileAbsPath);
     ctx.set("Content-Type","application/octet-stream");
-    ctx.set("Content-Disposition","attachment");
     await send(ctx, fileName, { root: fileDir + "/" });
   } catch (error) {
     ctx.body = $t("http_router.downloadErr", { error: error.message });
