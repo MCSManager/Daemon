@@ -7,6 +7,7 @@ import path from "path";
 import { missionPassport } from "../service/mission_passport";
 import InstanceSubsystem from "../service/system_instance";
 import FileManager from "../service/system_file";
+import logger from "../service/log";
 
 const router = new Router();
 
@@ -54,6 +55,7 @@ router.post("/upload/:key", async (ctx) => {
   const key = ctx.params.key;
   const unzip = ctx.query.unzip;
   const zipCode = String(ctx.query.code);
+  logger.info("正在上传文件！");
   try {
     // Get the task & check the task & check if the instance exists
     const mission = missionPassport.getMission(key, "upload");
@@ -63,6 +65,7 @@ router.post("/upload/:key", async (ctx) => {
     const uploadDir = mission.parameter.uploadDir;
     const cwd = instance.config.cwd;
 
+    console.log("ctx.request.files", ctx.request.files);
     const file = ctx.request.files.file as any;
     if (file) {
       // Confirm storage location
@@ -96,6 +99,7 @@ router.post("/upload/:key", async (ctx) => {
     ctx.body = $t("http_router.updateErr");
     ctx.status = 500;
   } catch (error) {
+    console.log("上传文件出错：", error);
     ctx.body = error.message;
     ctx.status = 500;
   } finally {

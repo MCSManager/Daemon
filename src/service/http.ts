@@ -5,6 +5,7 @@ import koaBody from "koa-body";
 
 // Load the HTTP service route
 import koaRouter from "../routers/http_router";
+import logger from "./log";
 
 export function initKoa() {
   // Initialize the Koa framework
@@ -13,7 +14,11 @@ export function initKoa() {
     koaBody({
       multipart: true,
       formidable: {
-        maxFileSize: 1024 * 1024 * 1024 * 1000
+        maxFieldsSize: Number.MAX_VALUE,
+        maxFileSize: Number.MAX_VALUE
+      },
+      onError(err, ctx) {
+        logger.error("koaBody 库错误：", err);
       }
     })
   );

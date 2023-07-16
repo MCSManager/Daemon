@@ -57,6 +57,7 @@ const koaApp = koa.initKoa();
 
 // Listen for Koa errors
 koaApp.on("error", (error) => {
+  logger.error("Koa 框架错误：", error);
   // Block all Koa framework error
   // When Koa is attacked by a short connection flood, it is easy for error messages to swipe the screen, which may indirectly affect the operation of some applications
 });
