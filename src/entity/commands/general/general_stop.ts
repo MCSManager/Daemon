@@ -16,14 +16,8 @@ export default class GeneralStopCommand extends InstanceCommand {
 
     instance.status(Instance.STATUS_STOPPING);
 
-    const stopCommandList = stopCommand.split(/(\^c|\^C|\\n|\\N)/g);
+    const stopCommandList = stopCommand.split("\n");
     for (const stopCommandColumn of stopCommandList) {
-      if (stopCommandColumn == "") {
-        continue;
-      }
-      if (stopCommandColumn.toLocaleLowerCase() == "\\n") {
-        continue;
-      }
       if (stopCommandColumn.toLocaleLowerCase() == "^c") {
         instance.process.kill("SIGINT");
       } else {

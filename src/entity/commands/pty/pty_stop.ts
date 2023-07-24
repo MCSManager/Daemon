@@ -18,14 +18,8 @@ export default class PtyStopCommand extends InstanceCommand {
 
     instance.println("INFO", $t("pty_stop.execCmd", { stopCommand: stopCommand }));
 
-    const stopCommandList = stopCommand.split(/(\^c|\^C|\\n|\\N)/g);
+    const stopCommandList = stopCommand.split("\n");
     for (const stopCommandColumn of stopCommandList) {
-      if (stopCommandColumn == "") {
-        continue;
-      }
-      if (stopCommandColumn.toLocaleLowerCase() == "\\n") {
-        continue;
-      }
       if (stopCommandColumn.toLocaleLowerCase() == "^c") {
         await instance.exec(new SendCommand("\x03"));
       } else {
