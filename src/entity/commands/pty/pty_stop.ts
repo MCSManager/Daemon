@@ -17,8 +17,15 @@ export default class PtyStopCommand extends InstanceCommand {
     instance.status(Instance.STATUS_STOPPING);
 
     instance.println("INFO", $t("pty_stop.execCmd", { stopCommand: stopCommand }));
-    if (stopCommand.toLowerCase() == "^c") stopCommand = "\x03";
-    await instance.exec(new SendCommand(stopCommand));
+
+    const stopCommandList = stopCommand.split("\n");
+    for (const stopCommandColumn of stopCommandList) {
+      if (stopCommandColumn.toLocaleLowerCase() == "^c") {
+        await instance.exec(new SendCommand("\x03"));
+      } else {
+        await instance.exec(new SendCommand(stopCommandColumn));
+      }
+    }
 
     // If the instance is still in the stopped state after 10 minutes, restore the state
     const cacheStartCount = instance.startCount;

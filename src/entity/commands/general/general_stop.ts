@@ -16,10 +16,13 @@ export default class GeneralStopCommand extends InstanceCommand {
 
     instance.status(Instance.STATUS_STOPPING);
 
-    if (stopCommand.toLocaleLowerCase() == "^c") {
-      instance.process.kill("SIGINT");
-    } else {
-      await instance.exec(new SendCommand(stopCommand));
+    const stopCommandList = stopCommand.split("\n");
+    for (const stopCommandColumn of stopCommandList) {
+      if (stopCommandColumn.toLocaleLowerCase() == "^c") {
+        instance.process.kill("SIGINT");
+      } else {
+        await instance.exec(new SendCommand(stopCommandColumn));
+      }
     }
 
     instance.println("INFO", $t("general_stop.execCmd", { stopCommand }));
