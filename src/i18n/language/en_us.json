@@ -10,7 +10,7 @@
     "addr": "Access URL: http://<IP>:{{port}}/ or ws://<IP>:{{port}}",
     "configPathTip": "Configuration file: data/Config/global.json",
     "password": "Access token: {{key}}",
-    "passwordTip": "The access token served as the only access credential, please use the MCSManager WebPanel to connect.",
+    "passwordTip": "The access token serves as the only access credential, please use the MCSManager WebPanel to connect.",
     "exitTip": "Use Ctrl+C to close this program.",
     "sysinfo": "SysInfo",
     "httpSetupError": "The port may already be in use or the network device is unavailable."
@@ -28,7 +28,7 @@
     "instanceNotOpen": "Failed to execute command, could not find the instance process."
   },
   "instance": {
-    "dirEmpty": "start command, I/O encoding, or working directory is empty.",
+    "dirEmpty": "Start command, I/O encoding, or working directory is empty.",
     "dirNoE": "The working directory does not exist.",
     "invalidCpu": "Illegal CPU core specification {{v}}",
     "invalidContainerName": "Invalid container name {{v}}",
@@ -37,7 +37,7 @@
   "start": {
     "instanceNotDown": "Could not start instance: already running.",
     "instanceMaturity": "Could not start instance: instance expired.",
-    "startInstance": "starting instance..."
+    "startInstance": "Starting instance..."
   },
   "restart": {
     "start": "Executing scheduled restart.",
@@ -53,15 +53,15 @@
     "instanceUuid": "Instance identifier: [{{uuid}}]",
     "startCmd": "Start command: {{cmdList}}",
     "cwd": "Working directory: {{cwd}}",
-    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nStart command parsing body:\nProgram: {{commandExeFile}}\nParameter(s): {{commandParameters}}\n\nPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.",
+    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrectly configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nStart command parsing body:\nProgram: {{commandExeFile}}\nParameter(s): {{commandParameters}}\n\nPlease report to the system administrator, check with a technical specialist, or troubleshoot on your own.",
     "startErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
     "startSuccess": "Instance {{instanceUuid}} started, PID: {{pid}}",
-    "startOrdinaryTerminal": "Instance running. You can use command at the input box located at the bottom. If you need to use function keys like CTRL or TAB, please enable the emulation mode  in terminal settings."
+    "startOrdinaryTerminal": "Instance running. You can use command at the input box located at the bottom. If you need to use function keys like CTRL or TAB, please enable the emulation mode in terminal settings."
   },
   "general_stop": {
     "notRunning": "Failed to stop instance: not running.",
-    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
-    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
+    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instances are not stopping.",
+    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if the instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
   "general_update": {
     "statusErr_notStop": "Unable to update: incorrect instance status, it has to be stopped first.",
@@ -91,30 +91,30 @@
     "ptyPath": "PTY Path: {{path}}",
     "ptyParams": "PTY parameter: {{param}}",
     "ptyCwd": "Working directory: {{cwd}}",
-    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrect configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nEmulation terminal tranPlease report to system administrator, consult with tenical specialist, or troubleshoo on your own.\nIf you think this is a panel issue, please switch back to general terminal mode by disabling the emulation mode.",
+    "pidErr": "Failed to start instance/container (empty PID), Possible cause:\n1. Incorrect start command, please double check the start command and parameters.\n2. Incorrectly configured host environment (e.g. no Java installed or PATH issue).\n\nNative start command: \n{{startCommand}}\n\nEmulation terminal: Please report to the system administrator, check with a technical specialist, or troubleshoot on your own.\nIf you think this is a panel issue, please switch back to general terminal mode by disabling the emulation mode.",
     "instanceStartErr": "Failed to start instance: Please check the starting command, host environment, or configuration file.",
     "startSuccess": "Instance {{instanceUuid}} Successfullly started PID: {{pid}}",
     "startEmulatedTerminal": "Active emulation terminal, you can use function keys (like CTRL, TAB) directly.",
-    "mustAbsolutePath": "In order to use the emulation terminal, you must use absolute path for your instance."
+    "mustAbsolutePath": "In order to use the emulation terminal, you must use an absolute path for your instance."
   },
   "pty_stop": {
     "notRunning": "Failed to stop: not running.",
-    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instance are not stopping.",
-    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if instance is frozen. The status was reset to running. You can also force terminate the instance process."
+    "execCmd": "Executed pre-defined stop command: {{stopCommand}}\nPlease set the correct stop command in the instance settings if the instances are not stopping.",
+    "stopErr": "Failed to stop instance: stop command sent but the instance is not shutting down. Please double check your stop command or if the instance is frozen. The status was reset to running. You can also force terminate the instance process."
   },
   "instanceConf": {
     "initInstanceErr": "Failed to initialize instance: empty identifier or configuration.",
     "cantModifyInstanceType": "Unable change instance type: instance running.",
     "cantModifyProcessType": "Unable to change instance process type: instance running.",
     "cantModifyPtyModel": "Unable to change PTY mode: instance running.",
-    "ptyNotExist": "Unable to use emulation terminal: {{path}}  dependencies not exist. Youcan contact system administrator to install it by restarting the Daemon under Linux environment.",
+    "ptyNotExist": "Unable to use emulation terminal: {{path}}  dependencies missing. You can contact the system administrator to install it by restarting the Daemon under Linux environment.",
     "instanceLock": "Failed to execute operation {{info}} : instance locked, please try again later.",
     "instanceBusy": "Instance busy, unable to perform any actions.",
     "info": "Info",
     "error": "Error",
     "autoRestart": "Unexpected stop detected, restarting...",
     "autoRestartErr": "Failed to auto restart: {{err}}",
-    "instantExit": "Instance exited short after started, might be due to a wrong start command or configuration."
+    "instantExit": "Instance exited shortly after being started, possibly due to a wrong start command or configuration."
   },
   "preset": {
     "actionErr": "Pre-defined command {{action}} unavailable."
@@ -140,20 +140,20 @@
   },
   "file_router": {
     "instanceNotExist": "Instance {{instanceUuid}} does not exist.",
-    "unzipLimit": "Exceeded the maximum allowed decompresson tasks. Limit: {{maxFileTask}}, currently running: {{fileLock}}. Please wait patiently."
+    "unzipLimit": "Exceeded the maximum allowed decompression tasks. Limit: {{maxFileTask}}, currently running: {{fileLock}}. Please wait patiently."
   },
   "http_router": {
     "instanceNotExist": "Instance doesn't exist.",
-    "fileNameNotSpec": "File requested by user does not conform to hte specification.",
+    "fileNameNotSpec": "File requested by user does not conform to the specifications.",
     "downloadErr": "Download error: {{error}}",
-    "updateErr": "Unkonwn reason: Upload error"
+    "updateErr": "Unknown reason: Upload error"
   },
   "Instance_router": {
     "requestIO": "Session {{id}} Request to redirect I/O stream of instance {{targetInstanceUuid}}",
     "cancelIO": "Session {{id}} Request to stop redirect I/O stream of instance {{targetInstanceUuid}}",
     "openInstanceErr": "Error starting instance {{instanceUuid}} : ",
     "performTasks": "Session {{id}} asks instance {{uuid}} to execute async task:  {{taskName}}",
-    "performTasksErr": "instance {{uuid}} reported an error while executing async task {{taskName}} error: {{err}}",
+    "performTasksErr": "Instance {{uuid}} reported an error while executing async task {{taskName}} error: {{err}}",
     "taskEmpty": "No async task running",
     "accessFileErr": "Access denied due to path error or non-existent file.",
     "terminalLogNotExist": "terminal log file does not exist."
@@ -162,8 +162,8 @@
     "registerErr": "Invalid task name or empty token."
   },
   "stream_router": {
-    "unauthorizedAccess": "Insufficient perission, Illegal access.",
-    "taskNotExist": "Task not exist.",
+    "unauthorizedAccess": "Insufficient permission, Illegal access.",
+    "taskNotExist": "Task does not exist.",
     "instanceNotExist": "Instance does not exist.",
     "authSuccess": "Session {{id}} {{address}} I/O channel authenticated.",
     "establishConnection": "Established data channel between session {{id}} {{address}} and {{uuid}}",
@@ -175,12 +175,12 @@
   },
   "install": {
     "ptyNotSupportSystem": "Emulation terminal can only support Windows/Linux x86_64 architecture, fall back to general terminal.",
-    "ptySupport": "Found installed dependencies, emulation terminal is available now.",
+    "ptySupport": "Found installed dependencies, emulation terminal is now available.",
     "skipInstall": "Non-Linux environment, skipping dependencies installation.",
-    "installed": "Optional depencies installed, emulation terminal and some advanced features are now available.",
+    "installed": "Optional dependencies installed, emulation terminal and some advanced features are now available.",
     "guide": "Dependency reference: https://github.com/mcsmanager/pty",
-    "changeModeErr": "Failed to change permission of {{path}} .Please set it to chmod 755 or above manually.",
-    "installErr": "Dependencies installation failed. Emulation terminal and some advancced features are not available. The installation task will be retried on next start."
+    "changeModeErr": "Failed to change permission of {{path}} . Please set it to chmod 755 or above manually.",
+    "installErr": "Dependencies installation failed. Emulation terminal and some advanced features will not be available. The installation task will be retried on next start."
   },
   "protocol": {
     "socketErr": "Invalid response from session {{id}}({{address}})/{{event}} :\n"
@@ -190,7 +190,7 @@
   },
   "system_file": {
     "illegalAccess": "Illegal access directory.",
-    "unzipLimit": "File decompression only support file size up to {{max}}GB . You can change this limit in data/Config/global.json",
+    "unzipLimit": "File decompression only supports file sizes up to {{max}}GB . You can change this limit in data/Config/global.json",
     "execLimit": "Exceeded the maximum file edit size limit."
   },
   "system_instance_control": {
@@ -198,8 +198,8 @@
     "existRepeatTask": "A duplicate task already exists",
     "illegalName": "Illegal task name. Only underscore, digit, and letters are supported.",
     "crateTask": "Create scheduled task {{name}}:\n{{task}}",
-    "crateTaskErr": "Error on creating scheduled task: incorrect time expression: \n{{name}}: {{timeArray}}\nPlease try remove file data/TaskConfig/{{name}}.json",
-    "crateSuccess": "Successfully created schedule task: {{name}}",
+    "crateTaskErr": "Error on creating scheduled task: incorrect time expression: \n{{name}}: {{timeArray}}\nPlease try removing file data/TaskConfig/{{name}}.json",
+    "crateSuccess": "Successfully created scheduled task: {{name}}",
     "execCmdErr": "Error on executing scheduled task {{name}} for instance {{uuid}}. Error: \n {{error}}"
   },
   "system_instance": {
@@ -216,12 +216,12 @@
     "versionDetectErr": "Version check failed."
   },
   "quick_install": {
-    "unzipError": "Failed decompress file.",
+    "unzipError": "Failed to decompress file.",
     "hiperError": "Unable to start another HiPer process: HiPer is running!"
   },
   "frp": {
     "downloadErr": "Downloading the FRP application failed, and the FRP intranet mapping program cannot be started normally.",
     "installing": "Downloading and installing the FRP intranet mapping program at the same time, we will automatically start the mapping function later...",
-    "done": "The FRP intranet mapping program is installed. You can check the mapping status from the upper left corner. If it is not displayed, it may be blocked by antivirus software, file permissions are insufficient, or the FRP key is wrong."
+    "done": "The FRP intranet mapping program is installed. You can check the mapping status from the upper left corner. If it is not displayed, it may be blocked by antivirus software, file permissions may be insufficient, or the FRP key might be wrong."
   }
 }
