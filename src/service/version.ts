@@ -15,6 +15,11 @@ export function initVersionManager() {
       if (data.version) {
         GlobalVariable.set("version", data.version);
       }
+    } else if (fs.existsSync("../package.json")) {
+      const data: any = JSON.parse(fs.readFileSync("../package.json", { encoding: "utf-8" }));
+      if (data.version) {
+        GlobalVariable.set("version", data.version);
+      }
     }
   } catch (error) {
     logger.error($t("version.versionDetectErr"), error);
