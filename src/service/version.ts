@@ -9,18 +9,20 @@ const PACKAGE_JSON = "package.json";
 
 export function initVersionManager() {
   try {
-    GlobalVariable.set("version", "Unknown");
-    if (fs.existsSync(PACKAGE_JSON)) {
-      const data: any = JSON.parse(fs.readFileSync(PACKAGE_JSON, { encoding: "utf-8" }));
-      if (data.version) {
-        GlobalVariable.set("version", data.version);
-      }
-    } else if (fs.existsSync("../package.json")) {
-      const data: any = JSON.parse(fs.readFileSync("../package.json", { encoding: "utf-8" }));
-      if (data.version) {
-        GlobalVariable.set("version", data.version);
+    const packagePaths = [PACKAGE_JSON, "../package.json"];
+    let version = "Unknown";
+    
+    for (const packagePath of packagePaths) {
+      if (fs.existsSync(packagePath)) {
+        const data = JSON.parse(fs.readFileSync(packagePath, { encoding: "utf-8" }));
+        if (data.version) {
+          version = data.version;
+          break;
+        }
       }
     }
+    
+    GlobalVariable.set("version", version);
   } catch (error) {
     logger.error($t("version.versionDetectErr"), error);
   }
