@@ -1,3 +1,12 @@
 export function sanitizeCommand(command: string): string {
-  return command.replace(/\\([0-9a-fA-F]{2})|[\x00-\x1F\x7F-\x9F]|\\u([0-9a-fA-F]{4})|[|`]|\\/g, '').replace('..', '');
+  // Escape special characters that have special meaning in regular expressions
+  command = command.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
+
+  // Remove control characters and non-printable characters
+  command = command.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+
+  // Prevent path escaping
+  command = command.replace(/\.\./g, '');
+
+  return command;
 }
