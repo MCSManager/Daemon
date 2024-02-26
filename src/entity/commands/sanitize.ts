@@ -14,5 +14,21 @@ export function sanitizeCommand(command: string): string {
   // Remove Unicode escape sequences like \uHHHH
   command = command.replace(/\\u([0-9a-fA-F]{4})/g, '');
 
+  // Remove specific dangerous commands
+  const dangerousCommands = [
+    'rm -rf',
+    'rm -rf /',
+    'sh',
+    'mv /',
+    'chmod -R 777',
+    'chown -R',
+    'dd if=/dev/zero',
+    'mkfs'
+  ];
+
+  dangerousCommands.forEach(dc => {
+    command = command.replace(new RegExp(dc, 'gi'), '');
+  });
+
   return command;
 }
