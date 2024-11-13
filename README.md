@@ -1,13 +1,10 @@
 <img src="https://public-link.oss-cn-shenzhen.aliyuncs.com/mcsm_picture/logo.png" alt="MCSManager icon.png" width="500px" />
 
 
-[![Status](https://img.shields.io/badge/npm-v6.14.15-blue.svg)](https://www.npmjs.com/)
-[![Status](https://img.shields.io/badge/node-v14.17.6-blue.svg)](https://nodejs.org/en/download/)
-[![Status](https://img.shields.io/badge/License-Apache%202.0-red.svg)](https://github.com/MCSManager)
+## Deprecated
 
-[Official Website](http://mcsmanager.com/) | [Team Homepage](https://github.com/MCSManager) | [Panel Project](https://github.com/MCSManager/MCSManager) | [UI Project](https://github.com/MCSManager/UI) | [Daemon project](https://github.com/MCSManager/Daemon)
+**!!! This repository is only applicable to MCSManager 9.X version. Please refer to the latest code here: [https://github.com/MCSManager/MCSManager](https://github.com/MCSManager/MCSManager)**
 
-Please go to the main project repository: [https://github.com/MCSManager/MCSManager](https://github.com/MCSManager/MCSManager)
 
 <br />
 
