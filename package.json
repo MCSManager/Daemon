@@ -32,8 +32,8 @@
     "os-utils": "0.0.14",
     "pidusage": "^2.0.21",
     "properties": "^1.2.1",
-    "socket.io": "^4.6.1",
-    "socket.io-client": "^4.6.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "uuid": "^8.3.2",
     "yaml": "^1.10.2"
   },
